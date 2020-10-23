@@ -14,5 +14,6 @@ class UserForm(FlaskForm):
     firstname = f.StringField('firstname', validators=[DataRequired()])
     lastname = f.StringField('lastname', validators=[DataRequired()])
     password = f.PasswordField('password', validators=[DataRequired()])
+    password_repeat = f.PasswordField('repeat password', validators=[DataRequired()])
     dateofbirth = f.DateField('dateofbirth', format='%d/%m/%Y')
-    display = ['email', 'firstname', 'lastname', 'password', 'dateofbirth']
+    display = ['email', 'firstname', 'lastname', 'password','password_repeat', 'dateofbirth']
