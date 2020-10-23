@@ -107,5 +107,5 @@ venv.bak/
 .mypy_cache/
 
 # personal
-./monolith/gooutsafe.db
+monolith/gooutsafe.db
 variables.sh
