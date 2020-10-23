@@ -1,9 +1,10 @@
-from flask import Blueprint, redirect, render_template, request
-from monolith.database import db, User
+from flask import Blueprint, redirect, render_template, request, flash
 from monolith.auth import admin_required
 from monolith.forms import UserForm
+from monolith.database import  User, db
 
 users = Blueprint('users', __name__)
+
 
 @users.route('/users')
 def _users():
@@ -11,17 +12,35 @@ def _users():
     return render_template("users.html", users=users)
 
 
+@admin_required
 @users.route('/create_user', methods=['GET', 'POST'])
 def create_user():
     form = UserForm()
     if request.method == 'POST':
 
         if form.validate_on_submit():
-            new_user = User()
-            form.populate_obj(new_user)
-            new_user.set_password(form.password.data) #pw should be hashed with some salt
-            db.session.add(new_user)
-            db.session.commit()
+            password = request.form['password']
+            password_repeat = request.form['password_repeat']
+            if password != password_repeat:
+                flash('Le password non coincidono', 'warning')
+                return redirect('#')
+
+            userGet = User.query.filter_by(email=form.email.data).first()
+            if userGet is None:
+                new_user = User()
+                form.populate_obj(new_user)
+                try:
+                    new_user.set_password(form.password.data)  # pw should be hashed with some salt
+                    db.session.add(new_user)
+                    db.session.commit()
+                except:
+                    flash('Utente non inserito','error')
+                    return redirect('#')
+            else:
+                flash('Utente esistente', 'error')
+                return redirect('#')
+
+            flash('Utente registrato con successo','success')
             return redirect('/users')
 
     return render_template('create_user.html', form=form)
