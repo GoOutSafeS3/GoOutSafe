@@ -99,7 +99,7 @@ class TestRegistration(unittest.TestCase):
             200) #GB 200 like dateofbirth or 400?
         self.assertEqual(
             reply["help-block"],
-            'Not a valid date value') #GB Need a control like this
+            'Invalid email address.') #GB Need a control like this
 
 
 if __name__ == '__main__':
