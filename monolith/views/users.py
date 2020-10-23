@@ -22,7 +22,7 @@ def create_user():
             password_repeat = request.form['password_repeat']
             if password != password_repeat:
                 flash('Le password non coincidono', 'warning')
-                return make_response(create_user(),400)
+                return make_response(render_template('create_user.html', form=form),400)
 
             userGet = User.query.filter_by(email=form.email.data).first()
             if userGet is None:
@@ -34,10 +34,10 @@ def create_user():
                     db.session.commit()
                 except:
                     flash('Utente non inserito','error')
-                    return make_response(create_user(),500)
+                    return make_response(render_template('create_user.html', form=form),500)
             else:
                 flash('Utente esistente', 'error')
-                return make_response(create_user(),400)
+                return make_response(render_template('create_user.html', form=form),400)
 
             flash('Utente registrato con successo','success')
             return make_response(_users(),200)
