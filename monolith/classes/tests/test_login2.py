@@ -43,4 +43,4 @@ class TestLogin2(unittest.TestCase):
             200)
         self.assertEqual(
             reply["help-block"],
-            '')
+            'success, User registerd succesfully')
