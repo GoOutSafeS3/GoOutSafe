@@ -65,9 +65,13 @@ class FlaskClient(BaseFlaskClient):
     # Feel free to define other methods on this test client. You can even
     # use the `csrf_token` property we just defined, like we're doing here!
     def t_post(self, url, data=None, json=None, **kwargs):
+        if data is None:
+            data = dict()
         data["csrf_token"] = self.csrf_token
         return self.post(url, data=data, json=json, **kwargs)
     
     def t_get(self, url, data=None, json=None, **kwargs):
+        if data is None:
+            data = dict()
         data["csrf_token"] = self.csrf_token
-        return self.post(url, data=data, json=json, **kwargs)
+        return self.get(url, data=data, json=json, **kwargs)

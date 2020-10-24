@@ -1,6 +1,7 @@
 import unittest
 from monolith.app import create_app_testing
 from flask_test_with_csrf import FlaskClient
+from bs4 import BeautifulSoup
 
 app = create_app_testing()
 app.test_client_class = FlaskClient
@@ -19,7 +20,6 @@ class TestLogin2(unittest.TestCase):
         }
         
         reply = tested_app.t_post('/create_user', data=form)
-        self.assertEqual(True,False,msg=reply.get_data(as_text=True))
         soup = BeautifulSoup(reply.get_data(as_text=True), 'html.parser')
         helpblock = soup.find_all('p', attrs={'class': 'help-block'})
 
@@ -38,4 +38,9 @@ class TestLogin2(unittest.TestCase):
         # But now, `client` is an instance of the class we defined!
 
         reply = self.send_registration_form(tested_app,"testerGoodForm@test.me","Tester", "GF", "42","42","123456","01/01/1970")
-        self.assertEqual(True,False,msg=reply.get_data(as_text=True))
+        self.assertEqual(
+            reply["status_code"],
+            200)
+        self.assertEqual(
+            reply["help-block"],
+            '')
