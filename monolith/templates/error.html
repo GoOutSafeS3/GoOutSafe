@@ -1,14 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>GoOutSafe</title>
-</head>
-<body>
+{% extends 'layout.html' %}
+{% block content %}
     {% if error == '404' %}
         <h3> GoOutSafe - Page not found</h3>
     {% elif error == '401' %}
         <h3> GoOutSafe - Permission denied </h3>
     {% endif %}
-</body>
-</html>
+{% endblock %}
