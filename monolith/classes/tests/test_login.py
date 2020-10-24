@@ -1,7 +1,7 @@
 import unittest
-from monolith.app import create_app
+from monolith.app import create_app_testing
 from flask import url_for
-app = create_app()
+app = create_app_testing()
 
 app.config['TESTING'] = True
 app.config['WTF_CSRF_ENABLED'] = False
