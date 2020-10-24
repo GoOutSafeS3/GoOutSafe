@@ -329,7 +329,7 @@ class TestRegistration(unittest.TestCase):
         tested_app.set_app(app)
 
         form = {
-            "email":"testerGoodFormOperatorm@test.me",
+            "email":"testerGoodFormOperator@test.me",
             "firstname":"Tester",
             "lastname":"GF",
             "password":"42",
