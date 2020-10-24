@@ -1,5 +1,15 @@
 <html>
  <body>
+     {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for message in messages %}
+                {% for category, message in messages %}
+                    <p class="help-block">{{category}}, {{ message }}</p>
+                {% endfor %}
+             {% endfor %}
+         {% endif %}
+    {% endwith %}
+
   <form action="" method="POST">
     {{ form.hidden_tag() }}
     <dl>
