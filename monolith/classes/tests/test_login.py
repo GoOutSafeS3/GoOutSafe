@@ -8,29 +8,39 @@ app.config['TESTING'] = True
 
 class TestLogin(unittest.TestCase):
 
+    def do_login(self,client, email, password):
+        return client.t_post('/login',data={"email":email, "password": password})
+        
+
     def test_login_get_1(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
-        reply = tested_app.t_get('/login')
+        client = app.test_client()
+        client.set_app(app)
+        reply = client.t_get('/login')
         self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
         self.assertTrue("form" in reply.get_data(as_text=True))
 
     def test_login_post_admin(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
-        reply = tested_app.t_post('/login',data={"email":"example@example.com", "password": "admin"})
+        client = app.test_client()
+        client.set_app(app)
+        reply = self.do_login(client, "example@example.com","admin")
         self.assertEqual(reply.status_code, 302)
         with app.test_request_context():
             self.assertEqual(reply.location, url_for('home.index',_external=True))
 
     def test_login_post_wrong(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
-        reply = tested_app.t_post('/login',data={"email":"example@example.com", "password": "wrong"})
+        client = app.test_client()
+        client.set_app(app)
+        reply = self.do_login(client, "example@example.com","wrong")
+        self.assertEqual(reply.status_code, 401)
+
+    def test_login_post_wrong2(self):
+        client = app.test_client()
+        client.set_app(app)
+        reply = self.do_login(client, "example@wrong.com","admin")
         self.assertEqual(reply.status_code, 401)
 
     def test_login_post_bad(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
-        reply = tested_app.t_post('/login',data={"email":"example@example.com", "password": None})
+        client = app.test_client()
+        client.set_app(app)
+        reply = self.do_login(client, "example@example.com",None)
         self.assertEqual(reply.status_code, 400)
