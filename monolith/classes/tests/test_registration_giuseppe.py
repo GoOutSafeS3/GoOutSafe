@@ -11,18 +11,9 @@ app.test_client_class = FlaskClient
 
 class TestRegistration(unittest.TestCase):
 
-    def send_registration_form(self,tested_app, email, firstname, lastname, password, password_repeat, telephone, dateofbirth):
-        form = {
-            "email":email,
-            "firstname":firstname,
-            "lastname":lastname,
-            "password":password,
-            "dateofbirth":dateofbirth,
-            "telephone":telephone,
-            "password_repeat":password_repeat,
-        }
-        
-        reply = tested_app.t_post('/create_user', data=form)
+    def send_registration_form(self, tested_app, url, form):
+
+        reply = tested_app.t_post(url, data=form)
         soup = BeautifulSoup(reply.get_data(as_text=True), 'html.parser')
         helpblock = soup.find_all('p', attrs={'class': 'help-block'})
 
@@ -37,17 +28,117 @@ class TestRegistration(unittest.TestCase):
         tested_app = app.test_client()
         tested_app.set_app(app)
 
-        reply = self.send_registration_form(tested_app,"testerGoodForm@test.me","Tester", "GF", "42","42","123456","01/01/1970")
+        form = {
+            "email":"testerGoodForm@test.me",
+            "firstname":"Tester",
+            "lastname":"GF",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+        }
+
+        reply = self.send_registration_form(tested_app, form)
         
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
 
+    def test_regood_form(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerGoodForm@test.me",
+            "firstname":"Tester",
+            "lastname":"GF",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+        }
+        reply = self.send_registration_form(tested_app, form)
+        
+        self.assertEqual(
+            reply["status_code"],
+            400,msg=reply)
+        self.assertEqual(
+            reply["help-block"],
+            'error, Existing user')
+
+    def test_missing_field(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"email@email.com",
+            "firstname":"firstname",
+            "lastname":"lastname",
+            "password":"password",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "password_repeat":"password",
+        }
+
+        fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat"]
+
+        for f in fields:
+            tested_form = form
+            del tested_form[f]
+
+            reply = self.send_registration_form(tested_app, form)
+            
+            self.assertEqual(
+                reply["status_code"],
+                200,msg=reply)
+            self.assertEqual(
+                reply["help-block"],
+                'This field is required.')
+
+    def test_empty_field(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"email@email.com",
+            "firstname":"firstname",
+            "lastname":"lastname",
+            "password":"password",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "password_repeat":"password",
+        }
+
+        fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat"]
+
+        for f in fields:
+            tested_form = form
+            tested_form[f] = ""
+
+            reply = self.send_registration_form(tested_app, form)
+            
+            self.assertEqual(
+                reply["status_code"],
+                200,msg=reply)
+            self.assertEqual(
+                reply["help-block"],
+                'This field is required.')
+
     def test_existing_email(self):
         tested_app = app.test_client()
         tested_app.set_app(app)
 
-        reply = self.send_registration_form(tested_app,"example@example.com","Tester", "EE", "42","42","123456","01/01/1970")
+        form = {
+            "email":"example@example.com",
+            "firstname":"Tester",
+            "lastname":"EE",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+        }
+
+        reply = self.send_registration_form(tested_app, form)
 
         self.assertEqual(
             reply["status_code"],
@@ -60,7 +151,17 @@ class TestRegistration(unittest.TestCase):
         tested_app = app.test_client()
         tested_app.set_app(app)
 
-        reply = self.send_registration_form(tested_app,"testerExistingNameSurname@tester.com","Tester", "GF", "42","42","123456","01/01/1970")
+        form = {
+            "email":"testerExistingNameSurname@tester.com",
+            "firstname":"Tester",
+            "lastname":"GF",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+        }
+
+        reply = self.send_registration_form(tested_app, form)
         
         self.assertEqual(
             reply["status_code"],
@@ -73,11 +174,21 @@ class TestRegistration(unittest.TestCase):
         tested_app = app.test_client()
         tested_app.set_app(app)
 
-        reply = self.send_registration_form(tested_app,"testerWrongDateOfBirth@test.me","Tester", "DoB", "42","42","123456","thisisadateofbirth")
+        form = {
+            "email":"testerWrongDateOfBirth@test.me",
+            "firstname":"Tester",
+            "lastname":"DoB",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"thisisadateofbirth",
+            "telephone":"1234567890",
+        }
+
+        reply = self.send_registration_form(tested_app, form)
         
         self.assertEqual(
             reply["status_code"],
-            200,msg=reply) #GB to change in 400?
+            200,msg=reply)
         self.assertEqual(
             reply["help-block"],
             'Not a valid date value')
@@ -86,11 +197,21 @@ class TestRegistration(unittest.TestCase):
         tested_app = app.test_client()
         tested_app.set_app(app)
 
-        reply = self.send_registration_form(tested_app,"testerWrongRepeatedPassword@test.me","Tester", "WRP", "42","43","123456","01/01/1970")
+        form = {
+            "email":"testerWrongRepeatedPassword@test.me",
+            "firstname":"Tester",
+            "lastname":"WRP",
+            "password":"42",
+            "password_repeat":"43",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+        }
+
+        reply = self.send_registration_form(tested_app, form)
         
         self.assertEqual(
             reply["status_code"],
-            200,msg=reply) #GB to change in 400?
+            200,msg=reply)
         self.assertEqual(
             reply["help-block"],
             'warning, Passwords do not match')
@@ -99,14 +220,24 @@ class TestRegistration(unittest.TestCase):
         tested_app = app.test_client()
         tested_app.set_app(app)
 
-        reply = self.send_registration_form(tested_app,"testerWorngEmail.test.me","tester", "WE", "42","42","123456","123456""01/01/1970")
+        form = {
+            "email":"testerWorngEmail.test.me",
+            "firstname":"Tester",
+            "lastname":"WE",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+        }
+
+        reply = self.send_registration_form(tested_app, form)
         
         self.assertEqual(
             reply["status_code"],
-            200,msg=reply) #GB 200 like dateofbirth or 400?
+            200,msg=reply)
         self.assertEqual(
             reply["help-block"],
-            'Invalid email address.') #GB Need a control like this
+            'Invalid email address.')
 
 
 if __name__ == '__main__':
