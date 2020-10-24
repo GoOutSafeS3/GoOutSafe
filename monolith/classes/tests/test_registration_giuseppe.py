@@ -24,6 +24,7 @@ class TestRegistration(unittest.TestCase):
 
         return {"status_code":reply.status_code, "help-block":helpblock}
 
+
     # --- CREATE_USER -------------------------------------------------------
 
     def test_user_good_form(self):
@@ -129,6 +130,35 @@ class TestRegistration(unittest.TestCase):
             self.assertEqual(
                 reply["help-block"],
                 'This field is required.')
+
+    def test_user_empty_field(self):
+            tested_app = app.test_client()
+            tested_app.set_app(app)
+
+            form = {
+                "email":"email@email.com",
+                "firstname":"firstname",
+                "lastname":"lastname",
+                "password":"password",
+                "dateofbirth":"01/01/1970",
+                "telephone":"1234567890",
+                "password_repeat":"password",
+            }
+
+            fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat"]
+
+            for f in fields:
+                tested_form = form
+                tested_form[f] = None
+
+                reply = self.send_registration_form(tested_app, '/create_user', form)
+                
+                self.assertEqual(
+                    reply["status_code"],
+                    200,msg=reply)
+                self.assertEqual(
+                    reply["help-block"],
+                    'This field is required.')
 
     def test_user_existing_email(self):
         tested_app = app.test_client()
@@ -417,6 +447,39 @@ class TestRegistration(unittest.TestCase):
                 reply["help-block"],
                 'This field is required.')
 
+    def test_operator_none_field(self):
+            tested_app = app.test_client()
+            tested_app.set_app(app)
+
+            form = {
+                "email":"email@email.com",
+                "firstname":"firstname",
+                "lastname":"lastname",
+                "password":"password",
+                "dateofbirth":"01/01/1970",
+                "telephone":"1234567890",
+                "password_repeat":"password",
+                "restaurant_name":"The Restaurant at the End of the Universe",
+                "restaurant_phone":"1234567890",
+                "restaurant_latitude":"43.431489",
+                "restaurant_longitude":"10.242911",
+            }
+
+            fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat","restaurant_name","restaurant_phone","restaurant_latitude","restaurant_longitude"]
+
+            for f in fields:
+                tested_form = form
+                tested_form[f] = None
+
+                reply = self.send_registration_form(tested_app, '/create_operator', form)
+                
+                self.assertEqual(
+                    reply["status_code"],
+                    200,msg=reply)
+                self.assertEqual(
+                    reply["help-block"],
+                    'This field is required.')
+
     def test_operator_existing_email(self):
         tested_app = app.test_client()
         tested_app.set_app(app)
@@ -660,6 +723,55 @@ class TestRegistration(unittest.TestCase):
             reply["help-block"],
             'Not a valid float value') 
 
+ # --- USERS LIST --------------------------------------------------------
+    
+    def test_get_users_as_anonymous(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        reply = tested_app.get('/users')
+        
+        self.assertEqual(
+            reply.status_code,
+            401,msg=reply)
+
+    def test_get_users_as_user(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        tested_app.t_post('/login',data={"email":"testerGoodForm@test.me", "password": "42"})
+
+        reply = tested_app.get('/users')
+        
+        self.assertEqual(
+            reply.status_code,
+            401,msg=reply)
+
+    def test_get_users_as_operator(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        tested_app.t_post('/login',data={"email":"testerGoodFormOperator@test.me", "password": "42"})
+
+        reply = tested_app.get('/users')
+        
+        self.assertEqual(
+            reply.status_code,
+            401,msg=reply)
+
+    def test_get_users_as_admin(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        tested_app.t_post('/login',data={"email":"example@example.com", "password": "admin"})
+
+        reply = tested_app.get('/users')
+        html = reply.get_data(as_text=True)
+        self.assertEqual(
+            reply.status_code,
+            200,msg=html)
+        self.assertIn("Admin Admin",html,msg=html)
+        self.assertIn("Tester GF",html,msg=html)
 
 
 if __name__ == '__main__':
