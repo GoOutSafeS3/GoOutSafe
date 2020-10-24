@@ -18,7 +18,7 @@ def log(name, text):
 
 class TestRegistration(unittest.TestCase):
 
-    def send_registration_form(self, email, firstname, lastname, password, password_repeat, dateofbirth):
+    def send_registration_form(self, email, firstname, lastname, password, password_repeat, telephone, dateofbirth):
         tested_app = app.test_client()
         form = {
             "email":email,
@@ -26,6 +26,7 @@ class TestRegistration(unittest.TestCase):
             "lastname":lastname,
             "password":password,
             "dateofbirth":dateofbirth,
+            "telephone":telephone,
             "password_repeat":password_repeat,
         }
         reply = tested_app.post('/create_user', data=form)
@@ -41,7 +42,7 @@ class TestRegistration(unittest.TestCase):
         return {"status_code":reply.status_code, "help-block":helpblock}
 
     def test_good_form(self): #GB need to clear the db each time or maybe we can insert an uuid
-        reply = self.send_registration_form("testerGoodForm@test.me","Tester", "GF", "42","42","01/01/1970")
+        reply = self.send_registration_form("testerGoodForm@test.me","Tester", "GF", "42","42","123456","01/01/1970")
         log(inspect.stack()[0][3],reply)
         
         self.assertEqual(
@@ -52,27 +53,27 @@ class TestRegistration(unittest.TestCase):
             '')
 
     def test_existing_email(self):
-        reply = self.send_registration_form("example@example.com","Tester", "EE", "42","42","01/01/1970")
+        reply = self.send_registration_form("example@example.com","Tester", "EE", "42","42","123456","01/01/1970")
         log(inspect.stack()[0][3],reply)
         self.assertEqual(
             reply["status_code"],
             400)
         self.assertEqual(
             reply["help-block"],
-            'error, Utente esistente')
+            'error, Existing user')
 
-    def test_name_surname_user(self):#GB Is really an error?
-        reply = self.send_registration_form("example@example.com","Tester", "GF", "42","42","01/01/1970")
+    def test_existing_name_surname_user(self):
+        reply = self.send_registration_form("testerExistingNameSurname@tester.com","Tester", "GF", "42","42","123456","01/01/1970")
         log(inspect.stack()[0][3],reply)
         self.assertEqual(
             reply["status_code"],
-            400) 
+            200) 
         self.assertEqual(
             reply["help-block"],
-            'error, Utente esistente') 
+            '') 
 
     def test_wrong_dateofbirth(self):
-        reply = self.send_registration_form("testerWrongDateOfBirth@test.me","Tester", "DoB", "42","42","thisisadateofbirth")
+        reply = self.send_registration_form("testerWrongDateOfBirth@test.me","Tester", "DoB", "42","42","123456","thisisadateofbirth")
         log(inspect.stack()[0][3],reply)
         self.assertEqual(
             reply["status_code"],
@@ -82,17 +83,17 @@ class TestRegistration(unittest.TestCase):
             'Not a valid date value')
 
     def test_wrong_repeated_password(self):
-        reply = self.send_registration_form("testerWrongRepeatedPassword@test.me","Tester", "WRP", "42","43","01/01/1970")
+        reply = self.send_registration_form("testerWrongRepeatedPassword@test.me","Tester", "WRP", "42","43","123456","01/01/1970")
         log(inspect.stack()[0][3],reply)
         self.assertEqual(
             reply["status_code"],
-            400)
+            200) #GB to change in 400?
         self.assertEqual(
             reply["help-block"],
-            'warning, Le password non coincidono')
+            'warning, Passwords do not match')
 
     def test_wrong_email(self):
-        reply = self.send_registration_form("testerWorngEmail.test.me","tester", "WE", "42","42","01/01/1970")
+        reply = self.send_registration_form("testerWorngEmail.test.me","tester", "WE", "42","42","123456","123456""01/01/1970")
         log(inspect.stack()[0][3],reply)
         self.assertEqual(
             reply["status_code"],
