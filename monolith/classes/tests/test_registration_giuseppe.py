@@ -24,7 +24,9 @@ class TestRegistration(unittest.TestCase):
 
         return {"status_code":reply.status_code, "help-block":helpblock}
 
-    def test_good_form(self):
+    # --- CREATE_USER -------------------------------------------------------
+
+    def test_user_good_form(self):
         tested_app = app.test_client()
         tested_app.set_app(app)
 
@@ -44,7 +46,7 @@ class TestRegistration(unittest.TestCase):
             reply["status_code"],
             200,msg=reply)
 
-    def test_regood_form(self):
+    def test_user_regood_form(self):
         tested_app = app.test_client()
         tested_app.set_app(app)
 
@@ -67,7 +69,7 @@ class TestRegistration(unittest.TestCase):
             reply["help-block"],
             'error, Existing user')
 
-    def test_missing_field(self):
+    def test_user_missing_field(self):
         tested_app = app.test_client()
         tested_app.set_app(app)
 
@@ -96,7 +98,7 @@ class TestRegistration(unittest.TestCase):
                 reply["help-block"],
                 'This field is required.')
 
-    def test_empty_field(self):
+    def test_user_empty_field(self):
         tested_app = app.test_client()
         tested_app.set_app(app)
 
@@ -125,7 +127,7 @@ class TestRegistration(unittest.TestCase):
                 reply["help-block"],
                 'This field is required.')
 
-    def test_existing_email(self):
+    def test_user_existing_email(self):
         tested_app = app.test_client()
         tested_app.set_app(app)
 
@@ -148,7 +150,7 @@ class TestRegistration(unittest.TestCase):
             reply["help-block"],
             'error, Existing user')
 
-    def test_existing_name_surname_user(self):
+    def test_user_existing_name_surname(self):
         tested_app = app.test_client()
         tested_app.set_app(app)
 
@@ -171,7 +173,7 @@ class TestRegistration(unittest.TestCase):
             reply["help-block"],
             '') 
 
-    def test_wrong_dateofbirth(self):
+    def test_user_wrong_dateofbirth(self):
         tested_app = app.test_client()
         tested_app.set_app(app)
 
@@ -194,7 +196,7 @@ class TestRegistration(unittest.TestCase):
             reply["help-block"],
             'Not a valid date value')
 
-    def test_wrong_repeated_password(self):
+    def test_user_wrong_repeated_password(self):
         tested_app = app.test_client()
         tested_app.set_app(app)
 
@@ -217,7 +219,7 @@ class TestRegistration(unittest.TestCase):
             reply["help-block"],
             'warning, Passwords do not match')
 
-    def test_wrong_email(self):
+    def test_user_wrong_email(self):
         tested_app = app.test_client()
         tested_app.set_app(app)
 
@@ -231,7 +233,261 @@ class TestRegistration(unittest.TestCase):
             "telephone":"1234567890",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_user', form)
+        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        
+        self.assertEqual(
+            reply["status_code"],
+            200,msg=reply)
+        self.assertEqual(
+            reply["help-block"],
+            'Invalid email address.')
+
+    # --- CREATE_OPERATOR -------------------------------------------------------
+
+    def test_operator_good_form(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerGoodFormOperator@test.me",
+            "firstname":"Tester",
+            "lastname":"GF",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        
+        self.assertEqual(
+            reply["status_code"],
+            200,msg=reply)
+
+    def test_operator_regood_form(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerGoodFormOperatorm@test.me",
+            "firstname":"Tester",
+            "lastname":"GF",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        
+        self.assertEqual(
+            reply["status_code"],
+            400,msg=reply)
+        self.assertEqual(
+            reply["help-block"],
+            'error, Existing operator')
+
+    def test_operator_missing_field(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"email@email.com",
+            "firstname":"firstname",
+            "lastname":"lastname",
+            "password":"password",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "password_repeat":"password",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat"]
+
+        for f in fields:
+            tested_form = form
+            del tested_form[f]
+
+            reply = self.send_registration_form(tested_app, '/create_operator', form)
+            
+            self.assertEqual(
+                reply["status_code"],
+                200,msg=reply)
+            self.assertEqual(
+                reply["help-block"],
+                'This field is required.')
+
+    def test_operator_empty_field(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"email@email.com",
+            "firstname":"firstname",
+            "lastname":"lastname",
+            "password":"password",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "password_repeat":"password",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat"]
+
+        for f in fields:
+            tested_form = form
+            tested_form[f] = ""
+
+            reply = self.send_registration_form(tested_app, '/create_operator', form)
+            
+            self.assertEqual(
+                reply["status_code"],
+                200,msg=reply)
+            self.assertEqual(
+                reply["help-block"],
+                'This field is required.')
+
+    def test_operator_existing_email(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"example@example.com",
+            "firstname":"Tester",
+            "lastname":"EE",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_operator', form)
+
+        self.assertEqual(
+            reply["status_code"],
+            400,msg=reply)
+        self.assertEqual(
+            reply["help-block"],
+            'error, Existing operator')
+
+    def test_operator_existing_name_surname(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerExistingNameSurnameOperator@tester.com",
+            "firstname":"Tester",
+            "lastname":"GF",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        
+        self.assertEqual(
+            reply["status_code"],
+            200,msg=reply) 
+        self.assertEqual(
+            reply["help-block"],
+            '') 
+
+    def test_operator_wrong_dateofbirth(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerWrongDateOfBirth@test.me",
+            "firstname":"Tester",
+            "lastname":"DoB",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"thisisadateofbirth",
+            "telephone":"1234567890",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        
+        self.assertEqual(
+            reply["status_code"],
+            200,msg=reply)
+        self.assertEqual(
+            reply["help-block"],
+            'Not a valid date value')
+
+    def test_operator_wrong_repeated_password(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerWrongRepeatedPassword@test.me",
+            "firstname":"Tester",
+            "lastname":"WRP",
+            "password":"42",
+            "password_repeat":"43",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        
+        self.assertEqual(
+            reply["status_code"],
+            200,msg=reply)
+        self.assertEqual(
+            reply["help-block"],
+            'warning, Passwords do not match')
+
+    def test_operator_wrong_email(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerWorngEmail.test.me",
+            "firstname":"Tester",
+            "lastname":"WE",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_operator', form)
         
         self.assertEqual(
             reply["status_code"],
