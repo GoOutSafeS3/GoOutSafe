@@ -62,7 +62,7 @@ def create_operator():
                 return make_response(render_template('create_operator.html', form=form),200)
 
             userGet = User.query.filter_by(email=form.email.data).first()
-            userRestaurant = Restaurant.query.filter_by(rest_name=form.restaurant_name.data).first()
+            userRestaurant = Restaurant.query.filter_by(name=form.restaurant_name.data).first()
             if userRestaurant is None:
                 new_rest = Restaurant()
                 new_rest.name = form.restaurant_name.data
