@@ -5,6 +5,7 @@ from monolith.views import blueprints
 from monolith.auth import login_manager
 import datetime
 
+
 def create_app_testing():
     try:
         os.remove("monolith/gooutsafe_test.db")
@@ -21,7 +22,6 @@ def create_app_testing():
     for bp in blueprints:
         app.register_blueprint(bp)
         bp.app = app
-
     db.init_app(app)
     login_manager.init_app(app)
     db.create_all(app=app)
@@ -54,6 +54,7 @@ def create_app_testing():
             db.session.commit()
 
     return app
+
 
 def create_app_production():
     app = Flask(__name__)

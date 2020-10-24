@@ -14,3 +14,23 @@ def index():
     else:
         restaurants = None
     return render_template("index.html", restaurants=restaurants)
+
+
+@home.app_errorhandler(404)
+def not_found_page(error):
+    """
+    404 Page error
+    :return: template *error.html*
+    :rtype: template
+    """
+    return render_template('error.html', error='404')
+
+
+@home.app_errorhandler(401)
+def permission_denied_page(error):
+    """
+    401 Page error
+    :return: template *error.html*
+    :rtype: template
+    """
+    return render_template('error.html', error='401')

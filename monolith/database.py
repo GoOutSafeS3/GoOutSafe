@@ -15,6 +15,7 @@ class User(db.Model):
     lastname = db.Column(db.Unicode(128))
     password = db.Column(db.Unicode(128))
     dateofbirth = db.Column(db.DateTime)
+    rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
     is_active = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)
     is_anonymous = False
@@ -30,6 +31,13 @@ class User(db.Model):
     def is_authenticated(self):
         return self._authenticated
 
+    @property
+    def is_operator(self):
+        if self.rest_id is None:
+            return False
+        else:
+            return True
+
     def authenticate(self, password):
         checked = check_password_hash(self.password, password)
         self._authenticated = checked
@@ -42,8 +50,8 @@ class User(db.Model):
 class Restaurant(db.Model):
     __tablename__ = 'restaurant'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-
-    name = db.Column(db.Text(100)) 
+    #r = db.relationship('User', backref='Restaurant')
+    name = db.Column(db.Text(100))
     
     likes = db.Column(db.Integer) # will store the number of likes, periodically updated in background
 

@@ -110,3 +110,5 @@ venv.bak/
 monolith/gooutsafe.db
 *.db
 variables.sh
+
+.idea

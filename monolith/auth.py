@@ -16,6 +16,24 @@ def admin_required(func):
     return _admin_required
 
 
+def operator_required():
+    user = load_user(current_user)
+    if user.is_operator:
+        return True
+    else:
+        return login_manager.unauthorized()
+
+
+def is_admin():
+    if current_user.is_anonymous is True:
+        return login_manager.unauthorized()
+    user = load_user(current_user)
+    if user.is_admin:
+        return True
+    else:
+        return login_manager.unauthorized()
+
+
 @login_manager.user_loader
 def load_user(user_id):
     user = User.query.get(user_id)
