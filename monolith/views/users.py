@@ -78,10 +78,12 @@ def create_operator():
                     new_user.dateofbirth = form.dateofbirth.data
                     try:
                         # pw should be hashed with some salt
-                        db.session.add(new_user)
-                        db.session.commit()
                         db.session.add(new_rest)
                         db.session.commit()
+                        new_user.rest_id = new_rest.id
+                        db.session.add(new_user)
+                        db.session.commit()
+
                     except: # Remove if coverage < 90%
                         flash('New operator and Restaurant not inserted','error')
                         return make_response(render_template('create_operator.html', form=form),500)

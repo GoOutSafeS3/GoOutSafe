@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, make_response
 
 from monolith.database import db, Restaurant, Like
 from monolith.auth import current_user
@@ -23,7 +23,7 @@ def not_found_page(error):
     :return: template *error.html*
     :rtype: template
     """
-    return render_template('error.html', error='404')
+    return make_response(render_template('error.html', error='404'),404)
 
 
 @home.app_errorhandler(401)
@@ -33,4 +33,4 @@ def permission_denied_page(error):
     :return: template *error.html*
     :rtype: template
     """
-    return render_template('error.html', error='401')
+    return make_response(render_template('error.html', error='401'),401)

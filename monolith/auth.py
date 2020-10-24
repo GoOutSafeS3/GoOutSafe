@@ -27,8 +27,7 @@ def operator_required():
 def is_admin():
     if current_user.is_anonymous is True:
         return login_manager.unauthorized()
-    user = load_user(current_user)
-    if user.is_admin:
+    if current_user.is_admin:
         return True
     else:
         return login_manager.unauthorized()
