@@ -6,11 +6,12 @@ from monolith.auth import login_manager
 import datetime
 
 def create_app_testing():
-    app = Flask(__name__)
     try:
-        os.remove("gooutsafe_test.db")
+        os.remove("monolith/gooutsafe_test.db")
     except:
         pass
+
+    app = Flask(__name__)
 
     app.config['WTF_CSRF_SECRET_KEY'] = 'A SECRET KEY'
     app.config['SECRET_KEY'] = 'ANOTHER ONE'

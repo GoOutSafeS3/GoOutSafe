@@ -41,7 +41,7 @@ class TestRegistration(unittest.TestCase):
 
         return {"status_code":reply.status_code, "help-block":helpblock}
 
-    def test_good_form(self): #GB need to clear the db each time or maybe we can insert an uuid
+    def test_good_form(self):
         reply = self.send_registration_form("testerGoodForm@test.me","Tester", "GF", "42","42","123456","01/01/1970")
         log(inspect.stack()[0][3],reply)
         
