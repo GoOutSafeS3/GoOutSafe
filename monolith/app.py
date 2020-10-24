@@ -9,6 +9,7 @@ import datetime
 def create_app_testing():
     try:
         os.remove("monolith/gooutsafe_test.db")
+        os.remove("test.txt")
     except:
         pass
 

@@ -2,35 +2,18 @@ import unittest
 import json
 from flask import request, jsonify
 from monolith.app import create_app_testing
+from flask_test_with_csrf import FlaskClient
 from bs4 import BeautifulSoup
 import inspect
 
 app = create_app_testing()
-app.config['TESTING'] = True
-app.config['WTF_CSRF_ENABLED'] = False #GB Why?
-
-def log(name, text):
-    with open("test.txt", "a") as f:
-            f.write("-------------------------------------\n")
-            f.write(str(name)+"\n")
-            f.write("-------------------------------------\n")
-            f.write(str(text)+"\n\n")
+app.test_client_class = FlaskClient
 
 class TestRegistration(unittest.TestCase):
 
-    def send_registration_form(self, email, firstname, lastname, password, password_repeat, telephone, dateofbirth):
-        tested_app = app.test_client()
-        form = {
-            "email":email,
-            "firstname":firstname,
-            "lastname":lastname,
-            "password":password,
-            "dateofbirth":dateofbirth,
-            "telephone":telephone,
-            "password_repeat":password_repeat,
-        }
-        reply = tested_app.post('/create_user', data=form)
+    def send_registration_form(self, tested_app, url, form):
 
+        reply = tested_app.t_post(url, data=form)
         soup = BeautifulSoup(reply.get_data(as_text=True), 'html.parser')
         helpblock = soup.find_all('p', attrs={'class': 'help-block'})
 
@@ -41,66 +24,477 @@ class TestRegistration(unittest.TestCase):
 
         return {"status_code":reply.status_code, "help-block":helpblock}
 
-    def test_good_form(self):
-        reply = self.send_registration_form("testerGoodForm@test.me","Tester", "GF", "42","42","123456","01/01/1970")
-        log(inspect.stack()[0][3],reply)
+    # --- CREATE_USER -------------------------------------------------------
+
+    def test_user_good_form(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerGoodForm@test.me",
+            "firstname":"Tester",
+            "lastname":"GF",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_user', form)
         
         self.assertEqual(
             reply["status_code"],
-            200)
-        self.assertEqual(
-            reply["help-block"],
-            '')
+            200,msg=reply)
 
-    def test_existing_email(self):
-        reply = self.send_registration_form("example@example.com","Tester", "EE", "42","42","123456","01/01/1970")
-        log(inspect.stack()[0][3],reply)
+    def test_user_regood_form(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerGoodForm@test.me",
+            "firstname":"Tester",
+            "lastname":"GF",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_user', form)
+        
         self.assertEqual(
             reply["status_code"],
-            400)
+            400,msg=reply)
         self.assertEqual(
             reply["help-block"],
             'error, Existing user')
 
-    def test_existing_name_surname_user(self):
-        reply = self.send_registration_form("testerExistingNameSurname@tester.com","Tester", "GF", "42","42","123456","01/01/1970")
-        log(inspect.stack()[0][3],reply)
+    def test_user_missing_field(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"email@email.com",
+            "firstname":"firstname",
+            "lastname":"lastname",
+            "password":"password",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "password_repeat":"password",
+        }
+
+        fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat"]
+
+        for f in fields:
+            tested_form = form
+            del tested_form[f]
+
+            reply = self.send_registration_form(tested_app, '/create_user', form)
+            
+            self.assertEqual(
+                reply["status_code"],
+                200,msg=reply)
+            self.assertEqual(
+                reply["help-block"],
+                'This field is required.')
+
+    def test_user_empty_field(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"email@email.com",
+            "firstname":"firstname",
+            "lastname":"lastname",
+            "password":"password",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "password_repeat":"password",
+        }
+
+        fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat"]
+
+        for f in fields:
+            tested_form = form
+            tested_form[f] = ""
+
+            reply = self.send_registration_form(tested_app, '/create_user', form)
+            
+            self.assertEqual(
+                reply["status_code"],
+                200,msg=reply)
+            self.assertEqual(
+                reply["help-block"],
+                'This field is required.')
+
+    def test_user_existing_email(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"example@example.com",
+            "firstname":"Tester",
+            "lastname":"EE",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_user', form)
+
         self.assertEqual(
             reply["status_code"],
-            200) 
+            400,msg=reply)
+        self.assertEqual(
+            reply["help-block"],
+            'error, Existing user')
+
+    def test_user_existing_name_surname(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerExistingNameSurname@tester.com",
+            "firstname":"Tester",
+            "lastname":"GF",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_user', form)
+        
+        self.assertEqual(
+            reply["status_code"],
+            200,msg=reply) 
         self.assertEqual(
             reply["help-block"],
             '') 
 
-    def test_wrong_dateofbirth(self):
-        reply = self.send_registration_form("testerWrongDateOfBirth@test.me","Tester", "DoB", "42","42","123456","thisisadateofbirth")
-        log(inspect.stack()[0][3],reply)
+    def test_user_wrong_dateofbirth(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerWrongDateOfBirth@test.me",
+            "firstname":"Tester",
+            "lastname":"DoB",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"thisisadateofbirth",
+            "telephone":"1234567890",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_user', form)
+        
         self.assertEqual(
             reply["status_code"],
-            200) #GB to change in 400?
+            200,msg=reply)
         self.assertEqual(
             reply["help-block"],
             'Not a valid date value')
 
-    def test_wrong_repeated_password(self):
-        reply = self.send_registration_form("testerWrongRepeatedPassword@test.me","Tester", "WRP", "42","43","123456","01/01/1970")
-        log(inspect.stack()[0][3],reply)
+    def test_user_wrong_repeated_password(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerWrongRepeatedPassword@test.me",
+            "firstname":"Tester",
+            "lastname":"WRP",
+            "password":"42",
+            "password_repeat":"43",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_user', form)
+        
         self.assertEqual(
             reply["status_code"],
-            200) #GB to change in 400?
+            200,msg=reply)
         self.assertEqual(
             reply["help-block"],
             'warning, Passwords do not match')
 
-    def test_wrong_email(self):
-        reply = self.send_registration_form("testerWorngEmail.test.me","tester", "WE", "42","42","123456","123456""01/01/1970")
-        log(inspect.stack()[0][3],reply)
+    def test_user_wrong_email(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerWorngEmail.test.me",
+            "firstname":"Tester",
+            "lastname":"WE",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        
         self.assertEqual(
             reply["status_code"],
-            200) #GB 200 like dateofbirth or 400?
+            200,msg=reply)
         self.assertEqual(
             reply["help-block"],
-            'Invalid email address.') #GB Need a control like this
+            'Invalid email address.')
+
+    # --- CREATE_OPERATOR -------------------------------------------------------
+
+    def test_operator_good_form(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerGoodFormOperator@test.me",
+            "firstname":"Tester",
+            "lastname":"GF",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        
+        self.assertEqual(
+            reply["status_code"],
+            200,msg=reply)
+
+    def test_operator_regood_form(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerGoodFormOperatorm@test.me",
+            "firstname":"Tester",
+            "lastname":"GF",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        
+        self.assertEqual(
+            reply["status_code"],
+            400,msg=reply)
+        self.assertEqual(
+            reply["help-block"],
+            'error, Existing operator')
+
+    def test_operator_missing_field(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"email@email.com",
+            "firstname":"firstname",
+            "lastname":"lastname",
+            "password":"password",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "password_repeat":"password",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat"]
+
+        for f in fields:
+            tested_form = form
+            del tested_form[f]
+
+            reply = self.send_registration_form(tested_app, '/create_operator', form)
+            
+            self.assertEqual(
+                reply["status_code"],
+                200,msg=reply)
+            self.assertEqual(
+                reply["help-block"],
+                'This field is required.')
+
+    def test_operator_empty_field(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"email@email.com",
+            "firstname":"firstname",
+            "lastname":"lastname",
+            "password":"password",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "password_repeat":"password",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat"]
+
+        for f in fields:
+            tested_form = form
+            tested_form[f] = ""
+
+            reply = self.send_registration_form(tested_app, '/create_operator', form)
+            
+            self.assertEqual(
+                reply["status_code"],
+                200,msg=reply)
+            self.assertEqual(
+                reply["help-block"],
+                'This field is required.')
+
+    def test_operator_existing_email(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"example@example.com",
+            "firstname":"Tester",
+            "lastname":"EE",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_operator', form)
+
+        self.assertEqual(
+            reply["status_code"],
+            400,msg=reply)
+        self.assertEqual(
+            reply["help-block"],
+            'error, Existing operator')
+
+    def test_operator_existing_name_surname(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerExistingNameSurnameOperator@tester.com",
+            "firstname":"Tester",
+            "lastname":"GF",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        
+        self.assertEqual(
+            reply["status_code"],
+            200,msg=reply) 
+        self.assertEqual(
+            reply["help-block"],
+            '') 
+
+    def test_operator_wrong_dateofbirth(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerWrongDateOfBirth@test.me",
+            "firstname":"Tester",
+            "lastname":"DoB",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"thisisadateofbirth",
+            "telephone":"1234567890",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        
+        self.assertEqual(
+            reply["status_code"],
+            200,msg=reply)
+        self.assertEqual(
+            reply["help-block"],
+            'Not a valid date value')
+
+    def test_operator_wrong_repeated_password(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerWrongRepeatedPassword@test.me",
+            "firstname":"Tester",
+            "lastname":"WRP",
+            "password":"42",
+            "password_repeat":"43",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        
+        self.assertEqual(
+            reply["status_code"],
+            200,msg=reply)
+        self.assertEqual(
+            reply["help-block"],
+            'warning, Passwords do not match')
+
+    def test_operator_wrong_email(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        form = {
+            "email":"testerWorngEmail.test.me",
+            "firstname":"Tester",
+            "lastname":"WE",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "restaurant_name":"The Restaurant at the End of the Universe",
+            "restaurant_phone":"1234567890",
+            "restaurant_latitude":"43.431489",
+            "restaurant_longitude":"10.242911",
+        }
+
+        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        
+        self.assertEqual(
+            reply["status_code"],
+            200,msg=reply)
+        self.assertEqual(
+            reply["help-block"],
+            'Invalid email address.')
 
 
 if __name__ == '__main__':
