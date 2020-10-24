@@ -6,7 +6,11 @@ test_existing_email
 -------------------------------------
 test_good_form
 -------------------------------------
+<<<<<<< HEAD
 {'status_code': 400, 'help-block': 'error, Utente esistente'}
+=======
+{'status_code': 200, 'help-block': ''}
+>>>>>>> 6e91823e99700bae7aeaa9169395a23bf43c8088
 
 -------------------------------------
 test_name_surname_user
@@ -34,6 +38,44 @@ test_existing_email
 {'status_code': 400, 'help-block': 'error, Utente esistente'}
 
 -------------------------------------
+<<<<<<< HEAD
+test_existing_name_surname_user
+-------------------------------------
+{'status_code': 200, 'help-block': ''}
+
+-------------------------------------
+=======
+>>>>>>> 6e91823e99700bae7aeaa9169395a23bf43c8088
+test_good_form
+-------------------------------------
+{'status_code': 400, 'help-block': 'error, Utente esistente'}
+
+-------------------------------------
+<<<<<<< HEAD
+test_wrong_dateofbirth
+-------------------------------------
+{'status_code': 200, 'help-block': 'Not a valid date value'}
+
+-------------------------------------
+test_wrong_email
+-------------------------------------
+{'status_code': 200, 'help-block': 'Invalid email address.'}
+
+-------------------------------------
+test_wrong_repeated_password
+-------------------------------------
+{'status_code': 400, 'help-block': 'warning, Le password non coincidono'}
+
+-------------------------------------
+test_existing_email
+=======
+test_name_surname_user
+>>>>>>> 6e91823e99700bae7aeaa9169395a23bf43c8088
+-------------------------------------
+{'status_code': 400, 'help-block': 'error, Utente esistente'}
+
+-------------------------------------
+<<<<<<< HEAD
 test_existing_name_surname_user
 -------------------------------------
 {'status_code': 200, 'help-block': ''}
@@ -41,9 +83,11 @@ test_existing_name_surname_user
 -------------------------------------
 test_good_form
 -------------------------------------
-{'status_code': 400, 'help-block': 'error, Utente esistente'}
+{'status_code': 200, 'help-block': ''}
 
 -------------------------------------
+=======
+>>>>>>> 6e91823e99700bae7aeaa9169395a23bf43c8088
 test_wrong_dateofbirth
 -------------------------------------
 {'status_code': 200, 'help-block': 'Not a valid date value'}
@@ -64,36 +108,7 @@ test_existing_email
 {'status_code': 400, 'help-block': 'error, Utente esistente'}
 
 -------------------------------------
-test_existing_name_surname_user
--------------------------------------
-{'status_code': 200, 'help-block': ''}
-
--------------------------------------
-test_good_form
--------------------------------------
-{'status_code': 200, 'help-block': ''}
-
--------------------------------------
-test_wrong_dateofbirth
--------------------------------------
-{'status_code': 200, 'help-block': 'Not a valid date value'}
-
--------------------------------------
-test_wrong_email
--------------------------------------
-{'status_code': 200, 'help-block': 'Invalid email address.'}
-
--------------------------------------
-test_wrong_repeated_password
--------------------------------------
-{'status_code': 400, 'help-block': 'warning, Le password non coincidono'}
-
--------------------------------------
-test_existing_email
--------------------------------------
-{'status_code': 400, 'help-block': 'error, Utente esistente'}
-
--------------------------------------
+<<<<<<< HEAD
 test_existing_name_surname_user
 -------------------------------------
 {'status_code': 200, 'help-block': ''}
@@ -312,8 +327,57 @@ test_existing_name_surname_user
 test_good_form
 -------------------------------------
 {'status_code': 200, 'help-block': ''}
+=======
+test_good_form
+-------------------------------------
+{'status_code': 200, 'help-block': ''}
 
 -------------------------------------
+test_name_surname_user
+-------------------------------------
+{'status_code': 400, 'help-block': 'error, Utente esistente'}
+>>>>>>> 6e91823e99700bae7aeaa9169395a23bf43c8088
+
+-------------------------------------
+test_wrong_dateofbirth
+-------------------------------------
+{'status_code': 200, 'help-block': 'Not a valid date value'}
+
+-------------------------------------
+test_wrong_email
+-------------------------------------
+{'status_code': 200, 'help-block': 'Invalid email address.'}
+
+-------------------------------------
+test_wrong_repeated_password
+-------------------------------------
+<<<<<<< HEAD
+{'status_code': 200, 'help-block': 'warning, Passwords do not match'}
+=======
+{'status_code': 400, 'help-block': 'warning, Le password non coincidono'}
+>>>>>>> 6e91823e99700bae7aeaa9169395a23bf43c8088
+
+-------------------------------------
+test_existing_email
+-------------------------------------
+<<<<<<< HEAD
+{'status_code': 400, 'help-block': 'error, Existing user'}
+
+-------------------------------------
+test_existing_name_surname_user
+-------------------------------------
+{'status_code': 200, 'help-block': ''}
+=======
+{'status_code': 400, 'help-block': 'error, Utente esistente'}
+>>>>>>> 6e91823e99700bae7aeaa9169395a23bf43c8088
+
+-------------------------------------
+test_good_form
+-------------------------------------
+{'status_code': 200, 'help-block': ''}
+
+-------------------------------------
+<<<<<<< HEAD
 test_wrong_dateofbirth
 -------------------------------------
 {'status_code': 200, 'help-block': 'Not a valid date value'}
@@ -342,6 +406,11 @@ test_existing_name_surname_user
 test_good_form
 -------------------------------------
 {'status_code': 200, 'help-block': ''}
+=======
+test_name_surname_user
+-------------------------------------
+{'status_code': 400, 'help-block': 'error, Utente esistente'}
+>>>>>>> 6e91823e99700bae7aeaa9169395a23bf43c8088
 
 -------------------------------------
 test_wrong_dateofbirth
@@ -356,35 +425,9 @@ test_wrong_email
 -------------------------------------
 test_wrong_repeated_password
 -------------------------------------
+<<<<<<< HEAD
 {'status_code': 200, 'help-block': 'warning, Passwords do not match'}
-
--------------------------------------
-test_existing_email
--------------------------------------
-{'status_code': 400, 'help-block': 'error, Existing user'}
-
--------------------------------------
-test_existing_name_surname_user
--------------------------------------
-{'status_code': 200, 'help-block': ''}
-
--------------------------------------
-test_good_form
--------------------------------------
-{'status_code': 200, 'help-block': ''}
-
--------------------------------------
-test_wrong_dateofbirth
--------------------------------------
-{'status_code': 200, 'help-block': 'Not a valid date value'}
-
--------------------------------------
-test_wrong_email
--------------------------------------
-{'status_code': 200, 'help-block': 'Invalid email address.'}
-
--------------------------------------
-test_wrong_repeated_password
--------------------------------------
-{'status_code': 200, 'help-block': 'warning, Passwords do not match'}
+=======
+{'status_code': 400, 'help-block': 'warning, Le password non coincidono'}
+>>>>>>> 6e91823e99700bae7aeaa9169395a23bf43c8088
 
