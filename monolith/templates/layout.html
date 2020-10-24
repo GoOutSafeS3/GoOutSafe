@@ -19,7 +19,13 @@
         {% if messages %}
             {% for message in messages %}
                 {% for category, message in messages %}
-                    <p class="help-block">{{category}}, {{ message }}</p>
+                    {% if category == 'success' %}
+                    <span class="passed">{{category}}, {{ message }}</span>
+                    {% elif category == 'error' %}
+                     <span class="error">{{category}}, {{ message }}</span>
+                    {% elif category == "warning" %}
+                     <span class="skipped">{{category}}, {{ message }}</span>
+                    {% endif %}
                 {% endfor %}
              {% endfor %}
          {% endif %}

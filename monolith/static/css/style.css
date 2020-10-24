@@ -1,19 +1,22 @@
 body {
 	font-family: Helvetica, Arial, sans-serif;
-	font-size: 12px;
+	margin-left: 30px;
+	padding-top: 20px;
+	padding-left: 20px;
+	font-size: 20px;
 	/* do not increase min-width as some may use split screens */
 	min-width: 800px;
-	color: #999;
+	color: #6f6f6f;
 }
 
 h1 {
 	font-size: 24px;
-	color: black;
+	color: #1e2968;
 }
 
 h2 {
-	font-size: 16px;
-	color: black;
+	font-size: 20px;
+	color: #054a7b;
 }
 
 p {
@@ -47,9 +50,11 @@ table {
 span.passed, .passed .col-result {
 	color: green;
 }
+
 span.skipped, span.xfailed, span.rerun, .skipped .col-result, .xfailed .col-result, .rerun .col-result {
 	color: orange;
 }
+
 span.error, span.failed, span.xpassed, .error .col-result, .failed .col-result, .xpassed .col-result  {
 	color: red;
 }
