@@ -38,7 +38,7 @@ class TestRegistration(unittest.TestCase):
             "telephone":"1234567890",
         }
 
-        reply = self.send_registration_form(tested_app, form)
+        reply = self.send_registration_form(tested_app, '/create_user', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -57,7 +57,8 @@ class TestRegistration(unittest.TestCase):
             "dateofbirth":"01/01/1970",
             "telephone":"1234567890",
         }
-        reply = self.send_registration_form(tested_app, form)
+
+        reply = self.send_registration_form(tested_app, '/create_user', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -86,7 +87,7 @@ class TestRegistration(unittest.TestCase):
             tested_form = form
             del tested_form[f]
 
-            reply = self.send_registration_form(tested_app, form)
+            reply = self.send_registration_form(tested_app, '/create_user', form)
             
             self.assertEqual(
                 reply["status_code"],
@@ -115,7 +116,7 @@ class TestRegistration(unittest.TestCase):
             tested_form = form
             tested_form[f] = ""
 
-            reply = self.send_registration_form(tested_app, form)
+            reply = self.send_registration_form(tested_app, '/create_user', form)
             
             self.assertEqual(
                 reply["status_code"],
@@ -138,7 +139,7 @@ class TestRegistration(unittest.TestCase):
             "telephone":"1234567890",
         }
 
-        reply = self.send_registration_form(tested_app, form)
+        reply = self.send_registration_form(tested_app, '/create_user', form)
 
         self.assertEqual(
             reply["status_code"],
@@ -161,7 +162,7 @@ class TestRegistration(unittest.TestCase):
             "telephone":"1234567890",
         }
 
-        reply = self.send_registration_form(tested_app, form)
+        reply = self.send_registration_form(tested_app, '/create_user', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -184,7 +185,7 @@ class TestRegistration(unittest.TestCase):
             "telephone":"1234567890",
         }
 
-        reply = self.send_registration_form(tested_app, form)
+        reply = self.send_registration_form(tested_app, '/create_user', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -207,7 +208,7 @@ class TestRegistration(unittest.TestCase):
             "telephone":"1234567890",
         }
 
-        reply = self.send_registration_form(tested_app, form)
+        reply = self.send_registration_form(tested_app, '/create_user', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -230,7 +231,7 @@ class TestRegistration(unittest.TestCase):
             "telephone":"1234567890",
         }
 
-        reply = self.send_registration_form(tested_app, form)
+        reply = self.send_registration_form(tested_app, '/create_user', form)
         
         self.assertEqual(
             reply["status_code"],
