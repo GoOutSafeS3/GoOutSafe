@@ -37,7 +37,7 @@ class TestLogin2(unittest.TestCase):
         tested_app.set_app(app)
         # But now, `client` is an instance of the class we defined!
 
-        reply = self.send_registration_form(tested_app,"testerGoodForm1@test.me","Tester", "GF", "42","42","123456","01/01/1970")
+        reply = self.send_registration_form(tested_app,"testerGoodForm1@test.me","Tester", "GF1", "42","42","123456","01/01/1970")
         self.assertEqual(
             reply["status_code"],
             200)

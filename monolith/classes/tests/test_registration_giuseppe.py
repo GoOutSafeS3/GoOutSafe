@@ -190,7 +190,7 @@ class TestRegistration(unittest.TestCase):
         form = {
             "email":"testerExistingNameSurname@tester.com",
             "firstname":"Tester",
-            "lastname":"GF",
+            "lastname":"ENS",
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
@@ -307,7 +307,7 @@ class TestRegistration(unittest.TestCase):
         form = {
             "email":"testerGoodFormOperator@test.me",
             "firstname":"Tester",
-            "lastname":"GF",
+            "lastname":"OGF",
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
@@ -334,7 +334,7 @@ class TestRegistration(unittest.TestCase):
         form = {
             "email":"testerGoodFormOperatorm@test.me",
             "firstname":"Tester",
-            "lastname":"GF",
+            "lastname":"OGF",
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
@@ -361,7 +361,7 @@ class TestRegistration(unittest.TestCase):
         form = {
             "email":"testerGoodFormOperator@test.me",
             "firstname":"Tester",
-            "lastname":"GF",
+            "lastname":"SOF",
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
@@ -487,7 +487,7 @@ class TestRegistration(unittest.TestCase):
         form = {
             "email":"example@example.com",
             "firstname":"Tester",
-            "lastname":"EE",
+            "lastname":"OEE",
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
@@ -514,7 +514,7 @@ class TestRegistration(unittest.TestCase):
         form = {
             "email":"testerExistingNameSurnameOperator@tester.com",
             "firstname":"Tester",
-            "lastname":"GF",
+            "lastname":"OENS",
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
@@ -541,7 +541,7 @@ class TestRegistration(unittest.TestCase):
         form = {
             "email":"testerWrongDateOfBirth@test.me",
             "firstname":"Tester",
-            "lastname":"DoB",
+            "lastname":"ODoB",
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"thisisadateofbirth",
@@ -568,7 +568,7 @@ class TestRegistration(unittest.TestCase):
         form = {
             "email":"testerWrongRepeatedPassword@test.me",
             "firstname":"Tester",
-            "lastname":"WRP",
+            "lastname":"OWRP",
             "password":"42",
             "password_repeat":"43",
             "dateofbirth":"01/01/1970",
@@ -595,7 +595,7 @@ class TestRegistration(unittest.TestCase):
         form = {
             "email":"testerWorngEmail.test.me",
             "firstname":"Tester",
-            "lastname":"WE",
+            "lastname":"OWE",
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
@@ -622,7 +622,7 @@ class TestRegistration(unittest.TestCase):
         form = {
             "email":"testerWrongTelephoneNumber@test.me",
             "firstname":"Tester",
-            "lastname":"WT",
+            "lastname":"OWT",
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
@@ -649,7 +649,7 @@ class TestRegistration(unittest.TestCase):
         form = {
             "email":"testerWrongTelephoneNumber@test.me",
             "firstname":"Tester",
-            "lastname":"WT",
+            "lastname":"OWRT",
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
@@ -676,7 +676,7 @@ class TestRegistration(unittest.TestCase):
         form = {
             "email":"testerWrongTelephoneNumber@test.me",
             "firstname":"Tester",
-            "lastname":"WT",
+            "lastname":"OWLat",
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
@@ -703,7 +703,7 @@ class TestRegistration(unittest.TestCase):
         form = {
             "email":"testerWrongTelephoneNumber@test.me",
             "firstname":"Tester",
-            "lastname":"WT",
+            "lastname":"OWLong",
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
@@ -770,8 +770,21 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply.status_code,
             200,msg=html)
-        self.assertIn("Admin Admin",html,msg=html)
-        self.assertIn("Tester GF",html,msg=html)
+
+    def test_zeta_all_registered(self):
+        tested_app = app.test_client()
+        tested_app.set_app(app)
+
+        tested_app.t_post('/login',data={"email":"example@example.com", "password": "admin"})
+
+        reply = tested_app.get('/users')
+        html = reply.get_data(as_text=True)
+        self.assertEqual(
+            reply.status_code,
+            200,msg=html)
+
+        for u in ["Admin Admin", "Tester GF", "Tester OENS", "Tester OGF", "Tester ENS"]:
+            self.assertIn(u,html,msg=html)
 
 
 if __name__ == '__main__':
