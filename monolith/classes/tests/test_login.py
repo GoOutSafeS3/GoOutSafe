@@ -2,6 +2,8 @@ import unittest
 from monolith.app import create_app_testing
 from flask_test_with_csrf import FlaskClient
 from flask import url_for
+from flask_login import current_user
+
 app = create_app_testing()
 app.test_client_class = FlaskClient
 app.config['TESTING'] = True
@@ -10,7 +12,9 @@ class TestLogin(unittest.TestCase):
 
     def do_login(self,client, email, password):
         return client.t_post('/login',data={"email":email, "password": password})
-        
+    
+    def do_logout(self, client):
+        return client.t_get('/logout')
 
     def test_login_get_1(self):
         client = app.test_client()
@@ -44,3 +48,12 @@ class TestLogin(unittest.TestCase):
         client.set_app(app)
         reply = self.do_login(client, "example@example.com",None)
         self.assertEqual(reply.status_code, 400)
+
+    def test_login_logout(self):
+        with app.test_client() as client:
+            client.set_app(app)
+            reply = self.do_login(client, "example@example.com", "admin")
+            self.assertEqual(current_user.is_authenticated, True)
+
+            reply = self.do_logout(client)
+            self.assertEqual(current_user.is_authenticated, False)
