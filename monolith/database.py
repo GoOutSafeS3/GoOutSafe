@@ -58,6 +58,17 @@ class Restaurant(db.Model):
     lat = db.Column(db.Float) # restaurant latitude
     lon = db.Column(db.Float) # restaurant longitude
 
+    tables_number = db.Column(db.Integer) # number of tables
+    tables_capacity = db.Column(db.Integer) # capacity for every table
+
+    opening_hour_lunch = db.Column(db.Integer) # the opening hour for the lunch
+    closing_hour_lunch = db.Column(db.Integer) # the closing hour for the lunch 
+
+    opening_hour_dinner = db.Column(db.Integer) # the opening hour for the dinner
+    closing_hour_dinner = db.Column(db.Integer) # the closing hour for the dinner 
+
+    closed_days = db.Column(db.Text(7)) # one number for every closing day (1-7 i.e. monday-sunday)
+
     phone = db.Column(db.Integer)
 
 
