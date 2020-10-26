@@ -1,5 +1,5 @@
-<html>
-  <body>
+{% extends 'layout.html' %}
+{% block content %}
     <h1>Restaurant List</h1>
     <h5>{{message}}</h5>
     <ul>
@@ -13,5 +13,4 @@
       </li>
       {% endfor %}
     </ul>
-  </body>
-</html>
+{% endblock %}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <meta name="description" content="">
+      <meta name="author" content="">
+
+      <title>GoOutSafe</title>
+
+  <!-- Custom styles for this template -->
+      <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  </head>
+
+
+  <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for message in messages %}
+                {% for category, message in messages %}
+                    {% if category == 'success' %}
+                    <span class="passed">{{category}}, {{ message }}</span>
+                    {% elif category == 'error' %}
+                     <span class="error">{{category}}, {{ message }}</span>
+                    {% elif category == "warning" %}
+                     <span class="skipped">{{category}}, {{ message }}</span>
+                    {% endif %}
+                {% endfor %}
+             {% endfor %}
+         {% endif %}
+    {% endwith %}
+
+    {% block content %}
+
+    {% endblock %}
+
+  </body>
+</html>

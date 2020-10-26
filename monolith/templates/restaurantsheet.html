@@ -1,5 +1,5 @@
-<html>
-  <body>
+{% extends 'layout.html' %}
+{% block content %}
     <h1>{{name}} -- Likes: {{likes}}</h1> 
     <h2>Phone: {{phone}}</h2> 
     <ul>
@@ -9,6 +9,7 @@
       
       {% endif %}
     </ul>
-  </body>
-</html>
+
+    <a href="/"> Back to Homepage </a>
+{% endblock %}
 
