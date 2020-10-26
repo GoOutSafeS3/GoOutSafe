@@ -3,6 +3,7 @@ import enum
 from sqlalchemy.orm import relationship
 import datetime as dt
 from flask_sqlalchemy import SQLAlchemy
+import datetime
 
 
 db = SQLAlchemy()
@@ -72,6 +73,33 @@ class Restaurant(db.Model):
     closed_days = db.Column(db.Text(7)) # one number for every closing day (1-7 i.e. monday-sunday)
 
     phone = db.Column(db.Integer)
+
+    @property
+    def is_open(self, date, hr, min):
+        dt = '2001-10-18'
+        day, month, year = (int(x) for x in dt.split('/'))    
+        weekday = datetime.date(year, month, day).weekday()
+
+        now = datetime.datetime.now()
+        lunch_opening = now.replace( hour=self.opening_hour_lunch, minute=0, second=0, microsecond=0 )
+        lunch_closing = now.replace( hour=self.closing_hour_lunch, minute=0, second=0, microsecond=0 )
+
+        dinner_opening = now.replace( hour=self.opening_hour_dinner, minute=0, second=0, microsecond=0 )
+        dinner_closing = now.replace( hour=self.closing_hour_dinner, minute=0, second=0, microsecond=0 )
+
+        booking = now.replace( hour=hr, minute=min, second=0, microsecond=0 )
+
+        return ( not(weekday in self.closed_days ) ) and ( (lunch_opening <= booking <= lunch_closing) or (dinner_opening <= booking <= dinner_closing) )
+
+class Booking(db.Model):
+    __tablename__ = 'booking'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
+    person_number = db.Column(db.Integer)
+    booking_date = db.Column(db.DateTime)
+    booking_hr = db.Column(db.Integer)
+    booking_min = db.Column(db.Integer)
 
 
 class Like(db.Model):
