@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 import wtforms as f
-from wtforms.validators import DataRequired, Email, InputRequired
+from wtforms.validators import DataRequired, Email, InputRequired, NumberRange
 from wtforms.fields.html5 import EmailField
 
 
@@ -37,3 +37,9 @@ class OperatorForm(FlaskForm):
     restaurant_longitude = f.FloatField('Restaurant Longitude', validators=[InputRequired()])
 
     display = ['email', 'firstname', 'lastname', 'password','password_repeat', 'telephone', 'dateofbirth','restaurant_name','restaurant_phone', 'restaurant_latitude', 'restaurant_longitude']
+
+class BookingForm(FlaskForm):
+
+    number_of_person = f.IntegerField("Number of Person", validators=[InputRequired(), NumberRange(min=1)])
+    display = ['number_of_person']
+

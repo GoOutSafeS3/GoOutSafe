@@ -3,7 +3,7 @@ from monolith.database import db, Restaurant, Like
 from monolith.auth import admin_required, current_user
 from flask_login import (current_user, login_user, logout_user,
                          login_required)
-from monolith.forms import UserForm
+from monolith.forms import UserForm, BookingForm
 
 restaurants = Blueprint('restaurants', __name__)
 
@@ -16,7 +16,7 @@ def _restaurants(message=''):
 def restaurant_sheet(restaurant_id):
     record = db.session.query(Restaurant).filter_by(id = int(restaurant_id)).all()[0]
     return render_template("restaurantsheet.html", name=record.name, likes=record.likes, lat=record.lat, lon=record.lon, phone=record.phone)
-
+    
 @restaurants.route('/restaurants/like/<restaurant_id>')
 @login_required
 def _like(restaurant_id):
@@ -31,3 +31,12 @@ def _like(restaurant_id):
     else:
         message = 'You\'ve already liked this place!'
     return _restaurants(message)
+
+@restaurants.route('/restaurants/book/<restaurant_id>', methods=['GET', 'POST'])
+@login_required
+def _book(restaurant_id):
+    form = BookingForm()
+    if request.method == 'POST':
+        pass
+    
+    return render_template('book_a_table.html', form=form)
