@@ -79,8 +79,6 @@ class Restaurant(db.Model):
         day, month, year = (int(x) for x in date.split('/'))    
         weekday = datetime.date(year, month, day).weekday()
 
-        print(self.opening_hour_lunch)
-
         now = datetime.datetime.now()
         lunch_opening = now.replace( hour=self.opening_hour_lunch, minute=0, second=0, microsecond=0 )
         lunch_closing = now.replace( hour=self.closing_hour_lunch, minute=0, second=0, microsecond=0 )
