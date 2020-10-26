@@ -23,7 +23,6 @@ def operator_required():
     else:
         return login_manager.unauthorized()
 
-
 def is_admin():
     if current_user.is_anonymous is True:
         return login_manager.unauthorized()

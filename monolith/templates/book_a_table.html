@@ -1,7 +1,7 @@
 <html>
     {% extends 'layout.html' %}
-
     {% block content %}
+        <h2>Book a Table!</h2>
         <form action="" method="POST">
         {{ form.hidden_tag() }}
             <dl>
@@ -18,7 +18,7 @@
             <p>
         <input type=submit value="Submit">
         </form>
-    <a href="/"> Back to Homepage </a>
+    <a href="/restaurants"> Back to Restaurant List</a>
     {% endblock %}
 </html>
 
