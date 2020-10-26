@@ -33,8 +33,12 @@ def _like(restaurant_id):
         message = 'You\'ve already liked this place!'
     return _restaurants(message)
 
-def is_bookable(restaurant_id, number_of_person, booking_date, booking_hr, booking_min):
-    return False
+def try_to_book(restaurant_id, number_of_person, booking_date, booking_hr, booking_min):
+    record = db.session.query(Restaurant).filter_by(id = int(restaurant_id)).all()[0]
+    if record.is_open(booking_date, booking_hr, booking_min):
+        pass
+    else:
+        False
 
 @restaurants.route('/restaurants/book/<restaurant_id>', methods=['GET', 'POST'])
 @login_required
@@ -50,12 +54,11 @@ def _book(restaurant_id):
             booking_hr = request.form["booking_hr"]
             booking_min = request.form["booking_min"]
 
-            if is_bookable(restaurant_id, number_of_person, booking_date, booking_hr, booking_min):
-                pass
+            if try_to_book(restaurant_id, number_of_person, booking_date, booking_hr, booking_min):
+                flash("The booking was confirmed","success")
+                return redirect("/restaurants/"+restaurant_id)
             else:
                 flash("The reservation could not be made","error")
                 return render_template('book_a_table.html', form=form)
 
-            
-    
     return render_template('book_a_table.html', form=form)
