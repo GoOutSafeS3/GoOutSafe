@@ -51,6 +51,14 @@ def create_app_testing():
             example.phone = 555123456
             example.lat = 43.720586
             example.lon = 10.408347
+            example.tables_number = 10
+            example.tables_capacity = 5
+            example.opening_hour_lunch = 10
+            example.closing_hour_lunch = 16
+            example.opening_hour_dinner = 21
+            example.closing_hour_dinner = 23
+            example.occupation_time = datetime.timedelta(hours=3)
+            example.closed_days = "17"
             db.session.add(example)
             db.session.commit()
 
@@ -96,6 +104,14 @@ def create_app_production():
             example.phone = 555123456
             example.lat = 43.720586
             example.lon = 10.408347
+            example.tables_number = 10
+            example.tables_capacity = 5
+            example.opening_hour_lunch = 10
+            example.closing_hour_lunch = 16
+            example.opening_hour_dinner = 21
+            example.closing_hour_dinner = 24
+            example.occupation_time = 3
+            example.closed_days = "17"
             db.session.add(example)
             db.session.commit()
 
