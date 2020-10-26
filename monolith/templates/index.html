@@ -10,13 +10,20 @@
             {% for restaurant in restaurants%}
               <div>
                 <li>
-                  {{restaurant.name}} -- Likes: {{restaurant.likes}}
+                 <a href="/restaurants/{{ restaurant.id }}"> {{restaurant.name}}  </a> -- Likes: {{restaurant.likes}}
                 </li>
               </div>
             {% endfor %}
 
-
         {% else %}
-          Hi Anonymous, <a href="/login">Log in</a>
+          Hi Anonymous, if you already have an account <a href="/login">Log in</a>
+            <p></p>
+            Otherwise:
+            <ul>
+                <li><a href="/create_user">Sign in as Customer</a> </li>
+                <li><a href="/create_operator">Sign in as Restaurant's Operator</a> </li>
+            </ul>
+
+
         {% endif %}
     {% endblock %}

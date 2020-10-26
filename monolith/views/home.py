@@ -1,5 +1,4 @@
 from flask import Blueprint, render_template, make_response
-
 from monolith.database import db, Restaurant, Like
 from monolith.auth import current_user
 
