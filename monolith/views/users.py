@@ -31,7 +31,12 @@ def create_user():
             userGet = User.query.filter_by(email=form.email.data).first()
             if userGet is None:
                 new_user = User()
-                form.populate_obj(new_user)
+                new_user.firstname = form.firstname.data
+                new_user.lastname = form.lastname.data
+                new_user.email = form.email.data
+                new_user.set_password(form.password.data)
+                new_user.phone = form.telephone.data
+                new_user.dateofbirth = form.dateofbirth.data
                 try:
                     new_user.set_password(form.password.data)  # pw should be hashed with some salt
                     db.session.add(new_user)
@@ -75,6 +80,7 @@ def create_operator():
                     new_user.lastname = form.lastname.data
                     new_user.email = form.email.data
                     new_user.set_password(form.password.data)
+                    new_user.phone = form.telephone.data
                     new_user.dateofbirth = form.dateofbirth.data
                     try:
                         # pw should be hashed with some salt
