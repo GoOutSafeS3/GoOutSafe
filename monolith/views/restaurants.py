@@ -130,7 +130,7 @@ def _booking_list(restaurant_id):
 def _reservation(reservation_id):
 
     qry = db.session.query(Booking,User).filter(Booking.id == reservation_id).filter(User.id == Booking.user_id).all()
-    print(qry)
+    
     if qry == []:
         return make_response(render_template('error.html', error='404'),404)
     else:
