@@ -3,8 +3,8 @@ from flask import Flask
 from monolith.database import db, User, Restaurant, Booking
 from monolith.views import blueprints
 from monolith.auth import login_manager
-import datetime
 
+import datetime
 
 def fake_data():
 
@@ -114,15 +114,15 @@ def create_app_testing():
         pass
 
     app = Flask(__name__)
-
     app.config['WTF_CSRF_SECRET_KEY'] = 'A SECRET KEY'
     app.config['SECRET_KEY'] = 'ANOTHER ONE'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///gooutsafe_test.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///gooutsafe.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     for bp in blueprints:
         app.register_blueprint(bp)
         bp.app = app
+
     db.init_app(app)
     login_manager.init_app(app)
     db.create_all(app=app)
@@ -141,6 +141,10 @@ def create_app_production():
     app.config['SECRET_KEY'] = 'ANOTHER ONE'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///gooutsafe.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config.update(
+        CELERY_BROKER_URL='redis://localhost:6379',
+        CELERY_RESULT_BACKEND='redis://localhost:6379'
+    )
 
     for bp in blueprints:
         app.register_blueprint(bp)
