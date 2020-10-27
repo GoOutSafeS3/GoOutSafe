@@ -5,6 +5,10 @@
       {% for positive in positives: %}
       <li>
       {{positive.lastname}} {{positive.firstname}} since {{positive.positive_datetime}}
+      <form action="{{base_url}}/positives/unmark/{{positive.id}}" method="delete">
+        <input type=hidden />
+        <input type=submit value="Unmark" />
+      </form> 
       </li>
       {% endfor %}
     </ul>
