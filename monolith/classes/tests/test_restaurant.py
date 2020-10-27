@@ -20,6 +20,8 @@ class TestRestaurant(unittest.TestCase):
         reply_data = reply.get_data(as_text = True)
         with app.test_request_context():
             self.assertTrue("Trial Restaurant" in reply_data)
+            self.assertIn("True Italian Restaurant", reply_data)
+
 
     def test_profile_has_name(self):
         client = app.test_client()
@@ -64,6 +66,26 @@ class TestRestaurant(unittest.TestCase):
             self.assertFalse("Thursday" in reply_data)
             self.assertFalse("Friday" in reply_data)
             self.assertFalse("Saturday" in reply_data)
+
+    def test_profile_has_cuisine_type(self):
+        client = app.test_client()
+        client.set_app(app)
+        reply = client.t_get("/restaurants/1")
+        self.assertEqual(reply.status_code, 200)
+        reply_data = reply.get_data(as_text = True)
+        with app.test_request_context():
+            self.assertIn("True Italian Restaurant", reply_data)
+
+    def test_profile_has_menu(self):
+        client = app.test_client()
+        client.set_app(app)
+        reply = client.t_get("/restaurants/1")
+        self.assertEqual(reply.status_code, 200)
+        reply_data = reply.get_data(as_text = True)
+        with app.test_request_context():
+            self.assertIn("Pizza", reply_data)
+            self.assertIn("Pasta Bolognese", reply_data)
+            self.assertIn("Breadsticks", reply_data)
 
     def test_can_like_once(self):
         with app.test_client() as client:
