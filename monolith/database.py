@@ -18,7 +18,7 @@ class User(db.Model):
     dateofbirth = db.Column(db.DateTime)
     phone = db.Column(db.Integer)
     
-    rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
+    rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), default=None)
     is_active = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)
     is_anonymous = False

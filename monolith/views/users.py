@@ -8,8 +8,8 @@ from monolith.database import User, db, Restaurant
 users = Blueprint('users', __name__)
 
 
-@login_required
 @users.route('/users')
+@login_required
 def _users():
     if is_admin():
         users = db.session.query(User)
