@@ -1,9 +1,9 @@
 from flask import Blueprint, redirect, render_template, request, make_response, flash
 from monolith.database import db, Restaurant, Like, Booking
-from monolith.auth import admin_required, current_user, is_admin
+from monolith.auth import admin_required, current_user, is_admin, operator_required
 from flask_login import (current_user, login_user, logout_user,
                          login_required)
-from monolith.forms import UserForm, BookingForm
+from monolith.forms import UserForm, BookingForm, BookingList
 import datetime
 
 restaurants = Blueprint('restaurants', __name__)
@@ -44,6 +44,9 @@ def book_a_table(restaurant_id, number_of_person, booking_date, booking_hr, book
     db.session.add(new_booking)
     db.session.commit()
 
+def in_conflict(restaurant_id, number_of_person, booking_date, booking_hr, booking_min):
+    return False
+
 def try_to_book(restaurant_id, number_of_person, booking_date, booking_hr, booking_min):
     record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()[0]
     if record.is_open(booking_date, booking_hr, booking_min):
@@ -51,8 +54,7 @@ def try_to_book(restaurant_id, number_of_person, booking_date, booking_hr, booki
         day, month, year = (int(x) for x in booking_date.split('/'))   
         booking_date = now.replace(year=year,month=month,day=day,hour=0,minute=0,second=0,microsecond=0)
         q = Booking.query.filter_by(rest_id=restaurant_id, booking_date=booking_date).all()
-        print(q)
-        if q == []:
+        if not in_conflict(restaurant_id, number_of_person, booking_date, booking_hr, booking_min):
             book_a_table(restaurant_id, number_of_person, booking_date, booking_hr, booking_min)
             return True
     return False
@@ -87,3 +89,25 @@ def _book(restaurant_id):
                 return render_template('book_a_table.html', form=form)
 
     return render_template('book_a_table.html', form=form)
+
+@restaurants.route('/restaurants/reservations/<restaurant_id>', methods=['GET', 'POST'])
+@operator_required
+def _booking_list(restaurant_id):
+    form = BookingList()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            now = datetime.datetime.now()
+        
+            from_date = request.form["from_date"]
+            from_hr = request.form["from_hr"]
+            from_min = request.form["from_min"]
+            from_day, from_month, from_year = (int(x) for x in from_date.split('/'))   
+            from_datetime = now.replace(year=from_year,month=from_month,day=from_day,hour=int(from_hr),minute=int(from_min),second=0,microsecond=0)
+
+            to_date = request.form["to_date"]
+            to_hr = request.form["to_hr"]
+            to_min = request.form["to_min"]
+            to_day, to_month, to_year = (int(x) for x in to_date.split('/'))   
+            to_datetime = now.replace(year=to_year,month=to_month,day=to_day,hour=int(to_hr),minute=int(to_min),second=0,microsecond=0)
+
+    return render_template('booking_list.html', form=form)
