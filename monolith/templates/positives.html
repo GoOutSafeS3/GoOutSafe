@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <h1>Positives</h1>
+    <ul>
+      {% for positive in positives: %}
+      <li>
+      {{positive.lastname}} {{positive.firstname}} since {{positive.positive_datetime}}
+      </li>
+      {% endfor %}
+    </ul>
+    <a href="/"> Back to Homepage </a>
+{% endblock %}
