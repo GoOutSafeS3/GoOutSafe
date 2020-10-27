@@ -49,6 +49,7 @@ class User(db.Model):
 
 
 class Restaurant(db.Model):
+
     __tablename__ = 'restaurant'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     #r = db.relationship('User', backref='Restaurant')
@@ -74,10 +75,8 @@ class Restaurant(db.Model):
 
     phone = db.Column(db.Integer)
 
-    @property
-    def is_open(self, date, hr, min):
-        dt = '2001-10-18'
-        day, month, year = (int(x) for x in dt.split('/'))    
+    def is_open(self, date, hr, minutes):
+        day, month, year = (int(x) for x in date.split('/'))    
         weekday = datetime.date(year, month, day).weekday()
 
         now = datetime.datetime.now()
@@ -87,9 +86,9 @@ class Restaurant(db.Model):
         dinner_opening = now.replace( hour=self.opening_hour_dinner, minute=0, second=0, microsecond=0 )
         dinner_closing = now.replace( hour=self.closing_hour_dinner, minute=0, second=0, microsecond=0 )
 
-        booking = now.replace( hour=hr, minute=min, second=0, microsecond=0 )
+        booking = now.replace( hour=hr, minute=minutes, second=0, microsecond=0 )
 
-        return ( not(weekday in self.closed_days ) ) and ( (lunch_opening <= booking <= lunch_closing) or (dinner_opening <= booking <= dinner_closing) )
+        return ( not(str(weekday) in self.closed_days ) ) and ( (lunch_opening <= booking <= lunch_closing) or (dinner_opening <= booking <= dinner_closing) )
 
 class Booking(db.Model):
     __tablename__ = 'booking'

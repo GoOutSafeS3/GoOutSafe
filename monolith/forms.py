@@ -42,7 +42,7 @@ class BookingForm(FlaskForm):
 
     number_of_person = f.IntegerField("Number of Person", validators=[InputRequired(), NumberRange(min=1)])
     booking_date = f.DateField('Date', format='%d/%m/%Y')
-    booking_hr = f.SelectField('Hour', choices=range(1,25))
+    booking_hr = f.SelectField('Hour', choices=range(0,24))
     booking_min = f.SelectField('Minutes', choices=range(0,60,15))
     display = ['number_of_person','booking_date','booking_hr','booking_min']
 
