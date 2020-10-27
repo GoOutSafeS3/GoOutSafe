@@ -16,13 +16,29 @@ def _restaurants(message=''):
 @restaurants.route('/restaurants/<restaurant_id>')
 def restaurant_sheet(restaurant_id):
     record = db.session.query(Restaurant).filter_by(id = int(restaurant_id)).all()[0]
-    return render_template("restaurantsheet.html", name=record.name, likes=record.likes, lat=record.lat, lon=record.lon, phone=record.phone, id=restaurant_id)
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    closed_days = []
+    for day in record.closed_days:
+        closed_days.append(days[int(day) - 1])
+
+    return render_template("restaurantsheet.html",
+        name=record.name,
+        likes=record.likes,
+        lat=record.lat,
+        lon=record.lon,
+        phone=record.phone,
+        id=restaurant_id,
+        closed_days=closed_days,
+        lunch_opening=record.opening_hour_lunch,
+        lunch_closing=record.closing_hour_lunch,
+        dinner_opening=record.closing_hour_dinner,
+        dinner_closing=record.closing_hour_dinner)
     
 @restaurants.route('/restaurants/like/<restaurant_id>')
 @login_required
 def _like(restaurant_id):
     q = Like.query.filter_by(liker_id=current_user.id, restaurant_id=restaurant_id)
-    if q.first() != None:
+    if q.first() == None:
         new_like = Like()
         new_like.liker_id = current_user.id
         new_like.restaurant_id = restaurant_id
