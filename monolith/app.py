@@ -34,7 +34,7 @@ def fake_data():
         example.closing_hour_lunch = 16
         example.opening_hour_dinner = 21
         example.closing_hour_dinner = 23
-        example.occupation_time = datetime.timedelta(2)
+        example.occupation_time = 2
         example.closed_days = "17"
         db.session.add(example)
         db.session.commit()
