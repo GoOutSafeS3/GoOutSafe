@@ -1,8 +1,7 @@
 from flask import Blueprint, redirect, render_template, request, make_response, flash
 from monolith.database import db, Restaurant, Like, Booking, User, Table
 from monolith.auth import admin_required, current_user, is_admin, operator_required
-from flask_login import (current_user, login_user, logout_user,
-                         login_required)
+from flask_login import current_user, login_user, logout_user, login_required
 from monolith.forms import UserForm, BookingForm, BookingList
 import datetime
 
@@ -14,6 +13,7 @@ def _restaurants(message=''):
     return render_template("restaurants.html", message=message, restaurants=allrestaurants, base_url="http://127.0.0.1:5000/restaurants")
 
 @restaurants.route('/restaurants/<restaurant_id>')
+@login_required
 def restaurant_sheet(restaurant_id):
     record = db.session.query(Restaurant).filter_by(id = int(restaurant_id)).all()[0]
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -31,7 +31,7 @@ def restaurant_sheet(restaurant_id):
         closed_days=closed_days,
         lunch_opening=record.opening_hour_lunch,
         lunch_closing=record.closing_hour_lunch,
-        dinner_opening=record.closing_hour_dinner,
+        dinner_opening=record.opening_hour_dinner,
         dinner_closing=record.closing_hour_dinner)
     
 @restaurants.route('/restaurants/like/<restaurant_id>')
@@ -49,33 +49,56 @@ def _like(restaurant_id):
         message = 'You\'ve already liked this place!'
     return _restaurants(message)
 
-def book_a_table(restaurant, number_of_person, booking_datetime):
+def book_a_table(restaurant, number_of_person, booking_datetime, table):
     new_booking = Booking()
     new_booking.user_id = current_user.id
     new_booking.rest_id = restaurant.id
     new_booking.person_number = number_of_person
-    new_booking.booking_date = booking_datetime
+    new_booking.booking_datetime = booking_datetime
+    new_booking.table = table
     db.session.add(new_booking)
     db.session.commit()
 
-def in_conflict(restaurant, number_of_person, booking_datetime):
-    q = db.session.query(Booking,Table)filter_by(rest_id=restaurant.id)
-                        .filter(b <= Booking.booking_datetime)\
-                        .filter(Booking.booking_datetime <= to_datetime )\
-    return False
+def get_table(restaurant, number_of_person, booking_datetime):
+    delta = restaurant.occupation_time
+    starting_period = booking_datetime - datetime.timedelta(hours=delta)
+    ending_period = booking_datetime + datetime.timedelta(hours=delta)
+    occupied = db.session.query(Table.id).select_from(Booking,Table)\
+                        .filter(Booking.table == Table.id)\
+                        .filter(Booking.rest_id == restaurant.id)\
+                        .filter(starting_period <= Booking.booking_datetime)\
+                        .filter(Booking.booking_datetime <= ending_period )\
+                        .all()
+
+    total = db.session.query(Table.id,Table.capacity).select_from(Table,Restaurant)\
+                        .filter(Restaurant.id == Table.rest_id)\
+                        .all()
+
+    free_tables = [t for t in total if ( ( (t[0],) not in occupied) and (t[1] >= number_of_person) )]
+    free_tables.sort(key=lambda x:x[1])
+
+    print(occupied)
+    print(total)
+    print(free_tables)
+
+    if free_tables == []:
+        return None
+    return free_tables[0][0]
 
 def try_to_book(restaurant_id, number_of_person, booking_datetime):
     record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()[0]
     if record.is_open(booking_datetime):
-        if not in_conflict(record, number_of_person, booking_datetime):
-            book_a_table(restaurant_id, number_of_person, booking_datetime)
+        table = get_table(record, number_of_person, booking_datetime)
+        if table is not None:
+            book_a_table(record, number_of_person, booking_datetime, table)
             return True
     return False
 
 @restaurants.route('/restaurants/book/<restaurant_id>', methods=['GET', 'POST'])
 @login_required
 def _book(restaurant_id):
-    if is_admin or current_user.is_operator:
+
+    if current_user.is_admin or current_user.is_operator:
         flash("Please log as customer to book a table","error")
         return redirect("/restaurants/"+restaurant_id)
 
@@ -107,6 +130,7 @@ def _book(restaurant_id):
                 return render_template('book_a_table.html', form=form)
 
     return render_template('book_a_table.html', form=form)
+
 
 @restaurants.route('/restaurants/<restaurant_id>/reservations', methods=['GET', 'POST'])
 @operator_required
@@ -147,6 +171,8 @@ def _booking_list(restaurant_id):
             return render_template("reservations.html", reservations=qry)
 
     return render_template('booking_list.html', form=form)
+
+
 
 @restaurants.route('/reservations/<reservation_id>', methods=['GET', 'DELETE', 'POST'])
 @operator_required

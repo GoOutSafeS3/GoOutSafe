@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from monolith.database import db, User, Restaurant, Booking
+from monolith.database import db, User, Restaurant, Booking, Table
 from monolith.views import blueprints
 from monolith.auth import login_manager
 
@@ -39,6 +39,36 @@ def fake_data():
         db.session.add(example)
         db.session.commit()
 
+        table_1 = Table()
+        table_1.rest_id = example.id
+        table_1.capacity = 5
+        db.session.add(table_1)
+        db.session.commit()
+
+        table_2 = Table()
+        table_2.rest_id = example.id
+        table_2.capacity = 6
+        db.session.add(table_2)
+        db.session.commit()
+
+        table_3 = Table()
+        table_3.rest_id = example.id
+        table_3.capacity = 7
+        db.session.add(table_3)
+        db.session.commit()
+
+        table_4 = Table()
+        table_4.rest_id = example.id
+        table_4.capacity = 9
+        db.session.add(table_4)
+        db.session.commit()
+
+        table_5 = Table()
+        table_5.rest_id = example.id
+        table_5.capacity = 8
+        db.session.add(table_5)
+        db.session.commit()
+
         example_op = User()
         example_op.firstname = 'Operator'
         example_op.lastname = 'Operator'
@@ -54,7 +84,7 @@ def fake_data():
         booking_1 = Booking()
         booking_1.rest_id = 1
         booking_1.user_id = example_cust.id
-        booking_1.booking_datetime = datetime.datetime(2020,11,1,10,15,0,0)
+        booking_1.booking_datetime = datetime.datetime(2020,11,5,10,15,0,0)
         booking_1.person_number = 5
         booking_1.table = 1
         db.session.add(booking_1)
@@ -63,7 +93,7 @@ def fake_data():
         booking_2 = Booking()
         booking_2.rest_id = 1
         booking_2.user_id = example_cust.id
-        booking_2.booking_datetime = datetime.datetime(2020,11,1,10,15,0,0)
+        booking_2.booking_datetime = datetime.datetime(2020,11,5,10,15,0,0)
         booking_2.person_number = 5
         booking_2.table = 2
         db.session.add(booking_2)
@@ -72,7 +102,7 @@ def fake_data():
         booking_3 = Booking()
         booking_3.rest_id = 1
         booking_3.user_id = example_cust.id
-        booking_3.booking_datetime = datetime.datetime(2020,11,1,11,30,0,0)
+        booking_3.booking_datetime = datetime.datetime(2020,11,5,11,30,0,0)
         booking_3.person_number = 5
         booking_3.table = 3
         db.session.add(booking_3)
@@ -157,6 +187,7 @@ def create_app_production():
     # create a first admin user
     with app.app_context():
         init()
+        fake_data()
 
     return app
 
