@@ -98,6 +98,12 @@ class Restaurant(db.Model):
     def get_id(self):
         return self.id
 
+class Table(db.Model):
+    __tablename__ = 'table'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
+    capacity = db.Column(db.Integer)
+
 class Booking(db.Model):
     __tablename__ = 'booking'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -105,6 +111,7 @@ class Booking(db.Model):
     rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
     person_number = db.Column(db.Integer)
     booking_datetime = db.Column(db.DateTime)
+    table = db.Column(db.Integer, db.ForeignKey('table.id'))
 
 
 class Like(db.Model):
