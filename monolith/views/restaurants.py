@@ -13,7 +13,6 @@ def _restaurants(message=''):
     return render_template("restaurants.html", message=message, restaurants=allrestaurants, base_url="http://127.0.0.1:5000/restaurants")
 
 @restaurants.route('/restaurants/<restaurant_id>')
-@login_required
 def restaurant_sheet(restaurant_id):
     record = db.session.query(Restaurant).filter_by(id = int(restaurant_id)).all()[0]
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
