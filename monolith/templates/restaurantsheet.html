@@ -10,6 +10,21 @@
       {% endif %}
     </ul>
 
+    <div class="opening_hours">
+      <h3>Opening hours</h3>
+      <p>Lunch: {{lunch_opening}}:00 - {{lunch_closing}}:00</p>
+      <p>Dinner: {{dinner_opening}}:00 - {{dinner_closing}}:00</p>
+    </div>
+
+    <div class="closed_days">
+      Closed days:
+      <ul>
+        {% for day in closed_days: %}
+          <li>{{day}}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
     <form action="{{base_url}}/restaurants/book/{{id}}">
       <input type="submit" value="Book a Table!" />
     </form>
