@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+    {% block content %}
+        <h1>GoOutSafe</h1>
+
+          {% if current_user.is_operator %}
+            <h2>Your Reservations</h2>
+            {% for reservation in reservations%}
+              <div>
+                <li>
+                  {{reservation.Booking.person_number}} person at {{reservation.Booking.booking_datetime}} by {{reservation.User.lastname}} {{reservation.User.firstname}}
+                </li>
+              </div>
+            {% endfor %}
+
+          {% endif %}
+    {% endblock %}

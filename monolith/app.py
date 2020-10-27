@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from monolith.database import db, User, Restaurant
+from monolith.database import db, User, Restaurant, Booking
 from monolith.views import blueprints
 from monolith.auth import login_manager
 import datetime
@@ -52,6 +52,16 @@ def create_app_testing():
             db.session.add(example_cust)
             db.session.commit()
 
+            auth = User()
+            auth.firstname = 'Health'
+            auth.lastname = 'Authority'
+            auth.email = 'health@authority.com'
+            auth.dateofbirth = datetime.datetime(2020, 10, 5)
+            auth.is_health_authority = True
+            auth.set_password('health')
+            db.session.add(auth)
+            db.session.commit()
+
         q = db.session.query(Restaurant).filter(Restaurant.id == 1)
         restaurant = q.first()
         if restaurant is None:
@@ -66,7 +76,7 @@ def create_app_testing():
             example.opening_hour_lunch = 10
             example.closing_hour_lunch = 16
             example.opening_hour_dinner = 21
-            example.closing_hour_dinner = 24
+            example.closing_hour_dinner = 23
             example.occupation_time = datetime.timedelta(2)
             example.closed_days = "17"
             db.session.add(example)
@@ -82,6 +92,31 @@ def create_app_testing():
             example_op.rest_id = 1
             db.session.add(example_op)
             db.session.commit()
+
+            booking_1 = Booking()
+            booking_1.rest_id = 1
+            booking_1.user_id = 2
+            booking_1.booking_datetime = datetime.datetime(2020,11,1,10,15,0,0)
+            booking_1.person_number = 5
+            db.session.add(booking_1)
+            db.session.commit()
+
+            booking_2 = Booking()
+            booking_2.rest_id = 1
+            booking_2.user_id = 2
+            booking_2.booking_datetime = datetime.datetime(2020,11,1,10,15,0,0)
+            booking_2.person_number = 5
+            db.session.add(booking_2)
+            db.session.commit()
+
+            booking_3 = Booking()
+            booking_3.rest_id = 1
+            booking_3.user_id = 2
+            booking_3.booking_datetime = datetime.datetime(2020,11,1,11,30,0,0)
+            booking_3.person_number = 5
+            db.session.add(booking_3)
+            db.session.commit()
+
 
     return app
 
@@ -116,6 +151,16 @@ def create_app_production():
             db.session.add(example)
             db.session.commit()
 
+            auth = User()
+            auth.firstname = 'Health'
+            auth.lastname = 'Authority'
+            auth.email = 'health@authority.com'
+            auth.dateofbirth = datetime.datetime(2020, 10, 5)
+            auth.is_health_authority = True
+            auth.set_password('health')
+            db.session.add(auth)
+            db.session.commit()
+
             example_cust = User()
             example_cust.firstname = 'Customer'
             example_cust.lastname = 'Customer'
@@ -140,7 +185,7 @@ def create_app_production():
             example.opening_hour_lunch = 10
             example.closing_hour_lunch = 16
             example.opening_hour_dinner = 21
-            example.closing_hour_dinner = 24
+            example.closing_hour_dinner = 23
             example.occupation_time =  datetime.timedelta(2)
             example.closed_days = "17"
             db.session.add(example)
@@ -156,6 +201,31 @@ def create_app_production():
             example_op.rest_id(1)
             db.session.add(example_op)
             db.session.commit()
+
+            booking_1 = Booking()
+            booking_1.rest_id = 1
+            booking_1.user_id = 2
+            booking_1.booking_datetime = datetime.datetime(2020,11,1,10,15,0,0)
+            booking_1.person_number = 5
+            db.session.add(booking_1)
+            db.session.commit()
+
+            booking_2 = Booking()
+            booking_2.rest_id = 1
+            booking_2.user_id = 2
+            booking_2.booking_datetime = datetime.datetime(2020,11,1,10,15,0,0)
+            booking_2.person_number = 5
+            db.session.add(booking_2)
+            db.session.commit()
+
+            booking_3 = Booking()
+            booking_3.rest_id = 1
+            booking_3.user_id = 2
+            booking_3.booking_datetime = datetime.datetime(2020,11,1,11,30,0,0)
+            booking_3.person_number = 5
+            db.session.add(booking_3)
+            db.session.commit()
+
 
     return app
 

@@ -20,6 +20,9 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)
     is_anonymous = False
+    is_health_authority = db.Column(db.Boolean, default=False)
+    is_positive = db.Column(db.Boolean, default=False)
+    positive_datetime = db.Column(db.DateTime)
 
     def __init__(self, *args, **kw):
         super(User, self).__init__(*args, **kw)
@@ -46,6 +49,9 @@ class User(db.Model):
 
     def get_id(self):
         return self.id
+
+    def get_rest_id(self):
+        return self.rest_id
 
 
 class Restaurant(db.Model):
@@ -75,10 +81,7 @@ class Restaurant(db.Model):
 
     phone = db.Column(db.Integer)
 
-    def is_open(self, date, hr, minutes):
-        day, month, year = (int(x) for x in date.split('/'))    
-        weekday = datetime.date(year, month, day).weekday()
-
+    def is_open(self, booking_datetime):
         now = datetime.datetime.now()
         lunch_opening = now.replace( hour=self.opening_hour_lunch, minute=0, second=0, microsecond=0 )
         lunch_closing = now.replace( hour=self.closing_hour_lunch, minute=0, second=0, microsecond=0 )
@@ -86,9 +89,9 @@ class Restaurant(db.Model):
         dinner_opening = now.replace( hour=self.opening_hour_dinner, minute=0, second=0, microsecond=0 )
         dinner_closing = now.replace( hour=self.closing_hour_dinner, minute=0, second=0, microsecond=0 )
 
-        booking = now.replace( hour=hr, minute=minutes, second=0, microsecond=0 )
+        booking = now.replace( hour=booking_datetime.hour, minute=booking_datetime.minute, second=0, microsecond=0 )
 
-        return ( not(str(weekday+1) in self.closed_days ) ) and ( (lunch_opening <= booking <= lunch_closing) or (dinner_opening <= booking <= dinner_closing) )
+        return ( not(str(booking_datetime.weekday()+1) in self.closed_days ) ) and ( (lunch_opening <= booking <= lunch_closing) or (dinner_opening <= booking <= dinner_closing) )
 
     def get_id(self):
         return self.id
@@ -99,9 +102,7 @@ class Booking(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
     person_number = db.Column(db.Integer)
-    booking_date = db.Column(db.DateTime)
-    booking_hr = db.Column(db.Integer)
-    booking_min = db.Column(db.Integer)
+    booking_datetime = db.Column(db.DateTime)
 
 
 class Like(db.Model):

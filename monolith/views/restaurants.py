@@ -1,5 +1,5 @@
 from flask import Blueprint, redirect, render_template, request, make_response, flash
-from monolith.database import db, Restaurant, Like, Booking
+from monolith.database import db, Restaurant, Like, Booking, User
 from monolith.auth import admin_required, current_user, is_admin, operator_required
 from flask_login import (current_user, login_user, logout_user,
                          login_required)
@@ -33,29 +33,24 @@ def _like(restaurant_id):
         message = 'You\'ve already liked this place!'
     return _restaurants(message)
 
-def book_a_table(restaurant_id, number_of_person, booking_date, booking_hr, booking_min):
+def book_a_table(restaurant_id, number_of_person, booking_datetime):
     new_booking = Booking()
     new_booking.user_id = current_user.id
     new_booking.rest_id = restaurant_id
     new_booking.person_number = number_of_person
-    new_booking.booking_date = booking_date
-    new_booking.booking_hr = int(booking_hr)
-    new_booking.booking_min = int(booking_min)
+    new_booking.booking_date = booking_datetime
     db.session.add(new_booking)
     db.session.commit()
 
-def in_conflict(restaurant_id, number_of_person, booking_date, booking_hr, booking_min):
+def in_conflict(restaurant_id, number_of_person, booking_datetime):
+    q = Booking.query.filter_by(rest_id=restaurant_id, booking_datetime=booking_datetime)
     return False
 
-def try_to_book(restaurant_id, number_of_person, booking_date, booking_hr, booking_min):
+def try_to_book(restaurant_id, number_of_person, booking_datetime):
     record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()[0]
-    if record.is_open(booking_date, booking_hr, booking_min):
-        now = datetime.datetime.now()
-        day, month, year = (int(x) for x in booking_date.split('/'))   
-        booking_date = now.replace(year=year,month=month,day=day,hour=0,minute=0,second=0,microsecond=0)
-        q = Booking.query.filter_by(rest_id=restaurant_id, booking_date=booking_date).all()
-        if not in_conflict(restaurant_id, number_of_person, booking_date, booking_hr, booking_min):
-            book_a_table(restaurant_id, number_of_person, booking_date, booking_hr, booking_min)
+    if record.is_open(booking_datetime):
+        if not in_conflict(restaurant_id, number_of_person, booking_datetime):
+            book_a_table(restaurant_id, number_of_person, booking_datetime)
             return True
     return False
 
@@ -81,7 +76,7 @@ def _book(restaurant_id):
                 flash("You cannot book before now","error")
                 return render_template('book_a_table.html', form=form)
 
-            if try_to_book(restaurant_id, int(number_of_person), booking_date, int(booking_hr), int(booking_min)):
+            if try_to_book(restaurant_id, int(number_of_person), booking_datetime):
                 flash("The booking was confirmed","success")
                 return redirect("/restaurants/"+restaurant_id)
             else:
@@ -109,5 +104,10 @@ def _booking_list(restaurant_id):
             to_min = request.form["to_min"]
             to_day, to_month, to_year = (int(x) for x in to_date.split('/'))   
             to_datetime = now.replace(year=to_year,month=to_month,day=to_day,hour=int(to_hr),minute=int(to_min),second=0,microsecond=0)
+
+            qry = db.session.query(Booking,User).filter_by(rest_id = current_user.get_rest_id()).filter(User.id == Booking.user_id).all()
+            print(qry)
+
+            return render_template("reservations.html", reservations=qry)
 
     return render_template('booking_list.html', form=form)
