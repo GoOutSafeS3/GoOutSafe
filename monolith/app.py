@@ -154,9 +154,6 @@ def create_app_production():
     login_manager.init_app(app)
     db.create_all(app=app)
 
-    celery = make_celery(app)
-    app.celery = celery
-
     # create a first admin user
     with app.app_context():
         init()
