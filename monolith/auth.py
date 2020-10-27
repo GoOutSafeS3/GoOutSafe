@@ -16,12 +16,14 @@ def admin_required(func):
     return _admin_required
 
 
-def operator_required():
-    user = load_user(current_user)
-    if user.is_operator:
-        return True
-    else:
-        return login_manager.unauthorized()
+def operator_required(func):
+    @functools.wraps(func)
+    def _operator_required(*args, **kw):
+        if not current_user.is_operator:
+            return login_manager.unauthorized()
+        return func(*args, **kw)
+    return _operator_required
+
 
 def is_admin():
     if current_user.is_anonymous is True:

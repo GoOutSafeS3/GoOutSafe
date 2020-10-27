@@ -88,7 +88,10 @@ class Restaurant(db.Model):
 
         booking = now.replace( hour=hr, minute=minutes, second=0, microsecond=0 )
 
-        return ( not(str(weekday) in self.closed_days ) ) and ( (lunch_opening <= booking <= lunch_closing) or (dinner_opening <= booking <= dinner_closing) )
+        return ( not(str(weekday+1) in self.closed_days ) ) and ( (lunch_opening <= booking <= lunch_closing) or (dinner_opening <= booking <= dinner_closing) )
+
+    def get_id(self):
+        return self.id
 
 class Booking(db.Model):
     __tablename__ = 'booking'

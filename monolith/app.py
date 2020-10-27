@@ -42,6 +42,16 @@ def create_app_testing():
             db.session.add(example)
             db.session.commit()
 
+            example_cust = User()
+            example_cust.firstname = 'Customer'
+            example_cust.lastname = 'Customer'
+            example_cust.email = 'customer@example.com'
+            example_cust.dateofbirth = datetime.datetime(2020, 10, 5)
+            example_cust.is_admin = False
+            example_cust.set_password('customer')
+            db.session.add(example_cust)
+            db.session.commit()
+
         q = db.session.query(Restaurant).filter(Restaurant.id == 1)
         restaurant = q.first()
         if restaurant is None:
@@ -56,10 +66,21 @@ def create_app_testing():
             example.opening_hour_lunch = 10
             example.closing_hour_lunch = 16
             example.opening_hour_dinner = 21
-            example.closing_hour_dinner = 23
-            example.occupation_time = datetime.timedelta(hours=3)
+            example.closing_hour_dinner = 24
+            example.occupation_time = datetime.timedelta(2)
             example.closed_days = "17"
             db.session.add(example)
+            db.session.commit()
+
+            example_op = User()
+            example_op.firstname = 'Operator'
+            example_op.lastname = 'Operator'
+            example_op.email = 'operator@example.com'
+            example_op.dateofbirth = datetime.datetime(2020, 10, 5)
+            example_op.is_admin = False
+            example_op.set_password('operator')
+            example_op.rest_id = 1
+            db.session.add(example_op)
             db.session.commit()
 
     return app
@@ -95,6 +116,16 @@ def create_app_production():
             db.session.add(example)
             db.session.commit()
 
+            example_cust = User()
+            example_cust.firstname = 'Customer'
+            example_cust.lastname = 'Customer'
+            example_cust.email = 'customer@example.com'
+            example_cust.dateofbirth = datetime.datetime(2020, 10, 5)
+            example_cust.is_admin = False
+            example_cust.set_password('customer')
+            db.session.add(example_cust)
+            db.session.commit()
+
         q = db.session.query(Restaurant).filter(Restaurant.id == 1)
         restaurant = q.first()
         if restaurant is None:
@@ -110,9 +141,20 @@ def create_app_production():
             example.closing_hour_lunch = 16
             example.opening_hour_dinner = 21
             example.closing_hour_dinner = 24
-            example.occupation_time = 3
+            example.occupation_time =  datetime.timedelta(2)
             example.closed_days = "17"
             db.session.add(example)
+
+
+            example_op = User()
+            example_op.firstname = 'Operator'
+            example_op.lastname = 'Operator'
+            example_op.email = 'operator@example.com'
+            example_op.dateofbirth = datetime.datetime(2020, 10, 5)
+            example_op.is_admin = False
+            example_op.set_password('operator')
+            example_op.rest_id(1)
+            db.session.add(example_op)
             db.session.commit()
 
     return app

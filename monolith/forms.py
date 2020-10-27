@@ -46,3 +46,15 @@ class BookingForm(FlaskForm):
     booking_min = f.SelectField('Minutes', choices=range(0,60,15))
     display = ['number_of_person','booking_date','booking_hr','booking_min']
 
+class BookingList(FlaskForm):
+    
+    from_date = f.DateField('From Date', format='%d/%m/%Y')
+    from_hr = f.SelectField('Hour', choices=range(0,24))
+    from_min = f.SelectField('Minutes', choices=range(0,60,15))
+
+    to_date = f.DateField('To Date', format='%d/%m/%Y')
+    to_hr = f.SelectField('Hour', choices=range(0,24))
+    to_min = f.SelectField('Minutes', choices=range(0,60,15))
+
+    display = ['from_date','from_hr','from_min','to_date','to_hr','to_min']
+
