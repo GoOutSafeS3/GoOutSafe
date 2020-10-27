@@ -85,9 +85,14 @@ def _book(restaurant_id):
 
     return render_template('book_a_table.html', form=form)
 
-@restaurants.route('/restaurants/reservations/<restaurant_id>', methods=['GET', 'POST'])
+@restaurants.route('/restaurants/<restaurant_id>/reservations', methods=['GET', 'POST'])
 @operator_required
 def _booking_list(restaurant_id):
+
+    if current_user.rest_id != int(restaurant_id):
+        flash("Area reserved for the restaurant operator","error")
+        return redirect("/restaurants/"+restaurant_id, code=401)
+
     form = BookingList()
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -105,9 +110,41 @@ def _booking_list(restaurant_id):
             to_day, to_month, to_year = (int(x) for x in to_date.split('/'))   
             to_datetime = now.replace(year=to_year,month=to_month,day=to_day,hour=int(to_hr),minute=int(to_min),second=0,microsecond=0)
 
-            qry = db.session.query(Booking,User).filter_by(rest_id = current_user.get_rest_id()).filter(User.id == Booking.user_id).all()
-            print(qry)
+            if from_datetime >= to_datetime:
+                flash("Invalid time interval","error")
+                return render_template('booking_list.html', form=form)
+
+            qry = db.session.query(Booking,User)\
+                            .filter_by(rest_id = current_user.get_rest_id())\
+                            .filter(User.id == Booking.user_id)\
+                            .filter(from_datetime <= Booking.booking_datetime)\
+                            .filter(Booking.booking_datetime <= to_datetime )\
+                            .all()
 
             return render_template("reservations.html", reservations=qry)
 
     return render_template('booking_list.html', form=form)
+
+@restaurants.route('/reservations/<reservation_id>', methods=['GET', 'DELETE', 'POST'])
+@operator_required
+def _reservation(reservation_id):
+
+    qry = db.session.query(Booking,User).filter(Booking.id == reservation_id).filter(User.id == Booking.user_id).all()
+    print(qry)
+    if qry == []:
+        return make_response(render_template('error.html', error='404'),404)
+    else:
+        qry = qry[0]
+        if qry.Booking.rest_id != current_user.get_rest_id():
+            return make_response(render_template('error.html', error='401'),401)
+        else:
+            if request.method == "DELETE" or request.method == "POST":
+                db.session.query(Booking).filter_by(id = reservation_id).delete()
+                db.session.commit()
+                flash("Reservation deleted","success")
+                return redirect('/')
+            
+            elif request.method == "GET":
+                return render_template("reservation.html", reservation=qry)
+
+    

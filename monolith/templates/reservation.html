@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+    {% block content %}
+        <h1>GoOutSafe</h1>
+
+          {% if current_user.is_operator %}
+            <h2>Your Reservations</h2>
+              <div>
+                  <li>Reservation Id: {{reservation.Booking.id}}</li>
+                  <li>Customer: {{reservation.User.lastname}} {{reservation.User.firstname}}</li>
+                  <li>For {{reservation.Booking.person_number}} person</li>
+                  <li>At: {{reservation.Booking.booking_datetime}}</li>
+                  <li>Phone: {{reservation.User.phone}}</li>
+                  <li>Email: {{reservation.User.email}}</li>
+                  <form action="{{base_url}}/reservations/{{reservation.Booking.id}}" method="post">
+                    <input type=hidden />
+                    <input type=submit value="Delete" />
+                  </form> 
+              </div>
+
+          {% endif %}
+          <a href="/"> Back to Homepage </a>
+    {% endblock %}

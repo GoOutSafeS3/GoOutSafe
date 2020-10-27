@@ -15,6 +15,15 @@ def admin_required(func):
         return func(*args, **kw)
     return _admin_required
 
+def health_auyhority_required(func):
+    @functools.wraps(func)
+    def _health_auyhority_required(*args, **kw):
+        authority = current_user.is_authenticated and current_user.is_health_authority
+        if not authority:
+            return login_manager.unauthorized()
+        return func(*args, **kw)
+    return _health_auyhority_required
+
 
 def operator_required(func):
     @functools.wraps(func)
@@ -23,7 +32,6 @@ def operator_required(func):
             return login_manager.unauthorized()
         return func(*args, **kw)
     return _operator_required
-
 
 def is_admin():
     if current_user.is_anonymous is True:

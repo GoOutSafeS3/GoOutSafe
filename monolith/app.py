@@ -12,6 +12,7 @@ def fake_data():
     example_cust.firstname = 'Customer'
     example_cust.lastname = 'Customer'
     example_cust.email = 'customer@example.com'
+    example_cust.phone = 555123456
     example_cust.dateofbirth = datetime.datetime(2020, 10, 5)
     example_cust.is_admin = False
     example_cust.set_password('customer')
@@ -42,6 +43,7 @@ def fake_data():
         example_op.firstname = 'Operator'
         example_op.lastname = 'Operator'
         example_op.email = 'operator@example.com'
+        example_op.phone = 555123456
         example_op.dateofbirth = datetime.datetime(2020, 10, 5)
         example_op.is_admin = False
         example_op.set_password('operator')
