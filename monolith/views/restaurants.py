@@ -1,5 +1,5 @@
 from flask import Blueprint, redirect, render_template, request, make_response, flash
-from monolith.database import db, Restaurant, Like, Booking, User
+from monolith.database import db, Restaurant, Like, Booking, User, Table
 from monolith.auth import admin_required, current_user, is_admin, operator_required
 from flask_login import (current_user, login_user, logout_user,
                          login_required)
@@ -33,23 +33,25 @@ def _like(restaurant_id):
         message = 'You\'ve already liked this place!'
     return _restaurants(message)
 
-def book_a_table(restaurant_id, number_of_person, booking_datetime):
+def book_a_table(restaurant, number_of_person, booking_datetime):
     new_booking = Booking()
     new_booking.user_id = current_user.id
-    new_booking.rest_id = restaurant_id
+    new_booking.rest_id = restaurant.id
     new_booking.person_number = number_of_person
     new_booking.booking_date = booking_datetime
     db.session.add(new_booking)
     db.session.commit()
 
-def in_conflict(restaurant_id, number_of_person, booking_datetime):
-    q = Booking.query.filter_by(rest_id=restaurant_id, booking_datetime=booking_datetime)
+def in_conflict(restaurant, number_of_person, booking_datetime):
+    q = db.session.query(Booking,Table)filter_by(rest_id=restaurant.id)
+                        .filter(b <= Booking.booking_datetime)\
+                        .filter(Booking.booking_datetime <= to_datetime )\
     return False
 
 def try_to_book(restaurant_id, number_of_person, booking_datetime):
     record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()[0]
     if record.is_open(booking_datetime):
-        if not in_conflict(restaurant_id, number_of_person, booking_datetime):
+        if not in_conflict(record, number_of_person, booking_datetime):
             book_a_table(restaurant_id, number_of_person, booking_datetime)
             return True
     return False
@@ -57,9 +59,14 @@ def try_to_book(restaurant_id, number_of_person, booking_datetime):
 @restaurants.route('/restaurants/book/<restaurant_id>', methods=['GET', 'POST'])
 @login_required
 def _book(restaurant_id):
-    if False and is_admin or current_user.is_operator:
+    if is_admin or current_user.is_operator:
         flash("Please log as customer to book a table","error")
         return redirect("/restaurants/"+restaurant_id)
+
+    if current_user.is_positive:
+        flash("You cannot book as long as you are positive","error")
+        return redirect("/restaurants/"+restaurant_id)
+
     form = BookingForm()
     if request.method == 'POST':
         if form.validate_on_submit():
