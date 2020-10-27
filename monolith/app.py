@@ -36,6 +36,8 @@ def fake_data():
         example.closing_hour_dinner = 23
         example.occupation_time = 2
         example.closed_days = "17"
+        example.cuisine_type = "True Italian Restaurant"
+        example.menu = "Pasta Bolognese\nPizza\nBreadsticks"
         db.session.add(example)
         db.session.commit()
 

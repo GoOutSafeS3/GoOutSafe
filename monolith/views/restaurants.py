@@ -31,7 +31,9 @@ def restaurant_sheet(restaurant_id):
         lunch_opening=record.opening_hour_lunch,
         lunch_closing=record.closing_hour_lunch,
         dinner_opening=record.opening_hour_dinner,
-        dinner_closing=record.closing_hour_dinner)
+        dinner_closing=record.closing_hour_dinner,
+        cuisine_type=record.cuisine_type,
+        menu=record.menu)
     
 @restaurants.route('/restaurants/like/<restaurant_id>')
 @login_required

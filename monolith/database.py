@@ -83,6 +83,9 @@ class Restaurant(db.Model):
 
     phone = db.Column(db.Integer)
 
+    cuisine_type = db.Column(db.Text(1000))
+    menu = db.Column(db.Text(1000))
+
     def is_open(self, booking_datetime):
         now = datetime.datetime.now()
         lunch_opening = now.replace( hour=self.opening_hour_lunch, minute=0, second=0, microsecond=0 )
