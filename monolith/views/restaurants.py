@@ -65,9 +65,9 @@ def get_table(restaurant, number_of_person, booking_datetime):
     occupied = db.session.query(Table.id).select_from(Booking,Table)\
                         .filter(Booking.table == Table.id)\
                         .filter(Booking.rest_id == restaurant.id)\
-                        .filter(starting_period <= Booking.booking_datetime)\
-                        .filter(Booking.booking_datetime <= ending_period )\
-                        .all()
+                        .filter(starting_period < Booking.booking_datetime)\
+                        .filter(Booking.booking_datetime < ending_period )\
+                        .all() #GB < or <= ? Better <
 
     total = db.session.query(Table.id,Table.capacity).select_from(Table,Restaurant)\
                         .filter(Restaurant.id == Table.rest_id)\
