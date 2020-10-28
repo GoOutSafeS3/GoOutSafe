@@ -28,8 +28,6 @@ def fake_data():
         example.phone = 555123456
         example.lat = 43.720586
         example.lon = 10.408347
-        example.tables_number = 10
-        example.tables_capacity = 5
         example.opening_hour_lunch = 10
         example.closing_hour_lunch = 16
         example.opening_hour_dinner = 21
@@ -88,7 +86,7 @@ def fake_data():
         booking_1.user_id = example_cust.id
         booking_1.booking_datetime = datetime.datetime(2020,11,5,10,15,0,0)
         booking_1.person_number = 5
-        booking_1.table = 1
+        booking_1.table_id = 1
         db.session.add(booking_1)
         db.session.commit()
 
@@ -97,7 +95,7 @@ def fake_data():
         booking_2.user_id = example_cust.id
         booking_2.booking_datetime = datetime.datetime(2020,11,5,10,15,0,0)
         booking_2.person_number = 5
-        booking_2.table = 2
+        booking_2.table_id = 2
         db.session.add(booking_2)
         db.session.commit()
 
@@ -106,7 +104,7 @@ def fake_data():
         booking_3.user_id = example_cust.id
         booking_3.booking_datetime = datetime.datetime(2020,11,5,11,30,0,0)
         booking_3.person_number = 5
-        booking_3.table = 3
+        booking_3.table_id = 3
         db.session.add(booking_3)
         db.session.commit()
 

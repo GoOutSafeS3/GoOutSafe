@@ -34,6 +34,23 @@
         {% endfor %}
       </ul>
     </div>
+    {% if current_user.rest_id == id %}
+      <div class="restaurant_tables">
+        <h3>Your tables</h3>
+        <ul>
+          {% for table in tables: %}
+            <li>
+              Capacity: {{table.capacity}}
+              {% if table.bookings == []: %}
+                <a href="{{base_url}}/tables/delete/{{table.id}}">Delete</a>
+              {% else: %}
+                <em>This table is booked</em>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
 
     <form action="{{base_url}}/restaurants/book/{{id}}">
       <input type="submit" value="Book a Table!" />

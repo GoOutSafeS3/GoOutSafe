@@ -12,9 +12,9 @@ def _restaurants(message=''):
     allrestaurants = db.session.query(Restaurant)
     return render_template("restaurants.html", message=message, restaurants=allrestaurants, base_url="http://127.0.0.1:5000/restaurants")
 
-@restaurants.route('/restaurants/<restaurant_id>')
+@restaurants.route('/restaurants/<int:restaurant_id>')
 def restaurant_sheet(restaurant_id):
-    record = db.session.query(Restaurant).filter_by(id = int(restaurant_id)).all()[0]
+    record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()[0]
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     closed_days = []
     for day in record.closed_days:
@@ -33,9 +33,10 @@ def restaurant_sheet(restaurant_id):
         dinner_opening=record.opening_hour_dinner,
         dinner_closing=record.closing_hour_dinner,
         cuisine_type=record.cuisine_type,
-        menu=record.menu)
+        menu=record.menu,
+        tables=record.tables)
     
-@restaurants.route('/restaurants/like/<restaurant_id>')
+@restaurants.route('/restaurants/like/<int:restaurant_id>')
 @login_required
 def _like(restaurant_id):
     q = Like.query.filter_by(liker_id=current_user.id, restaurant_id=restaurant_id)
@@ -56,7 +57,7 @@ def book_a_table(restaurant, number_of_person, booking_datetime, table):
     new_booking.rest_id = restaurant.id
     new_booking.person_number = number_of_person
     new_booking.booking_datetime = booking_datetime
-    new_booking.table = table
+    new_booking.table_id = table
     db.session.add(new_booking)
     db.session.commit()
 
@@ -65,7 +66,7 @@ def get_table(restaurant, number_of_person, booking_datetime):
     starting_period = booking_datetime - datetime.timedelta(hours=delta)
     ending_period = booking_datetime + datetime.timedelta(hours=delta)
     occupied = db.session.query(Table.id).select_from(Booking,Table)\
-                        .filter(Booking.table == Table.id)\
+                        .filter(Booking.table_id == Table.id)\
                         .filter(Booking.rest_id == restaurant.id)\
                         .filter(starting_period <= Booking.booking_datetime)\
                         .filter(Booking.booking_datetime <= ending_period )\
@@ -95,7 +96,7 @@ def try_to_book(restaurant_id, number_of_person, booking_datetime):
             return True
     return False
 
-@restaurants.route('/restaurants/book/<restaurant_id>', methods=['GET', 'POST'])
+@restaurants.route('/restaurants/book/<int:restaurant_id>', methods=['GET', 'POST'])
 @login_required
 def _book(restaurant_id):
 
@@ -133,11 +134,11 @@ def _book(restaurant_id):
     return render_template('book_a_table.html', form=form)
 
 
-@restaurants.route('/restaurants/<restaurant_id>/reservations', methods=['GET', 'POST'])
+@restaurants.route('/restaurants/<int:restaurant_id>/reservations', methods=['GET', 'POST'])
 @operator_required
 def _booking_list(restaurant_id):
 
-    if current_user.rest_id != int(restaurant_id):
+    if current_user.rest_id != restaurant_id:
         flash("Area reserved for the restaurant operator","error")
         return redirect("/restaurants/"+restaurant_id, code=401)
 
@@ -175,7 +176,7 @@ def _booking_list(restaurant_id):
 
 
 
-@restaurants.route('/reservations/<reservation_id>', methods=['GET', 'DELETE', 'POST'])
+@restaurants.route('/reservations/<int:reservation_id>', methods=['GET', 'DELETE', 'POST'])
 @operator_required
 def _reservation(reservation_id):
 

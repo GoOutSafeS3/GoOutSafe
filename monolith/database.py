@@ -26,6 +26,8 @@ class User(db.Model):
     is_positive = db.Column(db.Boolean, default=False)
     positive_datetime = db.Column(db.DateTime)
 
+    restaurant = relationship('Restaurant')
+
     def __init__(self, *args, **kw):
         super(User, self).__init__(*args, **kw)
         self._authenticated = False
@@ -68,9 +70,6 @@ class Restaurant(db.Model):
     lat = db.Column(db.Float) # restaurant latitude
     lon = db.Column(db.Float) # restaurant longitude
 
-    tables_number = db.Column(db.Integer) # number of tables
-    tables_capacity = db.Column(db.Integer) # capacity for every table
-
     opening_hour_lunch = db.Column(db.Integer) # the opening hour for the lunch
     closing_hour_lunch = db.Column(db.Integer) # the closing hour for the lunch 
 
@@ -85,6 +84,9 @@ class Restaurant(db.Model):
 
     cuisine_type = db.Column(db.Text(1000))
     menu = db.Column(db.Text(1000))
+
+    tables = relationship('Table')
+    operators = relationship('User')
 
     def is_open(self, booking_datetime):
         now = datetime.datetime.now()
@@ -107,6 +109,9 @@ class Table(db.Model):
     rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
     capacity = db.Column(db.Integer)
 
+    restaurant = relationship('Restaurant')
+    bookings = relationship('Booking')
+
 class Booking(db.Model):
     __tablename__ = 'booking'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -114,7 +119,12 @@ class Booking(db.Model):
     rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
     person_number = db.Column(db.Integer)
     booking_datetime = db.Column(db.DateTime)
-    table = db.Column(db.Integer, db.ForeignKey('table.id'))
+    table_id = db.Column(db.Integer, db.ForeignKey('table.id'))
+
+    user = relationship('User')
+    restaurant = relationship('Restaurant')
+    table = relationship('Table')
+
 
 
 class Like(db.Model):
