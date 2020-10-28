@@ -51,6 +51,7 @@ def _like(restaurant_id):
         message = 'You\'ve already liked this place!'
     return _restaurants(message)
 
+
 def book_a_table(restaurant, number_of_person, booking_datetime, table):
     new_booking = Booking()
     new_booking.user_id = current_user.id
@@ -61,6 +62,7 @@ def book_a_table(restaurant, number_of_person, booking_datetime, table):
     db.session.add(new_booking)
     db.session.commit()
 
+
 def get_table(restaurant, number_of_person, booking_datetime):
     delta = restaurant.occupation_time
     starting_period = booking_datetime - datetime.timedelta(hours=delta)
@@ -68,9 +70,9 @@ def get_table(restaurant, number_of_person, booking_datetime):
     occupied = db.session.query(Table.id).select_from(Booking,Table)\
                         .filter(Booking.table_id == Table.id)\
                         .filter(Booking.rest_id == restaurant.id)\
-                        .filter(starting_period <= Booking.booking_datetime)\
-                        .filter(Booking.booking_datetime <= ending_period )\
-                        .all()
+                        .filter(starting_period < Booking.booking_datetime)\
+                        .filter(Booking.booking_datetime < ending_period )\
+                        .all() #GB < or <= ? Better <
 
     total = db.session.query(Table.id,Table.capacity).select_from(Table,Restaurant)\
                         .filter(Restaurant.id == Table.rest_id)\
@@ -86,6 +88,7 @@ def get_table(restaurant, number_of_person, booking_datetime):
     if free_tables == []:
         return None
     return free_tables[0][0]
+
 
 def try_to_book(restaurant_id, number_of_person, booking_datetime):
     record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()[0]
@@ -233,6 +236,7 @@ def delete_table(table_id):
 
     if table.rest_id == current_user.rest_id:
         db.session.delete(table)
+        db.session.commit()
         return redirect(f'/restaurants/{current_user.rest_id}')
     else:
         return make_response(render_template('error.html', error='401'),401)
