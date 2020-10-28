@@ -51,6 +51,7 @@ def _like(restaurant_id):
         message = 'You\'ve already liked this place!'
     return _restaurants(message)
 
+
 def book_a_table(restaurant, number_of_person, booking_datetime, table):
     new_booking = Booking()
     new_booking.user_id = current_user.id
@@ -61,6 +62,7 @@ def book_a_table(restaurant, number_of_person, booking_datetime, table):
     db.session.add(new_booking)
     db.session.commit()
 
+
 def get_table(restaurant, number_of_person, booking_datetime):
     delta = restaurant.occupation_time
     starting_period = booking_datetime - datetime.timedelta(hours=delta)
@@ -68,9 +70,9 @@ def get_table(restaurant, number_of_person, booking_datetime):
     occupied = db.session.query(Table.id).select_from(Booking,Table)\
                         .filter(Booking.table_id == Table.id)\
                         .filter(Booking.rest_id == restaurant.id)\
-                        .filter(starting_period <= Booking.booking_datetime)\
-                        .filter(Booking.booking_datetime <= ending_period )\
-                        .all()
+                        .filter(starting_period < Booking.booking_datetime)\
+                        .filter(Booking.booking_datetime < ending_period )\
+                        .all() #GB < or <= ? Better <
 
     total = db.session.query(Table.id,Table.capacity).select_from(Table,Restaurant)\
                         .filter(Restaurant.id == Table.rest_id)\
@@ -87,6 +89,7 @@ def get_table(restaurant, number_of_person, booking_datetime):
         return None
     return free_tables[0][0]
 
+
 def try_to_book(restaurant_id, number_of_person, booking_datetime):
     record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()[0]
     if record.is_open(booking_datetime):
@@ -96,7 +99,12 @@ def try_to_book(restaurant_id, number_of_person, booking_datetime):
             return True
     return False
 
+<<<<<<< HEAD
 @restaurants.route('/restaurants/book/<int:restaurant_id>', methods=['GET', 'POST'])
+=======
+
+@restaurants.route('/restaurants/book/<restaurant_id>', methods=['GET', 'POST'])
+>>>>>>> bookings
 @login_required
 def _book(restaurant_id):
 
@@ -140,7 +148,11 @@ def _booking_list(restaurant_id):
 
     if current_user.rest_id != restaurant_id:
         flash("Area reserved for the restaurant operator","error")
+<<<<<<< HEAD
         return redirect(f"/restaurants/{restaurant_id}", code=401)
+=======
+        return make_response("/restaurants/"+restaurant_id, code=401)
+>>>>>>> bookings
 
     form = BookingList()
     if request.method == 'POST':
@@ -175,8 +187,12 @@ def _booking_list(restaurant_id):
     return render_template('booking_list.html', form=form)
 
 
+<<<<<<< HEAD
 
 @restaurants.route('/reservations/<int:reservation_id>', methods=['GET', 'DELETE', 'POST'])
+=======
+@restaurants.route('/reservations/<reservation_id>', methods=['GET', 'DELETE', 'POST'])
+>>>>>>> bookings
 @operator_required
 def _reservation(reservation_id):
 
