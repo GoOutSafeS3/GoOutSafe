@@ -5,6 +5,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from monolith.forms import UserForm, BookingForm, BookingList
 import datetime
 
+reservations = Blueprint('reservations', __name__)
 
 def book_a_table(restaurant, number_of_person, booking_datetime, table):
     new_booking = Booking()
@@ -49,7 +50,7 @@ def try_to_book(restaurant_id, number_of_person, booking_datetime):
             return True
     return False
 
-@restaurants.route('/restaurants/<int:restaurant_id>/book', methods=['GET', 'POST'])
+@reservations.route('/restaurants/<int:restaurant_id>/book', methods=['GET', 'POST'])
 @login_required
 def _book(restaurant_id):
 
@@ -75,19 +76,19 @@ def _book(restaurant_id):
             
             if booking_datetime < now:
                 flash("You cannot book before now","error")
-                return render_template('book_a_table.html', form=form)
+                return render_template('form.html', form=form, title = "Book a table!")
 
             if try_to_book(restaurant_id, int(number_of_person), booking_datetime):
                 flash("The booking was confirmed","success")
                 return redirect(f"/restaurants/{restaurant_id}")
             else:
                 flash("The reservation could not be made","error")
-                return render_template('book_a_table.html', form=form)
+                return render_template('form.html', form=form, title = "Book a table!")
 
-    return render_template('book_a_table.html', form=form)
+    return render_template('form.html', form=form, title = "Book a table!")
 
 
-@restaurants.route('/restaurants/<int:restaurant_id>/reservations', methods=['GET', 'POST'])
+@reservations.route('/restaurants/<int:restaurant_id>/reservations', methods=['GET', 'POST'])
 @operator_required
 def _booking_list(restaurant_id):
 
@@ -129,7 +130,7 @@ def _booking_list(restaurant_id):
 
 
 
-@restaurants.route('/reservations/<int:reservation_id>', methods=['GET'])
+@reservations.route('/reservations/<int:reservation_id>', methods=['GET', 'DELETE', 'POST'])
 @operator_required
 def _reservation(reservation_id):
 
@@ -142,22 +143,11 @@ def _reservation(reservation_id):
         if qry.Booking.rest_id != current_user.get_rest_id():
             return make_response(render_template('error.html', error='401'),401)
         else:
-            return render_template("reservation.html", reservation=qry)
-
-@restaurants.route('/reservations/<int:reservation_id>/delete', methods=['GET', 'POST'])
-@operator_required
-def _reservation(reservation_id):
-
-    qry = db.session.query(Booking,User).filter(Booking.id == reservation_id).filter(User.id == Booking.user_id).all()
-    
-    if qry == []:
-        return make_response(render_template('error.html', error='404'),404)
-    else:
-        qry = qry[0]
-        if qry.Booking.rest_id != current_user.get_rest_id():
-            return make_response(render_template('error.html', error='401'),401)
-        else:
-            db.session.query(Booking).filter_by(id = reservation_id).delete()
-            db.session.commit()
-            flash("Reservation deleted","success")
-            return redirect('/')
+            if request.method == "DELETE" or request.method == "POST":
+                db.session.query(Booking).filter_by(id = reservation_id).delete()
+                db.session.commit()
+                flash("Reservation deleted","success")
+                return redirect('/')
+            
+            elif request.method == "GET":
+                return render_template("reservation.html", reservation=qry)
