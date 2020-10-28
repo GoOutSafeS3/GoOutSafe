@@ -211,6 +211,7 @@ def delete_table(table_id):
 
     if table.rest_id == current_user.rest_id:
         db.session.delete(table)
+        db.session.commit()
         return redirect(f'/restaurants/{current_user.rest_id}')
     else:
         return make_response(render_template('error.html', error='401'),401)
