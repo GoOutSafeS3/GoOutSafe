@@ -154,6 +154,7 @@ def create_app_testing():
 
     db.init_app(app)
     login_manager.init_app(app)
+    db.drop_all(app=app)
     db.create_all(app=app)
 
     # create a first admin user

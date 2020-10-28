@@ -14,7 +14,6 @@ class TestRegistration(unittest.TestCase):
         self.app.test_client_class = FlaskClient
 
     def send_registration_form(self, tested_app, url, form):
-
         reply = tested_app.t_post(url, data=form)
         soup = BeautifulSoup(reply.get_data(as_text=True), 'html.parser')
         helpblock = soup.find_all('p', attrs={'class': 'help-block'})
