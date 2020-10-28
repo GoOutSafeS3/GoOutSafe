@@ -34,14 +34,14 @@ def _book(restaurant_id):
             
             if booking_datetime < now:
                 flash("You cannot book before now","error")
-                return render_template('form.html', form=form, title = "Book a table!")
+                return make_response(render_template('form.html', form=form, title = "Book a table!"),400)
 
             if try_to_book(restaurant_id, int(number_of_person), booking_datetime):
                 flash("The booking was confirmed","success")
                 return redirect(f"/restaurants/{restaurant_id}")
             else:
                 flash("The reservation could not be made","error")
-                return render_template('form.html', form=form, title = "Book a table!")
+                return make_response(render_template('form.html', form=form, title = "Book a table!"),400)
 
     return render_template('form.html', form=form, title = "Book a table!")
 
@@ -73,7 +73,7 @@ def _booking_list(restaurant_id):
 
             if from_datetime >= to_datetime:
                 flash("Invalid time interval","error")
-                return render_template('booking_list.html', form=form)
+                return make_response(render_template('form.html', form=form),400)
 
             qry = db.session.query(Booking,User)\
                             .filter_by(rest_id = current_user.get_rest_id())\
@@ -84,7 +84,7 @@ def _booking_list(restaurant_id):
 
             return render_template("reservations.html", reservations=qry)
 
-    return render_template('booking_list.html', form=form)
+    return make_response(render_template('form.html', form=form),200)
 
 
 

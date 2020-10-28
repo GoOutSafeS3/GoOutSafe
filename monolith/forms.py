@@ -60,15 +60,13 @@ class RestaurantEditForm(FlaskForm):
 
 
 class BookingForm(FlaskForm):
-
     number_of_person = f.IntegerField("Number of Person", validators=[InputRequired(), NumberRange(min=1)])
     booking_date = f.DateField('Date', format='%d/%m/%Y')
-    booking_hr = f.SelectField('Hour', choices=range(0,24))
+    booking_hr = f.SelectField('Hour', choices=range(0,23))
     booking_min = f.SelectField('Minutes', choices=range(0,60,15))
     display = ['number_of_person','booking_date','booking_hr','booking_min']
 
 class BookingList(FlaskForm):
-    
     from_date = f.DateField('From Date', format='%d/%m/%Y')
     from_hr = f.SelectField('Hour', choices=range(0,24))
     from_min = f.SelectField('Minutes', choices=range(0,60,15))
