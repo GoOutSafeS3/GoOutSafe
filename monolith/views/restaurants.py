@@ -14,7 +14,11 @@ def _restaurants(message=''):
 
 @restaurants.route('/restaurants/<int:restaurant_id>')
 def restaurant_sheet(restaurant_id):
-    record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()[0]
+    record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()
+    if record == []:
+        return make_response(render_template('error.html', error='404'),404)
+    else:
+        record = record[0]
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     closed_days = []
     for day in record.closed_days:

@@ -1,8 +1,9 @@
 from flask import Blueprint, redirect, render_template, request, flash, make_response
-from flask_login import login_required
+from flask_login import login_required, logout_user, current_user
 
-from monolith.auth import admin_required, is_admin
-from monolith.forms import UserForm, OperatorForm
+
+from monolith.auth import admin_required, is_admin, operator_required
+from monolith.forms import UserForm, OperatorForm, LoginForm
 from monolith.database import User, db, Restaurant
 
 users = Blueprint('users', __name__)
@@ -14,6 +15,59 @@ def _users():
     if is_admin():
         users = db.session.query(User)
         return render_template("users.html", users=users)
+
+
+@users.route('/delete_user', methods=['GET', 'POST'])
+@login_required
+def delete_user():
+    if current_user.is_admin or current_user.is_health_authority or current_user.is_operator:
+        return make_response(render_template('error.html', error='401'),401)
+    form = LoginForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            email, password = form.data['email'], form.data['password']
+            q = db.session.query(User).filter(User.email == email)
+            user = q.first()
+            if user is not None:
+                print(q.first().id)
+            if user is not None and user.authenticate(password) and current_user.id == user.id:
+                logout_user()
+                db.session.delete(user)
+                db.session.commit()
+                flash('Your account has been deleted','success')
+                return redirect('/')
+            flash('Wrong email or password','error')
+            return make_response(render_template('login.html', form=form, title="Unregister"),401)
+        flash('Bad form','error')
+        return make_response(render_template('login.html', form=form, title="Unregister"),400)
+    return make_response(render_template('login.html', form=form, title="Unregister"),200)
+
+@users.route('/delete_operator', methods=['GET', 'POST'])
+@operator_required
+def delete_operator():
+    form = LoginForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            email, password = form.data['email'], form.data['password']
+            q = db.session.query(User).filter(User.email == email)
+            user = q.first()
+            q_r = db.session.query(Restaurant).filter_by(id = user.rest_id)
+            rest = q_r.first()
+            if user is not None:
+                print(q.first().id)
+            if user is not None and user.authenticate(password) and current_user.id == user.id:
+                logout_user()
+                db.session.delete(user)
+                if rest is not None:
+                    db.session.delete(rest)
+                db.session.commit()
+                flash('Your account has been deleted','success')
+                return redirect('/')
+            flash('Wrong email or password','error')
+            return make_response(render_template('login.html', form=form, title="Unregister"),401)
+        flash('Bad form','error')
+        return make_response(render_template('login.html', form=form, title="Unregister"),400)
+    return make_response(render_template('login.html', form=form, title="Unregister"),200)
 
 
 @users.route('/create_user', methods=['GET', 'POST'])
