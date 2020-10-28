@@ -9,7 +9,7 @@
                   <li>At: {{reservation.Booking.booking_datetime}}</li>
                   <li>Phone: {{reservation.User.phone}}</li>
                   <li>Email: {{reservation.User.email}}</li>
-                  <form action="{{base_url}}/reservations/{{reservation.Booking.id}}" method="post">
+                  <form action="{{base_url}}/reservations/{{reservation.Booking.id}}/delete" method="post">
                     <input type=hidden />
                     <input type=submit value="Delete" />
                   </form> 

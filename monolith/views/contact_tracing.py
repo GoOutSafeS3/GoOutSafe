@@ -15,7 +15,7 @@ def positives():
     qry = db.session.query(User).filter_by(is_positive = True).all()
     return render_template("positives.html", positives = qry)
 
-@contact_tracing.route('/positives/mark/<user_id>', methods=['GET','POST'])
+@contact_tracing.route('/positives/<user_id>/mark', methods=['GET','POST'])
 @health_auyhority_required
 def mark_as_positive(user_id):
     qry = db.session.query(User).filter_by(id = user_id).all()
@@ -33,7 +33,7 @@ def mark_as_positive(user_id):
         flash("The user was marked as positive","success")
         return redirect("/")
 
-@contact_tracing.route('/positives/unmark/<user_id>', methods=['GET','POST'])
+@contact_tracing.route('/positives/<user_id>/unmark', methods=['GET','POST'])
 @health_auyhority_required
 def _unmark_as_positive(user_id):
     qry = db.session.query(User).filter_by(id = user_id).all()
