@@ -7,7 +7,11 @@
             <dl>
              {% for field in form.display %}
              <dt>{{ form[field].label }}</dt>
+             {% if 'closed_days' in field %}
+             <dd>{{ form[field](size=7, class='form-control',  multiple="multiple") }}</dd>
+             {% else %}
              <dd>{{ form[field]() }}</dd>
+             {% endif %}
                {% if form[field].errors %}
                   {% for e in form[field].errors %}
                    <p class="help-block">{{ e }}</p>

@@ -146,16 +146,17 @@ def _edit_restaurant(restaurant_id):
 
     record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()[0]
 
-    form = RestaurantEditForm(obj=record)
+    form = RestaurantEditForm()
     if request.method == 'POST':
         if form.validate_on_submit():
             form.populate_obj(record)
-            record.closed_days = ''.join(request.form['closed_days'])
+            record.closed_days = ''.join(request.form.getlist('closed_days'))
             db.session.add(record)
             db.session.commit()
             flash("Updated","success")
             return render_template("edit_restaurant.html", form=form)
-    flash(record.name,"success")
+        flash("Bad form","success")
+        return make_response(render_template('edit_restaurant.html', form=form), 400)
     return render_template('edit_restaurant.html', form=form)
 
 
