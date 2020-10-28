@@ -194,5 +194,5 @@ def create_app_production():
 
 
 if __name__ == '__main__':
-    app = create_app_production()
+    app = create_app_testing()
     app.run()

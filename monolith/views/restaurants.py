@@ -32,7 +32,8 @@ def restaurant_sheet(restaurant_id):
         lunch_closing=record.closing_hour_lunch,
         dinner_opening=record.opening_hour_dinner,
         dinner_closing=record.closing_hour_dinner)
-    
+
+
 @restaurants.route('/restaurants/like/<restaurant_id>')
 @login_required
 def _like(restaurant_id):
@@ -48,6 +49,7 @@ def _like(restaurant_id):
         message = 'You\'ve already liked this place!'
     return _restaurants(message)
 
+
 def book_a_table(restaurant, number_of_person, booking_datetime, table):
     new_booking = Booking()
     new_booking.user_id = current_user.id
@@ -57,6 +59,7 @@ def book_a_table(restaurant, number_of_person, booking_datetime, table):
     new_booking.table = table
     db.session.add(new_booking)
     db.session.commit()
+
 
 def get_table(restaurant, number_of_person, booking_datetime):
     delta = restaurant.occupation_time
@@ -84,6 +87,7 @@ def get_table(restaurant, number_of_person, booking_datetime):
         return None
     return free_tables[0][0]
 
+
 def try_to_book(restaurant_id, number_of_person, booking_datetime):
     record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()[0]
     if record.is_open(booking_datetime):
@@ -92,6 +96,7 @@ def try_to_book(restaurant_id, number_of_person, booking_datetime):
             book_a_table(record, number_of_person, booking_datetime, table)
             return True
     return False
+
 
 @restaurants.route('/restaurants/book/<restaurant_id>', methods=['GET', 'POST'])
 @login_required
@@ -137,7 +142,7 @@ def _booking_list(restaurant_id):
 
     if current_user.rest_id != int(restaurant_id):
         flash("Area reserved for the restaurant operator","error")
-        return redirect("/restaurants/"+restaurant_id, code=401)
+        return make_response("/restaurants/"+restaurant_id, code=401)
 
     form = BookingList()
     if request.method == 'POST':
@@ -170,7 +175,6 @@ def _booking_list(restaurant_id):
             return render_template("reservations.html", reservations=qry)
 
     return render_template('booking_list.html', form=form)
-
 
 
 @restaurants.route('/reservations/<reservation_id>', methods=['GET', 'DELETE', 'POST'])
