@@ -26,7 +26,7 @@ def create_user():
             password_repeat = request.form['password_repeat']
             if password != password_repeat:
                 flash('Passwords do not match', 'warning')
-                return make_response(render_template('create_user.html', form=form),200)
+                return make_response(render_template('form.html', form=form, title="Sign in!"),200)
 
             userGet = User.query.filter_by(email=form.email.data).first()
             if userGet is None:
@@ -43,15 +43,15 @@ def create_user():
                     db.session.commit()
                 except: # Remove if coverage < 90%
                     flash('User not inserted','error')
-                    return make_response(render_template('create_user.html', form=form),500)
+                    return make_response(render_template('form.html', form=form, title="Sign in!"),500)
             else:
                 flash('Existing user', 'error')
-                return make_response(render_template('create_user.html', form=form),400)
+                return make_response(render_template('form.html', form=form, title="Sign in!"),400)
 
             flash('User registerd succesfully','success')
-            return make_response(render_template('create_user.html',  form=form),200)
+            return make_response(render_template('form.html', form=form, title="Sign in!"),200)
 
-    return render_template('create_user.html', form=form)
+    return render_template('form.html', form=form, title="Sign in!")
 
 
 @users.route('/create_operator', methods=['GET', 'POST'])
@@ -64,7 +64,7 @@ def create_operator():
             password_repeat = request.form['password_repeat']
             if password != password_repeat:
                 flash('Passwords do not match', 'warning')
-                return make_response(render_template('create_operator.html', form=form),200)
+                return make_response(render_template('form.html', form=form, title="Sign in!"),200)
 
             userGet = User.query.filter_by(email=form.email.data).first()
             userRestaurant = Restaurant.query.filter_by(name=form.restaurant_name.data).first()
@@ -92,16 +92,16 @@ def create_operator():
 
                     except: # Remove if coverage < 90%
                         flash('New operator and Restaurant not inserted','error')
-                        return make_response(render_template('create_operator.html', form=form),500)
+                        return make_response(render_template('form.html', form=form, title="Sign in!"),500)
                 else:
                     flash('Existing operator', 'error')
-                    return make_response(render_template('create_operator.html', form=form), 400)
+                    return make_response(render_template('form.html', form=form, title="Sign in!"), 400)
             else:
                 flash('Existing restaurant', 'error')
-                return make_response(render_template('create_operator.html', form=form), 400)
+                return make_response(render_template('form.html', form=form, title="Sign in!"), 400)
 
             flash('Operator registerd succesfully','success')
-            return make_response(render_template('create_operator.html',  form=form),200)
+            return make_response(render_template('form.html', form=form, title="Sign in!"),200)
 
-    return render_template('create_operator.html', form=form)
+    return render_template('form.html', form=form, title="Sign in!")
 

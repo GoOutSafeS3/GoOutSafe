@@ -81,8 +81,8 @@ class TestRegistration(unittest.TestCase):
         #alrady logged as we created a user right now
         reply = client.t_get('/')
         text = reply.get_data(as_text=True)
-        text = text[text.find("Universe"):]
-        id = text[text.find("/restaurants/")+len("/restaurants/"):].split("/edit")[0]
+
+        id = text[text.find("/restaurants/")+len("/restaurants/"):].split("\"")[0]
         try:
             id = int(id)
         except:
@@ -180,7 +180,7 @@ class TestRegistration(unittest.TestCase):
             "cuisine_type": "Pizzoria",
             "menu": "Napolitano"
         }
-        reply = self.edit_restaurant(client, id, form.copy())
+        reply = self.edit_restaurant(client, id-1, form.copy()) #id-1 because id is the restorant of operato2
         self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))
 
 

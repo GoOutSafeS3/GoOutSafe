@@ -94,10 +94,10 @@ class TestRestaurant(unittest.TestCase):
             client.set_app(self.app)
             reply = self.do_login(client, "example@example.com", "admin")
             
-            reply = client.t_get("/restaurants/like/1")
+            reply = client.t_get("/restaurants/1/like")
             reply_data = reply.get_data(as_text = True)
             self.assertFalse("already liked" in reply_data)
             
-            reply = client.t_get("/restaurants/like/1")
+            reply = client.t_get("/restaurants/1/like")
             reply_data = reply.get_data(as_text = True)
-            self.assertTrue("already liked" in reply_data)
+            self.assertIn("already liked",reply_data)

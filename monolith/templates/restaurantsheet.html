@@ -8,11 +8,8 @@
     </div>
 
     <ul>
-      {% if current_user.is_authenticated %}
       <iframe width="600" height="400" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" 
       src="https://www.openstreetmap.org/export/embed.html?bbox={{lon - 0.001}}%2C{{lat - 0.001}}%2C{{lon + 0.001}}%2C{{lat + 0.001}}&amp;layer=mapnik&amp;marker={{lat}}%2C{{lon}}" style="border: 1px solid black"></iframe><br/><small><a href="https://www.openstreetmap.org/#map=17/{{lat}}/{{lon}}">See it Larger</a></small>
-      
-      {% endif %}
     </ul>
 
     <div class="menu">
@@ -43,7 +40,7 @@
             <li>
               Capacity: {{table.capacity}}
               {% if table.bookings == []: %}
-                <a href="{{base_url}}/tables/delete/{{table.id}}">Delete</a>
+                <a href="{{base_url}}/tables/{{table.id}}/delete">Delete</a>
               {% else: %}
                 <em>This table is booked</em>
               {% endif %}
@@ -53,7 +50,7 @@
       </div>
     {% endif %}
 
-    <form action="{{base_url}}/restaurants/book/{{id}}">
+    <form action="{{base_url}}/restaurants/{{id}}/book">
       <input type="submit" value="Book a Table!" />
     </form>
 
