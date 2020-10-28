@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, render_template, request, make_response, 
 from monolith.database import db, Restaurant, Like, Booking, User, Table
 from monolith.auth import admin_required, current_user, is_admin, operator_required
 from flask_login import current_user, login_user, logout_user, login_required
-from monolith.forms import UserForm, BookingForm, BookingList
+from monolith.forms import UserForm, BookingForm, BookingList, RestaurantEditForm
 import datetime
 
 restaurants = Blueprint('restaurants', __name__)
@@ -132,6 +132,28 @@ def _book(restaurant_id):
                 return render_template('book_a_table.html', form=form)
 
     return render_template('book_a_table.html', form=form)
+
+@restaurants.route('/restaurants/<int:restaurant_id>/edit', methods=['GET', 'POST'])
+@operator_required
+def _edit_restaurant(restaurant_id):
+    
+    if current_user.rest_id != restaurant_id:
+        flash("Area reserved for the restaurant operator","error")
+        return redirect(f"/restaurants/{restaurant_id}", code=401)
+
+    record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()[0]
+
+    form = RestaurantEditForm(obj=record)
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            form.populate_obj(record)
+            record.closed_days = ''.join(request.form['closed_days'])
+            db.session.add(record)
+            db.session.commit()
+            flash("Updated","success")
+            return render_template("edit_restaurant.html", form=form)
+    flash(record.name,"success")
+    return render_template('edit_restaurant.html', form=form)
 
 
 @restaurants.route('/restaurants/<int:restaurant_id>/reservations', methods=['GET', 'POST'])
