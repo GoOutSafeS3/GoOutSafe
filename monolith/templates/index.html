@@ -1,10 +1,9 @@
-{% extends 'layout.html' %}
+{% extends 'homepage.html' %}
     {% block content %}
         {% if current_user.is_authenticated %}
-          Hi {{ current_user.firstname }}! <a href="/logout">Logout</a>
-
+          <h3>Hi {{ current_user.firstname }}!<h3>
           {% if current_user.is_operator %}
-            <h2>Your Restaurants</h2>
+            <h4>Your Restaurants</h4>
             {% for restaurant in restaurants%}
               <div>
                 <li>
@@ -15,6 +14,7 @@
           {% endif %}
 
         {% else %}
+            <h2>Welcome to GoOutSafe</h2>
           Hi Anonymous, if you already have an account <a href="/login">Log in</a>
             <p></p>
             Otherwise:
