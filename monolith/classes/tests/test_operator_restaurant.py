@@ -7,6 +7,11 @@ from bs4 import BeautifulSoup
 import inspect
 
 class TestRegistration(unittest.TestCase):
+    @classmethod
+    def setUpClass(self):
+        self.app = create_app_testing()
+        self.app.test_client_class = FlaskClient
+
     def send_registration_form(self, tested_app, url, form):
 
         reply = tested_app.t_post(url, data=form)
@@ -21,10 +26,8 @@ class TestRegistration(unittest.TestCase):
         return {"status_code":reply.status_code, "help-block":helpblock}
 
     def setup_app(self):
-        app = create_app_testing()
-        app.test_client_class = FlaskClient
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerGoodFormOperator@test.me",
