@@ -102,11 +102,11 @@ def _book(restaurant_id):
 
     if current_user.is_admin or current_user.is_operator:
         flash("Please log as customer to book a table","error")
-        return redirect("/restaurants/"+restaurant_id)
+        return redirect(f"/restaurants/{restaurant_id}")
 
     if current_user.is_positive:
         flash("You cannot book as long as you are positive","error")
-        return redirect("/restaurants/"+restaurant_id)
+        return redirect(f"/restaurants/{restaurant_id}")
 
     form = BookingForm()
     if request.method == 'POST':
@@ -126,7 +126,7 @@ def _book(restaurant_id):
 
             if try_to_book(restaurant_id, int(number_of_person), booking_datetime):
                 flash("The booking was confirmed","success")
-                return redirect("/restaurants/"+restaurant_id)
+                return redirect(f"/restaurants/{restaurant_id}")
             else:
                 flash("The reservation could not be made","error")
                 return render_template('book_a_table.html', form=form)
@@ -140,7 +140,7 @@ def _booking_list(restaurant_id):
 
     if current_user.rest_id != restaurant_id:
         flash("Area reserved for the restaurant operator","error")
-        return redirect("/restaurants/"+restaurant_id, code=401)
+        return redirect(f"/restaurants/{restaurant_id}", code=401)
 
     form = BookingList()
     if request.method == 'POST':
@@ -198,4 +198,19 @@ def _reservation(reservation_id):
             elif request.method == "GET":
                 return render_template("reservation.html", reservation=qry)
 
-    
+@restaurants.route('/tables/delete/<int:table_id>')
+@operator_required
+def delete_table(table_id):
+    table = db.session.query(Table).filter(Table.id == table_id).first()
+
+    if table == None:
+        return make_response(render_template('error.html', error='404'), 404)
+
+    if table.bookings != []:
+        return make_response(render_template('error.html', error="Table is already booked"), 412)
+
+    if table.rest_id == current_user.rest_id:
+        db.session.delete(table)
+        return redirect(f'/restaurants/{current_user.rest_id}')
+    else:
+        return make_response(render_template('error.html', error='401'),401)

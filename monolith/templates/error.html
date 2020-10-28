@@ -4,5 +4,7 @@
         <h3> GoOutSafe - Page not found</h3>
     {% elif error == '401' %}
         <h3> GoOutSafe - Permission denied </h3>
+    {% else %}
+        <h3>GoOutSafe - {{error}}</h3>
     {% endif %}
 {% endblock %}
