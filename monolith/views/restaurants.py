@@ -99,12 +99,7 @@ def try_to_book(restaurant_id, number_of_person, booking_datetime):
             return True
     return False
 
-<<<<<<< HEAD
 @restaurants.route('/restaurants/book/<int:restaurant_id>', methods=['GET', 'POST'])
-=======
-
-@restaurants.route('/restaurants/book/<restaurant_id>', methods=['GET', 'POST'])
->>>>>>> bookings
 @login_required
 def _book(restaurant_id):
 
@@ -148,11 +143,7 @@ def _booking_list(restaurant_id):
 
     if current_user.rest_id != restaurant_id:
         flash("Area reserved for the restaurant operator","error")
-<<<<<<< HEAD
         return redirect(f"/restaurants/{restaurant_id}", code=401)
-=======
-        return make_response("/restaurants/"+restaurant_id, code=401)
->>>>>>> bookings
 
     form = BookingList()
     if request.method == 'POST':
@@ -187,12 +178,8 @@ def _booking_list(restaurant_id):
     return render_template('booking_list.html', form=form)
 
 
-<<<<<<< HEAD
 
 @restaurants.route('/reservations/<int:reservation_id>', methods=['GET', 'DELETE', 'POST'])
-=======
-@restaurants.route('/reservations/<reservation_id>', methods=['GET', 'DELETE', 'POST'])
->>>>>>> bookings
 @operator_required
 def _reservation(reservation_id):
 
