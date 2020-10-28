@@ -1,4 +1,3 @@
-#Hello, World!
 import os
 from flask import Flask
 from monolith.database import db, User, Restaurant, Booking, Table
