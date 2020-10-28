@@ -8,11 +8,11 @@
             {% for restaurant in restaurants%}
               <div>
                 <li>
-                 <a href="/restaurants/{{ restaurant.id }}"> {{restaurant.name}}  </a> -- Likes: {{restaurant.likes}}
+                 <a href="/restaurants/{{ restaurant.id }}"> {{restaurant.name}}  </a> -- Likes: {{restaurant.likes}} <a href="/restaurants/{{ restaurant.id }}/edit"> Edit Restaurant  </a>
                 </li>
               </div>
             {% endfor %}
-            {% endif %}
+          {% endif %}
 
         {% else %}
           Hi Anonymous, if you already have an account <a href="/login">Log in</a>

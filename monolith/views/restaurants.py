@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, render_template, request, make_response, 
 from monolith.database import db, Restaurant, Like, Booking, User, Table
 from monolith.auth import admin_required, current_user, is_admin, operator_required
 from flask_login import current_user, login_user, logout_user, login_required
-from monolith.forms import UserForm, BookingForm, BookingList
+from monolith.forms import UserForm, BookingForm, BookingList, RestaurantEditForm
 import datetime
 
 restaurants = Blueprint('restaurants', __name__)

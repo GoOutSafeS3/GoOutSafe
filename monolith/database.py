@@ -78,7 +78,7 @@ class Restaurant(db.Model):
 
     occupation_time = db.Column(db.Integer)
 
-    closed_days = db.Column(db.Text(7)) # one number for every closing day (1-7 i.e. monday-sunday)
+    closed_days = db.Column(db.Text(7), default="") # one number for every closing day (1-7 i.e. monday-sunday)
 
     phone = db.Column(db.Integer)
 

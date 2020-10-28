@@ -31,7 +31,8 @@
         {% endfor %}
       </ul>
     </div>
-    {% if current_user.rest_id == id %}
+    {% if current_user.is_operator and current_user.rest_id == id %}
+      <a href="/restaurants/{{ id }}/edit"> Edit Restaurant  </a>
       <div class="restaurant_tables">
         <h3>Your tables</h3>
         <ul>

@@ -6,10 +6,12 @@ from flask_test_with_csrf import FlaskClient
 from bs4 import BeautifulSoup
 import inspect
 
-app = create_app_testing()
-app.test_client_class = FlaskClient
 
 class TestRegistration(unittest.TestCase):
+    @classmethod
+    def setUpClass(self):
+        self.app = create_app_testing()
+        self.app.test_client_class = FlaskClient
 
     def send_registration_form(self, tested_app, url, form):
 
@@ -28,8 +30,8 @@ class TestRegistration(unittest.TestCase):
     # --- CREATE_USER -------------------------------------------------------
 
     def test_user_good_form(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerGoodForm@test.me",
@@ -51,8 +53,8 @@ class TestRegistration(unittest.TestCase):
             'success, User registerd succesfully') 
 
     def test_user_regood_form(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerGoodForm@test.me",
@@ -74,8 +76,8 @@ class TestRegistration(unittest.TestCase):
             'error, Existing user')
 
     def test_user_missing_field(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"email@email.com",
@@ -103,8 +105,8 @@ class TestRegistration(unittest.TestCase):
                 'This field is required.')
 
     def test_user_empty_field(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"email@email.com",
@@ -132,8 +134,8 @@ class TestRegistration(unittest.TestCase):
                 'This field is required.')
 
     def test_user_empty_field(self):
-            tested_app = app.test_client()
-            tested_app.set_app(app)
+            tested_app = self.app.test_client()
+            tested_app.set_app(self.app)
 
             form = {
                 "email":"email@email.com",
@@ -161,8 +163,8 @@ class TestRegistration(unittest.TestCase):
                     'This field is required.')
 
     def test_user_existing_email(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"example@example.com",
@@ -184,8 +186,8 @@ class TestRegistration(unittest.TestCase):
             'error, Existing user')
 
     def test_user_existing_name_surname(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerExistingNameSurname@tester.com",
@@ -207,8 +209,8 @@ class TestRegistration(unittest.TestCase):
             'success, User registerd succesfully') 
 
     def test_user_wrong_dateofbirth(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerWrongDateOfBirth@test.me",
@@ -230,8 +232,8 @@ class TestRegistration(unittest.TestCase):
             'Not a valid date value')
 
     def test_user_wrong_repeated_password(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerWrongRepeatedPassword@test.me",
@@ -253,8 +255,8 @@ class TestRegistration(unittest.TestCase):
             'warning, Passwords do not match')
 
     def test_user_wrong_email(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerWorngEmail.test.me",
@@ -276,8 +278,8 @@ class TestRegistration(unittest.TestCase):
             'Invalid email address.')
 
     def test_user_wrong_telephone_form(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerWrongTelephone@test.me",
@@ -301,8 +303,8 @@ class TestRegistration(unittest.TestCase):
     # --- CREATE_OPERATOR -------------------------------------------------------
 
     def test_operator_good_form(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerGoodFormOperator@test.me",
@@ -328,8 +330,8 @@ class TestRegistration(unittest.TestCase):
             'success, Operator registerd succesfully') 
 
     def test_operator_regood_form(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerGoodFormOperatorm@test.me",
@@ -355,8 +357,8 @@ class TestRegistration(unittest.TestCase):
             'error, Existing restaurant')
 
     def test_operator_same_operator_form(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerGoodFormOperator@test.me",
@@ -382,8 +384,8 @@ class TestRegistration(unittest.TestCase):
             'error, Existing operator')
 
     def test_operator_missing_field(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"email@email.com",
@@ -415,8 +417,8 @@ class TestRegistration(unittest.TestCase):
                 'This field is required.')
 
     def test_operator_empty_field(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"email@email.com",
@@ -448,8 +450,8 @@ class TestRegistration(unittest.TestCase):
                 'This field is required.')
 
     def test_operator_none_field(self):
-            tested_app = app.test_client()
-            tested_app.set_app(app)
+            tested_app = self.app.test_client()
+            tested_app.set_app(self.app)
 
             form = {
                 "email":"email@email.com",
@@ -481,8 +483,8 @@ class TestRegistration(unittest.TestCase):
                     'This field is required.')
 
     def test_operator_existing_email(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"example@example.com",
@@ -508,8 +510,8 @@ class TestRegistration(unittest.TestCase):
             'error, Existing operator')
 
     def test_operator_existing_name_surname(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerExistingNameSurnameOperator@tester.com",
@@ -535,8 +537,8 @@ class TestRegistration(unittest.TestCase):
             'success, Operator registerd succesfully') 
 
     def test_operator_wrong_dateofbirth(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerWrongDateOfBirth@test.me",
@@ -562,8 +564,8 @@ class TestRegistration(unittest.TestCase):
             'Not a valid date value')
 
     def test_operator_wrong_repeated_password(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerWrongRepeatedPassword@test.me",
@@ -589,8 +591,8 @@ class TestRegistration(unittest.TestCase):
             'warning, Passwords do not match')
 
     def test_operator_wrong_email(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerWorngEmail.test.me",
@@ -616,8 +618,8 @@ class TestRegistration(unittest.TestCase):
             'Invalid email address.')
 
     def test_user_wrong_operator_telephone_form(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerWrongTelephoneNumber@test.me",
@@ -643,8 +645,8 @@ class TestRegistration(unittest.TestCase):
             'Not a valid integer value') 
 
     def test_user_wrong_rest_telephone_form(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerWrongTelephoneNumber@test.me",
@@ -670,8 +672,8 @@ class TestRegistration(unittest.TestCase):
             'Not a valid integer value') 
 
     def test_user_wrong_latitude_form(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerWrongTelephoneNumber@test.me",
@@ -697,8 +699,8 @@ class TestRegistration(unittest.TestCase):
             'Not a valid float value') 
 
     def test_user_wrong_longitude_form(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         form = {
             "email":"testerWrongTelephoneNumber@test.me",
@@ -726,8 +728,8 @@ class TestRegistration(unittest.TestCase):
  # --- USERS LIST --------------------------------------------------------
     
     def test_get_users_as_anonymous(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         reply = tested_app.get('/users')
         
@@ -736,8 +738,8 @@ class TestRegistration(unittest.TestCase):
             401,msg=reply)
 
     def test_get_users_as_user(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         tested_app.t_post('/login',data={"email":"testerGoodForm@test.me", "password": "42"})
 
@@ -748,8 +750,8 @@ class TestRegistration(unittest.TestCase):
             401,msg=reply)
 
     def test_get_users_as_operator(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         tested_app.t_post('/login',data={"email":"testerGoodFormOperator@test.me", "password": "42"})
 
@@ -760,8 +762,8 @@ class TestRegistration(unittest.TestCase):
             401,msg=reply)
 
     def test_get_users_as_admin(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         tested_app.t_post('/login',data={"email":"example@example.com", "password": "admin"})
 
@@ -772,8 +774,8 @@ class TestRegistration(unittest.TestCase):
             200,msg=html)
 
     def test_zeta_all_registered(self):
-        tested_app = app.test_client()
-        tested_app.set_app(app)
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
         tested_app.t_post('/login',data={"email":"example@example.com", "password": "admin"})
 

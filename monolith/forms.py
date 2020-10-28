@@ -38,6 +38,27 @@ class OperatorForm(FlaskForm):
 
     display = ['email', 'firstname', 'lastname', 'password','password_repeat', 'telephone', 'dateofbirth','restaurant_name','restaurant_phone', 'restaurant_latitude', 'restaurant_longitude']
 
+class RestaurantEditForm(FlaskForm):
+    name = f.StringField('Restaurant Name',validators=[DataRequired()])
+    phone = f.IntegerField('Restaurant Phone', validators=[InputRequired()])
+    lat = f.FloatField('Restaurant latitude', validators=[InputRequired()])
+    lon = f.FloatField('Restaurant Longitude', validators=[InputRequired()])
+
+    opening_hour_lunch = f.IntegerField('Opening hour for lunch', validators=[InputRequired()])  # the opening hour for the lunch
+    closing_hour_lunch = f.IntegerField('Closing hour for lunch', validators=[InputRequired()]) # the closing hour for the lunch 
+
+    opening_hour_dinner = f.IntegerField('Opening hour for dinner', validators=[InputRequired()]) # the opening hour for the dinner
+    closing_hour_dinner = f.IntegerField('Closing hour for dinner', validators=[InputRequired()]) # the closing hour for the dinner 
+
+    occupation_time = f.IntegerField('Time for a table to be clear again', validators=[InputRequired()])
+
+    closed_days = f.SelectMultipleField('Closed days',  choices=[("1","Monday"), ("2","Tuesday"), ("3","Wednesday"), ("4","Thursday"),("5","Friday"), ("6","Saturday"),("7","Sunday")], validators=[InputRequired()])
+
+    cuisine_type = f.StringField('Cousine type',validators=[DataRequired()])
+    menu = f.StringField('Restaurant menu',validators=[DataRequired()])
+    display = ['name', 'phone', 'lat', 'lon','opening_hour_lunch', 'closing_hour_lunch', 'opening_hour_dinner','closing_hour_dinner','occupation_time', 'closed_days', 'cuisine_type','menu']
+
+
 class BookingForm(FlaskForm):
 
     number_of_person = f.IntegerField("Number of Person", validators=[InputRequired(), NumberRange(min=1)])
