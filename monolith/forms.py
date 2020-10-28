@@ -28,7 +28,7 @@ class OperatorForm(FlaskForm):
     lastname = f.StringField('Lastname', validators=[DataRequired()])
     password = f.PasswordField('Password', validators=[DataRequired()])
     password_repeat = f.PasswordField('Repeat Password', validators=[DataRequired()])
-    telephone = f.IntegerField('Telephone', validators=[InputRequired()]) #GB add validator
+    telephone = f.IntegerField('Telephone', validators=[InputRequired()]) 
     dateofbirth = f.DateField('Date Of Birth', format='%d/%m/%Y')
 
     restaurant_name = f.StringField('Restaurant Name',validators=[DataRequired()])
@@ -77,3 +77,12 @@ class BookingList(FlaskForm):
 
     display = ['from_date','from_hr','from_min','to_date','to_hr','to_min']
 
+class SearchUserForm(FlaskForm):
+    
+    email = f.StringField('Email', validators=[DataRequired()])
+    firstname = f.StringField('Firstname', validators=[DataRequired()])
+    lastname = f.StringField('Lastname', validators=[DataRequired()])
+    dateofbirth = f.DateField('Date Of Birth', format='%d/%m/%Y')
+
+    display = ['email', 'firstname', 'lastname', 'dateofbirth'] 
+    

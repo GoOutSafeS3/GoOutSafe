@@ -2,8 +2,9 @@ from flask import Blueprint, redirect, render_template, request, flash, make_res
 from flask_login import login_required
 
 from monolith.auth import admin_required, is_admin, health_auyhority_required
-from monolith.forms import UserForm, OperatorForm
+from monolith.forms import UserForm, OperatorForm, SearchUserForm
 from monolith.database import User, db, Restaurant
+from monolith.utilities.contact_tracing import mark_as_positive, unmark_as_positive
 
 import datetime
 
@@ -15,44 +16,40 @@ def positives():
     qry = db.session.query(User).filter_by(is_positive = True).all()
     return render_template("positives.html", positives = qry)
 
-@contact_tracing.route('/positives/<user_id>/mark', methods=['GET','POST'])
+@contact_tracing.route('/positives/mark', methods=['GET','POST'])
 @health_auyhority_required
-def mark_as_positive(user_id):
-    qry = db.session.query(User).filter_by(id = user_id).all()
-    if qry == []:
-        return make_response(render_template('error.html', error='404'),404)
-    else:
-        qry = qry[0]
-        qry.is_positive = True
-        qry.positive_datetime = datetime.datetime.now()
-        db.session.commit()
+def _mark_as_positive():
+    form = SearchUserForm()
+    if request.method == 'POST':
+        qry = db.session.query(User).filter_by(email = request.form["email"]).all()[0]
+        if qry == []:
+            flash("User not found","error")
+            return redirect("/positives/mark",code=404)
 
-        waiting_time = datetime.datetime.utcnow() + datetime.timedelta(minutes=1)
-        #unmark_as_positive.apply_async((user_id),eta=waiting_time)
+        if mark_as_positive(qry.id):
+            flash("The user was marked","success")
+            return redirect("/positives/mark")
+        else:
+            flash("User not found","error")
+            return redirect("/positives/mark",code=404)
+    
+    return render_template('form.html', form=form, title="Mark a User")
 
-        flash("The user was marked as positive","success")
-        return redirect("/")
-
-@contact_tracing.route('/positives/<user_id>/unmark', methods=['GET','POST'])
+@contact_tracing.route('/positives/unmark', methods=['GET','POST'])
 @health_auyhority_required
-def _unmark_as_positive(user_id):
-    qry = db.session.query(User).filter_by(id = user_id).all()
-    if qry == []:
-        return make_response(render_template('error.html', error='404'),404)
-    else:
-        unmark_as_positive(user_id)
+def _unmark_as_positive():
+    form = SearchUserForm()
+    if request.method == 'POST':
+        qry = db.session.query(User).filter_by(email = request.form["email"]).all()[0]
+        if qry == []:
+            flash("User not found","error")
+            return redirect("/positives/unmark",code=404)
 
-        flash("The user was unmarked","success")
-        return redirect("/")
-
-
-def unmark_as_positive(user_id):
-    qry = db.session.query(User).filter_by(id = user_id).all()
-    if qry == []:
-        return False
-    else:
-        qry = qry[0]
-        qry.is_positive = False
-        qry.positive_datetime = None
-        db.session.commit()
-        return True
+        if unmark_as_positive(qry.id):
+            flash("The user was unmarked","success")
+            return redirect("/positives/unmark")
+        else:
+            flash("User not found","error")
+            return redirect("/positives/unmark",code=404)
+    
+    return render_template('form.html', form=form, title="Unmark a User")

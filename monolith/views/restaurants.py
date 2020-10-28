@@ -35,7 +35,30 @@ def restaurant_sheet(restaurant_id):
         cuisine_type=record.cuisine_type,
         menu=record.menu,
         tables=record.tables)
+
+@restaurants.route('/restaurants/<int:restaurant_id>/edit', methods=['GET', 'POST'])
+@operator_required
+def _edit_restaurant(restaurant_id):
     
+    if current_user.rest_id != restaurant_id:
+        flash("Area reserved for the restaurant operator","error")
+        return redirect(f"/restaurants/{restaurant_id}", code=401)
+
+    record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()[0]
+
+    form = RestaurantEditForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            form.populate_obj(record)
+            record.closed_days = ''.join(request.form.getlist('closed_days'))
+            db.session.add(record)
+            db.session.commit()
+            flash("Updated","success")
+            return render_template("edit_restaurant.html", form=form)
+        flash("Bad form","success")
+        return make_response(render_template('edit_restaurant.html', form=form), 400)
+    return render_template('edit_restaurant.html', form=form)
+
 @restaurants.route('/restaurants/<int:restaurant_id>/like')
 @login_required
 def _like(restaurant_id):
