@@ -87,7 +87,7 @@ class TestReservation(unittest.TestCase):
             reply = client.t_get("/restaurants/1/reservations", data=form)
             self.assertEqual(reply.status_code, 200)
 
-    def test_post_reservation_list_operator(self):
+    def test_bad_reservation_list(self):
         with self.app.test_client() as client:
             client.set_app(self.app)
             form = {
@@ -96,7 +96,63 @@ class TestReservation(unittest.TestCase):
             }
             reply = client.t_post('/login', data=form)
             self.assertEqual(reply.status_code, 302)
+
+            form = {
+                "from_date":"10/10/2020",
+                "from_hr":"13",
+                "from_min":"30",
+                "to_date":"08/10/2020",
+                "to_hr":"14",
+                "to_min":"30"
+            }
             reply = client.t_post("/restaurants/1/reservations", data=form)
+            self.assertEqual(reply.status_code, 400)
+
+    def test_good_reservation_list(self):
+        with self.app.test_client() as client:
+            client.set_app(self.app)
+            form = {
+                "email": "operator@example.com",
+                "password": "operator"
+            }
+            reply = client.t_post('/login', data=form)
+            self.assertEqual(reply.status_code, 302)
+
+            form = {
+                "from_date": "08/10/2020",
+                "from_hr": "13",
+                "from_min": "30",
+                "to_date": "10/10/2020",
+                "to_hr": "14",
+                "to_min": "30"
+            }
+            reply = client.t_post("/restaurants/1/reservations", data=form)
+            self.assertEqual(reply.status_code, 200)
+
+    def test_bad_reservations_id(self):
+        with self.app.test_client() as client:
+            client.set_app(self.app)
+            form = {
+                "email": "operator@example.com",
+                "password": "operator"
+            }
+            reply = client.t_post('/login', data=form)
+            self.assertEqual(reply.status_code, 302)
+
+            reply = client.t_get("/restaurants/479432")
+            self.assertEqual(reply.status_code, 404)
+
+    def test_good_reservations_id(self):
+        with self.app.test_client() as client:
+            client.set_app(self.app)
+            form = {
+                "email": "operator@example.com",
+                "password": "operator"
+            }
+            reply = client.t_post('/login', data=form)
+            self.assertEqual(reply.status_code, 302)
+
+            reply = client.t_get("/restaurants/1")
             self.assertEqual(reply.status_code, 200)
 
 if __name__ == '__main__':

@@ -8,6 +8,7 @@ import datetime
 
 reservations = Blueprint('reservations', __name__)
 
+
 @reservations.route('/restaurants/<int:restaurant_id>/book', methods=['GET', 'POST'])
 @login_required
 def _book(restaurant_id):
@@ -86,10 +87,9 @@ def _booking_list(restaurant_id):
                             .filter(Booking.booking_datetime <= to_datetime )\
                             .all()
 
-            return render_template("reservations.html", reservations=qry)
+            return make_response(render_template("reservations.html", reservations=qry),200)
 
     return make_response(render_template('form.html', form=form),200)
-
 
 
 @reservations.route('/reservations/<int:reservation_id>', methods=['GET', 'DELETE', 'POST'])
