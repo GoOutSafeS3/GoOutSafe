@@ -28,7 +28,10 @@ def health_auyhority_required(func):
 def operator_required(func):
     @functools.wraps(func)
     def _operator_required(*args, **kw):
-        if not current_user.is_operator:
+        try:
+            if not current_user.is_operator:
+                return login_manager.unauthorized()
+        except:
             return login_manager.unauthorized()
         return func(*args, **kw)
     return _operator_required

@@ -58,6 +58,9 @@ class RestaurantEditForm(FlaskForm):
     menu = f.StringField('Restaurant menu',validators=[DataRequired()])
     display = ['name', 'phone', 'lat', 'lon','opening_hour_lunch', 'closing_hour_lunch', 'opening_hour_dinner','closing_hour_dinner','occupation_time', 'closed_days', 'cuisine_type','menu']
 
+class TableAddForm(FlaskForm):
+    capacity = f.IntegerField('Table capacity', validators=[InputRequired()])
+    display = ['capacity']
 
 class BookingForm(FlaskForm):
     number_of_person = f.IntegerField("Number of Person", validators=[InputRequired(), NumberRange(min=1)])

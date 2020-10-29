@@ -13,13 +13,10 @@ reservations = Blueprint('reservations', __name__)
 def _book(restaurant_id):
 
     if current_user.is_admin or current_user.is_operator or current_user.is_health_authority:
-        flash("Please log as customer to book a table","error")
-        return redirect(f"/restaurants/{restaurant_id}")
+        return make_response(render_template('error.html', error="Please log as customer to book a table"), 401)
 
     if current_user.is_positive:
-        flash("You cannot book as long as you are positive","error")
-        return redirect(f"/restaurants/{restaurant_id}")
-
+        return make_response(render_template('error.html', error="You cannot book as long as you are positive"), 401)
     form = BookingForm()
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -51,8 +48,7 @@ def _book(restaurant_id):
 def _booking_list(restaurant_id):
 
     if current_user.rest_id != restaurant_id:
-        flash("Area reserved for the restaurant operator","error")
-        return redirect(f"/restaurants/{restaurant_id}", code=401)
+        return make_response(render_template('error.html', error="Area reserved for the restaurant operator"), 401)
 
     form = BookingList()
     if request.method == 'POST':

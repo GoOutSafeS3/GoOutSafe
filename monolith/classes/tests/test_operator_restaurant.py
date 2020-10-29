@@ -119,38 +119,7 @@ class TestRegistration(unittest.TestCase):
             "menu": "Napolitano"
         }
         reply = self.edit_restaurant(client, id, form.copy())
-        self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
-        reply = client.t_get('/restaurants/'+str(id))
-        self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
-        for k,v in form.items():
-            if k == "closed_days":
-                if v == 1:
-                    self.assertTrue("Monday" in reply.get_data(as_text=True), msg=v+"\n"+reply.get_data(as_text=True))
-                if v == 2:
-                    self.assertTrue("Tuesday" in reply.get_data(as_text=True), msg=v+"\n"+reply.get_data(as_text=True))
-            else:
-                self.assertTrue(v in reply.get_data(as_text=True), msg=v+"\n"+reply.get_data(as_text=True))
-
-    def test_post_edit(self):
-        client = self.setup_app()
-        self.do_login(client,"testerGoodFormOperator@test.me", "42")
-        id = self.get_my_restaurant_id(client)
-        form = {
-            "name":"Restaurant at the End of the Universe",
-            "phone":"1234567890",
-            "lat":"43.431489",
-            "lon":"10.242911",
-            "opening_hour_lunch": "13",
-            "closing_hour_lunch": "15",
-            "opening_hour_dinner": "19",
-            "closing_hour_dinner": "23",
-            "occupation_time": "2",
-            "closed_days": ["1","2"],
-            "cuisine_type": "Pizzoria",
-            "menu": "Napolitano"
-        }
-        reply = self.edit_restaurant(client, id, form.copy())
-        self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
+        self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
         reply = client.t_get('/restaurants/'+str(id))
         self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
         for k,v in form.items():

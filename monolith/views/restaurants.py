@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, render_template, request, make_response, 
 from monolith.database import db, Restaurant, Like, Booking, User, Table
 from monolith.auth import admin_required, current_user, is_admin, operator_required
 from flask_login import current_user, login_user, logout_user, login_required
-from monolith.forms import UserForm, BookingForm, BookingList, RestaurantEditForm
+from monolith.forms import UserForm, BookingForm, BookingList, RestaurantEditForm, TableAddForm
 import datetime
 
 restaurants = Blueprint('restaurants', __name__)
@@ -40,29 +40,6 @@ def restaurant_sheet(restaurant_id):
         menu=record.menu,
         tables=record.tables)
 
-@restaurants.route('/restaurants/<int:restaurant_id>/edit', methods=['GET', 'POST'])
-@operator_required
-def _edit_restaurant(restaurant_id):
-    
-    if current_user.rest_id != restaurant_id:
-        flash("Area reserved for the restaurant operator","error")
-        return redirect(f"/restaurants/{restaurant_id}", code=401)
-
-    record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()[0]
-
-    form = RestaurantEditForm()
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            form.populate_obj(record)
-            record.closed_days = ''.join(request.form.getlist('closed_days'))
-            db.session.add(record)
-            db.session.commit()
-            flash("Updated","success")
-            return render_template("edit_restaurant.html", form=form)
-        flash("Bad form","success")
-        return make_response(render_template('edit_restaurant.html', form=form), 400)
-    return render_template('edit_restaurant.html', form=form)
-
 @restaurants.route('/restaurants/<int:restaurant_id>/like')
 @login_required
 def _like(restaurant_id):
@@ -78,12 +55,80 @@ def _like(restaurant_id):
         message = 'You\'ve already liked this place!'
     return _restaurants(message)
 
+@restaurants.route('/restaurants/<int:restaurant_id>/edit', methods=['GET', 'POST'])
+@operator_required
+def _edit_restaurant(restaurant_id):
+    
+    if current_user.rest_id != restaurant_id:
+        return make_response(render_template('error.html', error="Area reserved for the restaurant operator"), 401)
+
+    record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()[0]
+
+    if request.method == 'POST':
+        form = RestaurantEditForm()
+        if form.validate_on_submit():
+            form.populate_obj(record)
+            record.closed_days = ''.join(request.form.getlist('closed_days'))
+            db.session.add(record)
+            db.session.commit()
+            return redirect(f"/restaurants/{current_user.rest_id}")
+        flash("Bad form","error")
+        return make_response(render_template('edit_restaurant.html', form=form), 400)
+    form = RestaurantEditForm(obj=record)
+    return render_template('edit_restaurant.html', form=form)
+
+@restaurants.route('/tables/add', methods=['GET', 'POST'])
+@operator_required
+def _add_tables():
+    form = TableAddForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            table = Table()
+            table.rest_id = current_user.rest_id
+            table.capacity = int(request.form['capacity'])
+            if table.capacity > 0:
+                db.session.add(table)
+                db.session.commit()
+                return redirect(f"/restaurants/{current_user.rest_id}")
+            flash("Capacity must be strictly positive","error")
+            return make_response(render_template('form.html', form=form), 400)
+        flash("Bad form","error")
+        return make_response(render_template('form.html', form=form), 400)
+    return make_response(render_template('form.html', form=form), 200)
+
+@restaurants.route('/tables/<int:table_id>/edit', methods=['GET', 'POST'])
+@operator_required
+def _edit_tables(table_id):
+    table = db.session.query(Table).filter(Table.id == table_id).first()
+
+    if table is None:
+        return make_response(render_template('error.html', error='404'), 404)
+
+    if current_user.rest_id != table.rest_id:
+        return make_response(render_template('error.html', error="Area reserved for the restaurant operator"), 401)
+
+    if request.method == 'POST':
+        form = TableAddForm()
+        if form.validate_on_submit():
+            capacity = int(request.form['capacity'])
+            if capacity > 0:
+                table.capacity = capacity
+                db.session.add(table)
+                db.session.commit()
+                return redirect(f"/restaurants/{current_user.rest_id}")
+            flash("Capacity must be strictly positive","error")
+            return make_response(render_template('form.html', form=form), 400)
+        flash("Bad form","error")
+        return make_response(render_template('form.html', form=form), 400)
+    form = TableAddForm(obj=table)
+    return make_response(render_template('form.html', form=form), 200)
+
 @restaurants.route('/tables/<int:table_id>/delete')
 @operator_required
 def delete_table(table_id):
     table = db.session.query(Table).filter(Table.id == table_id).first()
 
-    if table == None:
+    if table is None:
         return make_response(render_template('error.html', error='404'), 404)
 
     if table.bookings != []:

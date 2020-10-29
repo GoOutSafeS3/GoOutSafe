@@ -109,6 +109,7 @@ class Table(db.Model):
     rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
     capacity = db.Column(db.Integer)
 
+
     restaurant = relationship('Restaurant')
     bookings = relationship('Booking')
 
