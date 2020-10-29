@@ -1,0 +1,20 @@
+version: '3'
+services:
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile-test
+    depends_on:
+      - redis
+  monolith:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+    ports:
+      - "5000:5000"
+  redis:
+    image: "redis:alpine"
+    expose:
+      - "6379"
