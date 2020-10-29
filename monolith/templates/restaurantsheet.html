@@ -39,12 +39,8 @@
           {% for table in tables: %}
             <li>
               Capacity: {{table.capacity}}
-              {% if table.bookings == []: %}
-                <a href="{{base_url}}/tables/{{table.id}}/edit">Edit</a>
-                <a href="{{base_url}}/tables/{{table.id}}/delete">Delete</a>
-              {% else: %}
-                <em>This table is booked with {{table.bookings[0].person_number}} People</em>
-              {% endif %}
+              <a href="{{base_url}}/tables/{{table.id}}/edit">Edit</a>
+              <a href="{{base_url}}/tables/{{table.id}}/delete">Delete</a>
             </li>
           {% endfor %}
           <li><a href="{{base_url}}/tables/add">Add a table</a></li>

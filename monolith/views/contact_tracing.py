@@ -21,17 +21,17 @@ def positives():
 def _mark_as_positive():
     form = SearchUserForm()
     if request.method == 'POST':
-        qry = db.session.query(User).filter_by(email = request.form["email"]).all()[0]
-        if qry == []:
+        qry = db.session.query(User).filter_by(email = request.form["email"]).first()
+        if qry is None:
             flash("User not found","error")
-            return redirect("/positives/mark",code=404)
+            return make_response(render_template('error.html', error='404'), 404)
 
         if mark_as_positive(qry.id):
             flash("The user was marked","success")
             return redirect("/positives/mark")
         else:
             flash("User not found","error")
-            return redirect("/positives/mark",code=404)
+            return make_response(render_template('error.html', error='404'), 404)
     
     return render_template('form.html', form=form, title="Mark a User")
 
@@ -40,16 +40,33 @@ def _mark_as_positive():
 def _unmark_as_positive():
     form = SearchUserForm()
     if request.method == 'POST':
-        qry = db.session.query(User).filter_by(email = request.form["email"]).all()[0]
-        if qry == []:
+        qry = db.session.query(User).filter_by(email = request.form["email"]).first()
+        if qry is None:
             flash("User not found","error")
-            return redirect("/positives/unmark",code=404)
+            return make_response(render_template('error.html', error='404'), 404)
 
         if unmark_as_positive(qry.id):
             flash("The user was unmarked","success")
             return redirect("/positives/unmark")
         else:
             flash("User not found","error")
-            return redirect("/positives/unmark",code=404)
+            return make_response(render_template('error.html', error='404'), 404)
     
     return render_template('form.html', form=form, title="Unmark a User")
+
+
+@contact_tracing.route('/positives/<int:pos_id>/unmark', methods=['GET'])
+@health_auyhority_required
+def _unmark_as_positive_by_id(pos_id):
+
+    qry = db.session.query(User).filter_by(id = pos_id).first()
+    if qry is None:
+        flash("User not found","error")
+        return make_response(render_template('error.html', error='404'), 404)
+
+    if unmark_as_positive(qry.id):
+        flash("The user was unmarked","success")
+        return redirect("/positives")
+    else:
+        flash("User not found","error")
+        return make_response(render_template('error.html', error='404'), 404)

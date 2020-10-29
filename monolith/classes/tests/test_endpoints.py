@@ -26,4 +26,4 @@ class TestLogin(unittest.TestCase):
                 client.set_app(self.app)
                 client.t_post('/login',data={"email":"operator@example.com", "password": "operator"})
                 reply = client.t_get(url)
-                self.assertEqual(reply.status_code, 404, msg=url+reply.get_data(as_text=True))
+                self.assertIn(reply.status_code, [404, 401], msg=url+reply.get_data(as_text=True))

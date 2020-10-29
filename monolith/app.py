@@ -108,6 +108,15 @@ def fake_data():
         db.session.add(booking_3)
         db.session.commit()
 
+        booking_4 = Booking()
+        booking_4.rest_id = 1
+        booking_4.user_id = example_cust.id
+        booking_4.booking_datetime = datetime.datetime(2020,10,5,11,30,0,0)
+        booking_4.person_number = 5
+        booking_4.table_id = 5
+        db.session.add(booking_4)
+        db.session.commit()
+
 def init():
     q = db.session.query(User).filter(User.email == 'example@example.com')
     admin = q.first()
