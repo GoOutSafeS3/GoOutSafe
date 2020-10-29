@@ -10,11 +10,13 @@ import datetime
 
 contact_tracing = Blueprint('contact_tracing', __name__)
 
+
 @contact_tracing.route('/positives', methods=['GET'])
 @health_auyhority_required
 def positives():
     qry = db.session.query(User).filter_by(is_positive = True).all()
     return render_template("positives.html", positives = qry)
+
 
 @contact_tracing.route('/positives/mark', methods=['GET','POST'])
 @health_auyhority_required

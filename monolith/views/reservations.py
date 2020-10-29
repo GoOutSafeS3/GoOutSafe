@@ -110,5 +110,5 @@ def _reservation(reservation_id):
                 flash("Reservation deleted","success")
                 return redirect('/')
             
-            elif request.method == "GET":
+            elif request.method == "GET": # pragma: no cover
                 return render_template("reservation.html", reservation=qry)
