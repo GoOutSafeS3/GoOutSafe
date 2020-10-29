@@ -5,8 +5,8 @@ from wtforms.fields.html5 import EmailField
 
 
 class LoginForm(FlaskForm):
-    email = f.StringField('email', validators=[DataRequired()])
-    password = f.PasswordField('password', validators=[DataRequired()])
+    email = f.StringField('Email', validators=[DataRequired()])
+    password = f.PasswordField('Password', validators=[DataRequired()])
     display = ['email', 'password']
 
 

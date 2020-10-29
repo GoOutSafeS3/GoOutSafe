@@ -1,6 +1,8 @@
 {% extends 'layout.html' %}
 {% block content %}
-  <form action="" method="POST">
+  <header class="py-5 bg-image-full" style="height:700px;">
+    <img style="padding-bottom: 30px" class="img-fluid d-block mx-auto" src="{{ url_for('static', filename='images/logo.png') }}" alt="">
+    <form align="center" action="" method="POST">
     {{ form.hidden_tag() }}
     <dl>
      {% for field in form.display %}
@@ -14,6 +16,7 @@
      {% endfor %}
     </dl>
     <p>
-    <input type=submit value="Publish">
+    <input type=submit value="Login">
   </form>
+  </header>
 {% endblock %}

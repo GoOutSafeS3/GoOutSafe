@@ -11,7 +11,7 @@
   <title>GoOutSafe</title>
 
   <!-- Bootstrap core CSS -->
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.css') }}" rel="stylesheet">
 
   <!-- Custom styles for this template -->
     <link href="{{ url_for('static', filename='css/full-width-pics.css') }}" rel="stylesheet">
@@ -29,35 +29,28 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="/">Homepage
-              <span class="sr-only">(current)</span>
-            </a>
-          </li>
-          {% if current_user.is_health_authority %}
-          <li class="nav-item">
-            <a class="nav-link" href="/positives">Positives</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/positives/mark">Mark</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/positives/unmark">Unmark</a>
-          </li>
-          {% else %}
-          <li class="nav-item">
-            <a class="nav-link" href="/restaurants">Restaurants</a>
-          </li>
-          {% endif %}
 
-            {% if current_user.is_authenticated %}
-            <li class="nav-item">
-                <a class="nav-link" href="#">Contact</a>
-              </li>
-                <li> <a class="nav-link" href="/logout">Logout
-            </a>
-                </li>
-            {% endif %}
+        {% if current_user.is_authenticated %}
+
+          {% if current_user.is_health_authority %}
+            <li class="nav-item"> <a class="nav-link" href="/positives">Positives</a> </li>
+            <li class="nav-item"> <a class="nav-link" href="/positives/mark">Mark</a> </li>
+
+          {% elif current_user.is_admin %}
+            <li class="nav-item"><a class="nav-link" href="/users">Users</a></li>
+            <li class="nav-item"><a class="nav-link" href="/restaurants">Restaurants</a></li>
+
+          {% elif current_user.is_operator %}
+             <li class="nav-item"><a class="nav-link" href="/users">Settings</a></li>
+
+          {% else %}
+              <li class="nav-item"><a class="nav-link" href="/restaurants">Restaurants</a></li>
+              <li class="nav-item"><a class="nav-link" href="/">Bookings</a></li>
+              <li class="nav-item"><a class="nav-link" href="/restaurants">Settings</a></li>
+          {% endif %}
+            <li><a class="nav-link" href="/logout"> Logout </a></li>
+         {% endif %}
+
         </ul>
       </div>
     </div>
@@ -87,9 +80,9 @@
     </div>
   </section>
 
-  <!-- Bootstrap core JavaScript -->
-  <script src="vendor/jquery/jquery.min.js"></script>
-  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+   <!-- Bootstrap core JavaScript -->
+  <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.js') }}"></script>
 
 </body>
 </html>
