@@ -4,6 +4,7 @@ from flask_test_with_csrf import FlaskClient
 from flask import url_for
 from flask_login import current_user
 from utils import do_login, do_logout, get_positives_id
+from monolith.utilities.contact_tracing import mark_as_positive, unmark_as_positive
 
 class TestLogin(unittest.TestCase):
     @classmethod
@@ -192,3 +193,8 @@ class TestLogin(unittest.TestCase):
         reply = client.t_get(f"/positives/{match}/unmark")
         self.assertEqual(reply.status_code, 404, msg=reply.get_data(as_text=True))
         do_logout(client)
+
+    def test_utilities_with_wrong_id(self):
+        with self.app.app_context():
+            self.assertFalse(mark_as_positive(99999))
+            self.assertFalse(unmark_as_positive(99999))
