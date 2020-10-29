@@ -138,7 +138,9 @@ def delete_table(table_id):
         return make_response(render_template('error.html', error='404'), 404)
 
     if table.bookings != []:
-        return make_response(render_template('error.html', error="Table is already booked"), 412)
+        qr = db.session.query(Table).join(Table.bookings, aliased=True).filter(Table.id == table_id).filter(Booking.booking_datetime >= datetime.datetime.now()).first()
+        if qr is not None:
+            return make_response(render_template('error.html', error="Table is already booked"), 412)
 
     if table.rest_id == current_user.rest_id:
         db.session.delete(table)

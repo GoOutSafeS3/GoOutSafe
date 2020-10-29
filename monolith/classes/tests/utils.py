@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-
+import re
 
 def send_registration_form(tested_app, url, form):
     reply = tested_app.t_post(url, data=form)
@@ -43,3 +43,8 @@ def get_my_restaurant_id(client, name=""):
     except:
         return None
     return id
+
+def get_tables_ids(client, rest_id):
+    reply = client.t_get('/restaurants/'+str(rest_id))
+    matches = re.findall(r"\/tables\/([0-9]+)\/edit",reply.get_data(as_text=True))
+    return [int(match) for match in matches]
