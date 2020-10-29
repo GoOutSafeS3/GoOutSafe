@@ -18,3 +18,28 @@ def do_login(client, email, password):
 
 def do_logout(client):
     return client.t_get('/logout')
+
+def edit_restaurant(client, id, data):
+    return client.t_post("/restaurants/"+str(id)+"/edit", data=data)
+
+def get_restaurant_id(client, name=""):
+    reply = client.t_get('/restaurants')
+    text = reply.get_data(as_text=True)
+    text = text[text.find(name):]
+    id = text[text.find("/restaurants/")+len("/restaurants/"):].split("/")[0]
+    try:
+        id = int(id)
+    except:
+        return None
+    return id
+
+def get_my_restaurant_id(client, name=""):
+    reply = client.t_get('/')
+    text = reply.get_data(as_text=True)
+    text = text[text.find(name):]
+    id = text[text.find("/restaurants/")+len("/restaurants/"):].split("\"")[0]
+    try:
+        id = int(id)
+    except:
+        return None
+    return id

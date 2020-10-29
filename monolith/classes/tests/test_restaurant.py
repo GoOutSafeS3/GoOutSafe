@@ -3,16 +3,13 @@ from monolith.app import create_app_testing
 from flask_test_with_csrf import FlaskClient
 from flask import url_for
 from flask_login import current_user
-
+from utils import do_login
 
 class TestRestaurant(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.app = create_app_testing()
         self.app.test_client_class = FlaskClient
-
-    def do_login(self,client, email, password):
-        return client.t_post('/login',data={"email":email, "password": password})
 
     def test_restaurant_list(self):
         client = self.app.test_client()
@@ -92,7 +89,7 @@ class TestRestaurant(unittest.TestCase):
     def test_can_like_once(self):
         with self.app.test_client() as client:
             client.set_app(self.app)
-            reply = self.do_login(client, "example@example.com", "admin")
+            reply = do_login(client, "example@example.com", "admin")
             
             reply = client.t_get("/restaurants/1/like")
             reply_data = reply.get_data(as_text = True)

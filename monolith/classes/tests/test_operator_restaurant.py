@@ -3,7 +3,7 @@ import json
 from flask import request, jsonify
 from monolith.app import create_app_testing
 from flask_test_with_csrf import FlaskClient
-from utils import do_login, send_registration_form
+from utils import do_login, send_registration_form, edit_restaurant, get_my_restaurant_id
 
 class TestRegistration(unittest.TestCase):
     @classmethod
@@ -11,9 +11,6 @@ class TestRegistration(unittest.TestCase):
         self.app = create_app_testing()
         self.app.test_client_class = FlaskClient
 
-    def setup_app(self):
-        self.app = create_app_testing()
-        self.app.test_client_class = FlaskClient
         tested_app = self.app.test_client()
         tested_app.set_app(self.app)
 
@@ -30,13 +27,7 @@ class TestRegistration(unittest.TestCase):
             "restaurant_latitude":"43.431489",
             "restaurant_longitude":"10.242911",
         }
-        reply = send_registration_form(tested_app, '/create_operator', form)
-        self.assertEqual(
-            reply["status_code"],
-            200,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'success, Operator registerd succesfully')
+        send_registration_form(tested_app, '/create_operator', form)
 
         form = {
             "email":"testerGoodFormOperator2@test.me",
@@ -51,42 +42,25 @@ class TestRegistration(unittest.TestCase):
             "restaurant_latitude":"43.431481",
             "restaurant_longitude":"10.242915",
         }
-        reply = send_registration_form(tested_app, '/create_operator', form)
-        self.assertEqual(
-            reply["status_code"],
-            200,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'success, Operator registerd succesfully')
-        return tested_app
-
-    def get_my_restaurant_id(self, client):
-        #alrady logged as we created a user right now
-        reply = client.t_get('/')
-        text = reply.get_data(as_text=True)
-
-        id = text[text.find("/restaurants/")+len("/restaurants/"):].split("\"")[0]
-        try:
-            id = int(id)
-        except:
-            self.fail(msg="id not integer "+str(id)+" "+text)
-        return id
-
-    def edit_restaurant(self, client, id, data):
-        return client.t_post("/restaurants/"+str(id)+"/edit", data=data)
+        send_registration_form(tested_app, '/create_operator', form)
 
 
     def test_get_edit_id(self):
-        client = self.setup_app()
+        client = self.app.test_client()
+        client.set_app(self.app)
+
         do_login(client,"testerGoodFormOperator@test.me", "42")
-        id = self.get_my_restaurant_id(client)
+        id = get_my_restaurant_id(client)
+        self.assertIsNotNone(id)
         reply = client.t_get('/restaurants/'+str(id)+"/edit")
         self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
 
     def test_post_edit(self):
-        client = self.setup_app()
+        client = self.app.test_client()
+        client.set_app(self.app)
         do_login(client,"testerGoodFormOperator@test.me", "42")
-        id = self.get_my_restaurant_id(client)
+        id = get_my_restaurant_id(client)
+        self.assertIsNotNone(id)
         form = {
             "name":"Restaurant at the End of the Universe",
             "phone":"1234567890",
@@ -101,7 +75,7 @@ class TestRegistration(unittest.TestCase):
             "cuisine_type": "Pizzoria",
             "menu": "Napolitano"
         }
-        reply = self.edit_restaurant(client, id, form.copy())
+        reply = edit_restaurant(client, id, form.copy())
         self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
         reply = client.t_get('/restaurants/'+str(id))
         self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
@@ -115,9 +89,11 @@ class TestRegistration(unittest.TestCase):
                 self.assertTrue(v in reply.get_data(as_text=True), msg=v+"\n"+reply.get_data(as_text=True))
 
     def test_post_edit_wrong_user(self):
-        client = self.setup_app()
+        client = self.app.test_client()
+        client.set_app(self.app)
         do_login(client,"testerGoodFormOperator2@test.me", "42")
-        id = self.get_my_restaurant_id(client)
+        id = get_my_restaurant_id(client)
+        self.assertIsNotNone(id)
         form = {
             "name":"Restaurant at the End of the Universe",
             "phone":"1234567890",
@@ -132,14 +108,16 @@ class TestRegistration(unittest.TestCase):
             "cuisine_type": "Pizzoria",
             "menu": "Napolitano"
         }
-        reply = self.edit_restaurant(client, id-1, form.copy()) #id-1 because id is the restorant of operato2
+        reply = edit_restaurant(client, id-1, form.copy()) #id-1 because id is the restorant of operato2
         self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))
 
 
     def test_post_edit_wrong_data(self):
-        client = self.setup_app()
+        client = self.app.test_client()
+        client.set_app(self.app)
         do_login(client,"testerGoodFormOperator@test.me", "42")
-        id = self.get_my_restaurant_id(client)
+        id = get_my_restaurant_id(client)
+        self.assertIsNotNone(id)
         form = {
             "name": None,
             "phone":"1234567890",
@@ -157,5 +135,5 @@ class TestRegistration(unittest.TestCase):
         for k,v in form.items():
             dup = form.copy()
             dup[k] = None
-            reply = self.edit_restaurant(client, id, dup)
+            reply = edit_restaurant(client, id, dup)
             self.assertEqual(reply.status_code, 400, msg=reply.get_data(as_text=True))
