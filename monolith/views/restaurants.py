@@ -3,8 +3,7 @@ from monolith.database import db, Restaurant, Like, Booking, User, Table
 from monolith.auth import admin_required, current_user, is_admin, operator_required
 from flask_login import current_user, login_user, logout_user, login_required
 from monolith.forms import UserForm, BookingForm, BookingList, RestaurantEditForm, TableAddForm
-import datetime
-
+from monolith.utilities.restaurant import is_busy_table
 restaurants = Blueprint('restaurants', __name__)
 
 @restaurants.route('/restaurants')
@@ -138,8 +137,7 @@ def delete_table(table_id):
         return make_response(render_template('error.html', error='404'), 404)
 
     if table.bookings != []:
-        qr = db.session.query(Table).join(Table.bookings, aliased=True).filter(Table.id == table_id).filter(Booking.booking_datetime >= datetime.datetime.now()).first()
-        if qr is not None:
+        if is_busy_table(table_id):
             return make_response(render_template('error.html', error="Table is already booked"), 412)
 
     if table.rest_id == current_user.rest_id:

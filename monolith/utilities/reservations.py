@@ -1,7 +1,6 @@
 from monolith.database import db, Restaurant, Like, Booking, User, Table
 from monolith.auth import current_user
-import datetime
-
+from datetime import timedelta
 
 def book_a_table(restaurant, number_of_person, booking_datetime, table):
     new_booking = Booking()
@@ -13,11 +12,10 @@ def book_a_table(restaurant, number_of_person, booking_datetime, table):
     db.session.add(new_booking)
     db.session.commit()
 
-
-def get_table(restaurant, number_of_person, booking_datetime):
+def get_table(restaurant, number_of_people, booking_datetime):
     delta = restaurant.occupation_time
-    starting_period = booking_datetime - datetime.timedelta(hours=delta)
-    ending_period = booking_datetime + datetime.timedelta(hours=delta)
+    starting_period = booking_datetime - timedelta(hours=delta)
+    ending_period = booking_datetime + timedelta(hours=delta)
     occupied = db.session.query(Table.id).select_from(Booking,Table)\
                         .filter(Booking.table_id == Table.id)\
                         .filter(Booking.rest_id == restaurant.id)\
@@ -29,19 +27,19 @@ def get_table(restaurant, number_of_person, booking_datetime):
                         .filter(Restaurant.id == Table.rest_id)\
                         .all()
 
-    free_tables = [t for t in total if ( ( (t[0],) not in occupied) and (t[1] >= number_of_person) )]
-    free_tables.sort(key=lambda x:x[1])
+    free_tables = [t for t in total if ( ( (t[0],) not in occupied) and (t[1] >= number_of_people) )] # returns the free table usable by this number of people
+    free_tables.sort(key=lambda x:x[1]) # order the tables from the smaller
 
     if free_tables == []:
         return None
-    return free_tables[0][0]
+    return free_tables[0][0] # return the smaller table that can be used
 
 
-def try_to_book(restaurant_id, number_of_person, booking_datetime):
+def try_to_book(restaurant_id, number_of_people, booking_datetime):
     record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()[0]
     if record.is_open(booking_datetime):
-        table = get_table(record, number_of_person, booking_datetime)
+        table = get_table(record, number_of_people, booking_datetime)
         if table is not None:
-            book_a_table(record, number_of_person, booking_datetime, table)
+            book_a_table(record, number_of_people, booking_datetime, table)
             return True
     return False
