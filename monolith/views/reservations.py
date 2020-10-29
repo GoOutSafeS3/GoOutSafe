@@ -96,12 +96,11 @@ def _booking_list(restaurant_id):
 @operator_required
 def _reservation(reservation_id):
 
-    qry = db.session.query(Booking,User).filter(Booking.id == reservation_id).filter(User.id == Booking.user_id).all()
+    qry = db.session.query(Booking,User).filter(Booking.id == reservation_id).filter(User.id == Booking.user_id).first()
     
-    if qry == []:
+    if qry is None:
         return make_response(render_template('error.html', error='404'),404)
     else:
-        qry = qry[0]
         if qry.Booking.rest_id != current_user.get_rest_id():
             return make_response(render_template('error.html', error='401'),401)
         else:
