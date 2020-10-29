@@ -34,10 +34,23 @@
               <span class="sr-only">(current)</span>
             </a>
           </li>
+          {% if current_user.is_health_authority %}
+          <li class="nav-item">
+            <a class="nav-link" href="/positives">Positives</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/positives/mark">Mark</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/positives/unmark">Unmark</a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="/restaurants">Restaurants</a>
+          </li>
+          {% endif %}
+
             {% if current_user.is_authenticated %}
-            <li class="nav-item">
-                <a class="nav-link" href="/restaurants">Restaurants</a>
-            </li>
             <li class="nav-item">
                 <a class="nav-link" href="#">Contact</a>
               </li>

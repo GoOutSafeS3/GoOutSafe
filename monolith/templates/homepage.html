@@ -29,17 +29,36 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ml-auto">
+
             {% if current_user.is_authenticated %}
                 <li class="nav-item active">
                     <a class="nav-link" href="/">Homepage
                     <span class="sr-only">(current)</span>
                     </a>
                 </li>
+
+                {% if current_user.is_health_authority %}
                 <li class="nav-item active">
-                    <a class="nav-link" href="/restaurants">Restaurants
-                    <span class="sr-only">(current)</span>
-                    </a>
+                  <a class="nav-link" href="/positives">Positives</a>
+                  <span class="sr-only">(current)</span>
+              </li>
+              <li class="nav-item active">
+                  <a class="nav-link" href="/positives/mark">Mark</a>
+                  <span class="sr-only">(current)</span>
                 </li>
+                <li class="nav-item active">
+                  <a class="nav-link" href="/positives/unmark">Unmark</a>
+                  <span class="sr-only">(current)</span>
+                </li>
+                {% else %}
+
+                <li class="nav-item active">
+                  <a class="nav-link" href="/restaurants">Restaurants
+                  <span class="sr-only">(current)</span>
+                  </a>
+              </li>
+
+                {% endif %}
                 <li class="nav-item active">
                     <a class="nav-link" href="/logout">Logout
                     <span class="sr-only">(current)</span>
