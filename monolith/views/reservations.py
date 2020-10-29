@@ -11,12 +11,17 @@ reservations = Blueprint('reservations', __name__)
 @reservations.route('/restaurants/<int:restaurant_id>/book', methods=['GET', 'POST'])
 @login_required
 def _book(restaurant_id):
+    record = db.session.query(Restaurant).filter_by(id = restaurant_id).first()
+
+    if record is None:
+        return make_response(render_template('error.html', error='404'), 404)
 
     if current_user.is_admin or current_user.is_operator or current_user.is_health_authority:
         return make_response(render_template('error.html', error="Please log as customer to book a table"), 401)
 
     if current_user.is_positive:
         return make_response(render_template('error.html', error="You cannot book as long as you are positive"), 401)
+
     form = BookingForm()
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -46,6 +51,9 @@ def _book(restaurant_id):
 @reservations.route('/restaurants/<int:restaurant_id>/reservations', methods=['GET', 'POST'])
 @operator_required
 def _booking_list(restaurant_id):
+    record = db.session.query(Restaurant).filter_by(id = restaurant_id).first()
+    if record is None:
+        return make_response(render_template('error.html', error='404'),404)
 
     if current_user.rest_id != restaurant_id:
         return make_response(render_template('error.html', error="Area reserved for the restaurant operator"), 401)

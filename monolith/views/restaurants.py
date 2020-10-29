@@ -14,11 +14,10 @@ def _restaurants(message=''):
 
 @restaurants.route('/restaurants/<int:restaurant_id>')
 def restaurant_sheet(restaurant_id):
-    record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()
-    if record == []:
+    record = db.session.query(Restaurant).filter_by(id = restaurant_id).first()
+    if record is None:
         return make_response(render_template('error.html', error='404'),404)
-    else:
-        record = record[0]
+
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     closed_days = []
     for day in record.closed_days:
@@ -43,6 +42,10 @@ def restaurant_sheet(restaurant_id):
 @restaurants.route('/restaurants/<int:restaurant_id>/like')
 @login_required
 def _like(restaurant_id):
+    record = db.session.query(Restaurant).filter_by(id = restaurant_id).first()
+    if record is None:
+        return make_response(render_template('error.html', error='404'),404)
+
     q = Like.query.filter_by(liker_id=current_user.id, restaurant_id=restaurant_id)
     if q.first() == None:
         new_like = Like()
@@ -59,10 +62,13 @@ def _like(restaurant_id):
 @operator_required
 def _edit_restaurant(restaurant_id):
     
+    record = db.session.query(Restaurant).filter_by(id = restaurant_id).first()
+
+    if record is None:
+        return make_response(render_template('error.html', error='404'), 404)
+
     if current_user.rest_id != restaurant_id:
         return make_response(render_template('error.html', error="Area reserved for the restaurant operator"), 401)
-
-    record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()[0]
 
     if request.method == 'POST':
         form = RestaurantEditForm()
