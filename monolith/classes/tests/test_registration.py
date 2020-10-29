@@ -31,9 +31,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'success, User registerd succesfully') 
 
     def test_user_regood_form(self):
         tested_app = self.app.test_client()
@@ -54,9 +51,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             400,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'error, Existing user')
 
     def test_user_missing_field(self):
         tested_app = self.app.test_client()
@@ -83,9 +77,6 @@ class TestRegistration(unittest.TestCase):
             self.assertEqual(
                 reply["status_code"],
                 200,msg=reply)
-            self.assertEqual(
-                reply["help-block"],
-                'This field is required.')
 
     def test_user_empty_field(self):
         tested_app = self.app.test_client()
@@ -112,9 +103,6 @@ class TestRegistration(unittest.TestCase):
             self.assertEqual(
                 reply["status_code"],
                 200,msg=reply)
-            self.assertEqual(
-                reply["help-block"],
-                'This field is required.')
 
     def test_user_empty_field(self):
             tested_app = self.app.test_client()
@@ -141,9 +129,6 @@ class TestRegistration(unittest.TestCase):
                 self.assertEqual(
                     reply["status_code"],
                     200,msg=reply)
-                self.assertEqual(
-                    reply["help-block"],
-                    'This field is required.')
 
     def test_user_existing_email(self):
         tested_app = self.app.test_client()
@@ -164,9 +149,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             400,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'error, Existing user')
 
     def test_user_existing_name_surname(self):
         tested_app = self.app.test_client()
@@ -187,9 +169,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             200,msg=reply) 
-        self.assertEqual(
-            reply["help-block"],
-            'success, User registerd succesfully') 
 
     def test_user_wrong_dateofbirth(self):
         tested_app = self.app.test_client()
@@ -210,9 +189,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'Not a valid date value')
 
     def test_user_wrong_repeated_password(self):
         tested_app = self.app.test_client()
@@ -233,9 +209,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'warning, Passwords do not match')
 
     def test_user_wrong_email(self):
         tested_app = self.app.test_client()
@@ -256,9 +229,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'Invalid email address.')
 
     def test_user_wrong_telephone_form(self):
         tested_app = self.app.test_client()
@@ -279,9 +249,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'Not a valid integer value') 
 
     # --- CREATE_OPERATOR -------------------------------------------------------
 
@@ -308,9 +275,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'success, Operator registerd succesfully') 
 
     def test_operator_regood_form(self):
         tested_app = self.app.test_client()
@@ -335,9 +299,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             400,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'error, Existing restaurant')
 
     def test_operator_same_operator_form(self):
         tested_app = self.app.test_client()
@@ -362,9 +323,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             400,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'error, Existing operator')
 
     def test_operator_missing_field(self):
         tested_app = self.app.test_client()
@@ -395,9 +353,6 @@ class TestRegistration(unittest.TestCase):
             self.assertEqual(
                 reply["status_code"],
                 200,msg=reply)
-            self.assertEqual(
-                reply["help-block"],
-                'This field is required.')
 
     def test_operator_empty_field(self):
         tested_app = self.app.test_client()
@@ -428,9 +383,6 @@ class TestRegistration(unittest.TestCase):
             self.assertEqual(
                 reply["status_code"],
                 200,msg=reply)
-            self.assertEqual(
-                reply["help-block"],
-                'This field is required.')
 
     def test_operator_none_field(self):
             tested_app = self.app.test_client()
@@ -461,9 +413,6 @@ class TestRegistration(unittest.TestCase):
                 self.assertEqual(
                     reply["status_code"],
                     200,msg=reply)
-                self.assertEqual(
-                    reply["help-block"],
-                    'This field is required.')
 
     def test_operator_existing_email(self):
         tested_app = self.app.test_client()
@@ -488,9 +437,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             400,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'error, Existing operator')
 
     def test_operator_existing_name_surname(self):
         tested_app = self.app.test_client()
@@ -515,9 +461,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             200,msg=reply) 
-        self.assertEqual(
-            reply["help-block"],
-            'success, Operator registerd succesfully') 
 
     def test_operator_wrong_dateofbirth(self):
         tested_app = self.app.test_client()
@@ -542,9 +485,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'Not a valid date value')
 
     def test_operator_wrong_repeated_password(self):
         tested_app = self.app.test_client()
@@ -569,9 +509,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'warning, Passwords do not match')
 
     def test_operator_wrong_email(self):
         tested_app = self.app.test_client()
@@ -596,9 +533,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'Invalid email address.')
 
     def test_user_wrong_operator_telephone_form(self):
         tested_app = self.app.test_client()
@@ -623,9 +557,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'Not a valid integer value') 
 
     def test_user_wrong_rest_telephone_form(self):
         tested_app = self.app.test_client()
@@ -650,9 +581,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'Not a valid integer value') 
 
     def test_user_wrong_latitude_form(self):
         tested_app = self.app.test_client()
@@ -677,9 +605,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'Not a valid float value') 
 
     def test_user_wrong_longitude_form(self):
         tested_app = self.app.test_client()
@@ -704,9 +629,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'Not a valid float value') 
 
  # --- USERS LIST --------------------------------------------------------
     
