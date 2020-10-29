@@ -6,4 +6,3 @@ flask-wtf
 flask-sqlalchemy
 pip-tools
 email-validator
-bs4
