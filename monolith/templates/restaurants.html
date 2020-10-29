@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block content %}
+     <div class="alert alert-warning alert-dismissible" role="alert">{{ message }}</div>
     <h3>Restaurant List</h3>
-    {{ message }}
     <br>
     <ul>
       {% for restaurant in restaurants: %}
