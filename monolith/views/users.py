@@ -1,6 +1,5 @@
 from flask import Blueprint, redirect, render_template, request, flash, make_response
-from flask_login import login_required, logout_user, current_user
-
+from flask_login import login_required, logout_user, current_user, login_user
 
 from monolith.auth import admin_required, is_admin, operator_required
 from monolith.forms import UserForm, OperatorForm, LoginForm
@@ -41,6 +40,7 @@ def delete_user():
         flash('Bad form','error')
         return make_response(render_template('login.html', form=form, title="Unregister"),400)
     return make_response(render_template('login.html', form=form, title="Unregister"),200)
+
 
 @users.route('/delete_operator', methods=['GET', 'POST'])
 @operator_required
@@ -102,8 +102,10 @@ def create_user():
                 flash('Existing user', 'error')
                 return make_response(render_template('form.html', form=form, title="Sign in!"),400)
 
-            flash('User registerd succesfully','success')
-            return make_response(render_template('form.html', form=form, title="Sign in!"),200)
+            if new_user is not None and new_user.authenticate(password):
+                login_user(new_user)
+            flash('User registerd succesfully', 'success')
+            return make_response(render_template('index.html'), 200)
 
     return render_template('form.html', form=form, title="Sign in!")
 
@@ -154,8 +156,10 @@ def create_operator():
                 flash('Existing restaurant', 'error')
                 return make_response(render_template('form.html', form=form, title="Sign in!"), 400)
 
-            flash('Operator registerd succesfully','success')
-            return make_response(render_template('form.html', form=form, title="Sign in!"),200)
+            if new_user is not None and new_user.authenticate(password):
+                login_user(new_user)
+            flash('Restaurant registerd succesfully', 'success')
+            return make_response(render_template('index.html'),200)
 
     return render_template('form.html', form=form, title="Sign in!")
 

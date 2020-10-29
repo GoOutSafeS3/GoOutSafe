@@ -48,9 +48,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'success, Operator registerd succesfully')
 
         form = {
             "email":"testerGoodFormOperator2@test.me",
@@ -69,9 +66,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
-        self.assertEqual(
-            reply["help-block"],
-            'success, Operator registerd succesfully')
         return tested_app
 
     def do_login(self,client, email, password):

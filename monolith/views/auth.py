@@ -22,10 +22,10 @@ def login():
                 login_user(user)
                 return redirect('/')
             flash('Wrong email or password','error')
-            return make_response(render_template('login.html', form=form),401)
+            return make_response(render_template('login.html', form=form), 401)
         flash('Bad form','error')
-        return make_response(render_template('login.html', form=form),400)
-    return make_response(render_template('login.html', form=form),200)
+        return make_response(render_template('login.html', form=form), 400)
+    return make_response(render_template('login.html', form=form), 200)
 
 
 @auth.route("/logout")
