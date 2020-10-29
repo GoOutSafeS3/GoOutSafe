@@ -1,30 +1,14 @@
 import unittest
-import json
 from flask import request, jsonify
 from monolith.app import create_app_testing
 from flask_test_with_csrf import FlaskClient
-from bs4 import BeautifulSoup
-import inspect
-
+from utils import send_registration_form
 
 class TestRegistration(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.app = create_app_testing()
         self.app.test_client_class = FlaskClient
-
-    def send_registration_form(self, tested_app, url, form):
-        reply = tested_app.t_post(url, data=form)
-        soup = BeautifulSoup(reply.get_data(as_text=True), 'html.parser')
-        helpblock = soup.find_all('p', attrs={'class': 'help-block'})
-
-        if helpblock == []:
-            helpblock = ""
-        else:
-            helpblock = helpblock[0].text.strip()
-
-        return {"status_code":reply.status_code, "help-block":helpblock}
-
 
     # --- CREATE_USER -------------------------------------------------------
 
@@ -42,7 +26,7 @@ class TestRegistration(unittest.TestCase):
             "telephone":"1234567890",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_user', form)
+        reply = send_registration_form(tested_app, '/create_user', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -65,7 +49,7 @@ class TestRegistration(unittest.TestCase):
             "telephone":"1234567890",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_user', form)
+        reply = send_registration_form(tested_app, '/create_user', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -94,7 +78,7 @@ class TestRegistration(unittest.TestCase):
             tested_form = form
             del tested_form[f]
 
-            reply = self.send_registration_form(tested_app, '/create_user', form)
+            reply = send_registration_form(tested_app, '/create_user', form)
             
             self.assertEqual(
                 reply["status_code"],
@@ -123,7 +107,7 @@ class TestRegistration(unittest.TestCase):
             tested_form = form
             tested_form[f] = ""
 
-            reply = self.send_registration_form(tested_app, '/create_user', form)
+            reply = send_registration_form(tested_app, '/create_user', form)
             
             self.assertEqual(
                 reply["status_code"],
@@ -152,7 +136,7 @@ class TestRegistration(unittest.TestCase):
                 tested_form = form
                 tested_form[f] = None
 
-                reply = self.send_registration_form(tested_app, '/create_user', form)
+                reply = send_registration_form(tested_app, '/create_user', form)
                 
                 self.assertEqual(
                     reply["status_code"],
@@ -175,7 +159,7 @@ class TestRegistration(unittest.TestCase):
             "telephone":"1234567890",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_user', form)
+        reply = send_registration_form(tested_app, '/create_user', form)
 
         self.assertEqual(
             reply["status_code"],
@@ -198,7 +182,7 @@ class TestRegistration(unittest.TestCase):
             "telephone":"1234567890",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_user', form)
+        reply = send_registration_form(tested_app, '/create_user', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -221,7 +205,7 @@ class TestRegistration(unittest.TestCase):
             "telephone":"1234567890",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_user', form)
+        reply = send_registration_form(tested_app, '/create_user', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -244,7 +228,7 @@ class TestRegistration(unittest.TestCase):
             "telephone":"1234567890",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_user', form)
+        reply = send_registration_form(tested_app, '/create_user', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -267,7 +251,7 @@ class TestRegistration(unittest.TestCase):
             "telephone":"1234567890",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        reply = send_registration_form(tested_app, '/create_operator', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -290,7 +274,7 @@ class TestRegistration(unittest.TestCase):
             "telephone":"thisisatelephone",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_user', form)
+        reply = send_registration_form(tested_app, '/create_user', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -319,7 +303,7 @@ class TestRegistration(unittest.TestCase):
             "restaurant_longitude":"10.242911",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        reply = send_registration_form(tested_app, '/create_operator', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -346,7 +330,7 @@ class TestRegistration(unittest.TestCase):
             "restaurant_longitude":"10.242911",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        reply = send_registration_form(tested_app, '/create_operator', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -373,7 +357,7 @@ class TestRegistration(unittest.TestCase):
             "restaurant_longitude":"10.242911",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        reply = send_registration_form(tested_app, '/create_operator', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -406,7 +390,7 @@ class TestRegistration(unittest.TestCase):
             tested_form = form
             del tested_form[f]
 
-            reply = self.send_registration_form(tested_app, '/create_operator', form)
+            reply = send_registration_form(tested_app, '/create_operator', form)
             
             self.assertEqual(
                 reply["status_code"],
@@ -439,7 +423,7 @@ class TestRegistration(unittest.TestCase):
             tested_form = form
             tested_form[f] = ""
 
-            reply = self.send_registration_form(tested_app, '/create_operator', form)
+            reply = send_registration_form(tested_app, '/create_operator', form)
             
             self.assertEqual(
                 reply["status_code"],
@@ -472,7 +456,7 @@ class TestRegistration(unittest.TestCase):
                 tested_form = form
                 tested_form[f] = None
 
-                reply = self.send_registration_form(tested_app, '/create_operator', form)
+                reply = send_registration_form(tested_app, '/create_operator', form)
                 
                 self.assertEqual(
                     reply["status_code"],
@@ -499,7 +483,7 @@ class TestRegistration(unittest.TestCase):
             "restaurant_longitude":"10.242911",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        reply = send_registration_form(tested_app, '/create_operator', form)
 
         self.assertEqual(
             reply["status_code"],
@@ -526,7 +510,7 @@ class TestRegistration(unittest.TestCase):
             "restaurant_longitude":"10.242911",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        reply = send_registration_form(tested_app, '/create_operator', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -553,7 +537,7 @@ class TestRegistration(unittest.TestCase):
             "restaurant_longitude":"10.242911",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        reply = send_registration_form(tested_app, '/create_operator', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -580,7 +564,7 @@ class TestRegistration(unittest.TestCase):
             "restaurant_longitude":"10.242911",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        reply = send_registration_form(tested_app, '/create_operator', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -607,7 +591,7 @@ class TestRegistration(unittest.TestCase):
             "restaurant_longitude":"10.242911",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        reply = send_registration_form(tested_app, '/create_operator', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -634,7 +618,7 @@ class TestRegistration(unittest.TestCase):
             "restaurant_longitude":"10.242911",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        reply = send_registration_form(tested_app, '/create_operator', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -661,7 +645,7 @@ class TestRegistration(unittest.TestCase):
             "restaurant_longitude":"10.242911",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        reply = send_registration_form(tested_app, '/create_operator', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -688,7 +672,7 @@ class TestRegistration(unittest.TestCase):
             "restaurant_longitude":"10.242911",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        reply = send_registration_form(tested_app, '/create_operator', form)
         
         self.assertEqual(
             reply["status_code"],
@@ -715,7 +699,7 @@ class TestRegistration(unittest.TestCase):
             "restaurant_longitude":"longitude",
         }
 
-        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        reply = send_registration_form(tested_app, '/create_operator', form)
         
         self.assertEqual(
             reply["status_code"],

@@ -3,27 +3,13 @@ import json
 from flask import request, jsonify
 from monolith.app import create_app_testing
 from flask_test_with_csrf import FlaskClient
-from bs4 import BeautifulSoup
-import inspect
+from utils import do_login, send_registration_form
 
 class TestRegistration(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.app = create_app_testing()
         self.app.test_client_class = FlaskClient
-
-    def send_registration_form(self, tested_app, url, form):
-
-        reply = tested_app.t_post(url, data=form)
-        soup = BeautifulSoup(reply.get_data(as_text=True), 'html.parser')
-        helpblock = soup.find_all('p', attrs={'class': 'help-block'})
-
-        if helpblock == []:
-            helpblock = ""
-        else:
-            helpblock = helpblock[0].text.strip()
-
-        return {"status_code":reply.status_code, "help-block":helpblock}
 
     def setup_app(self):
         self.app = create_app_testing()
@@ -44,7 +30,7 @@ class TestRegistration(unittest.TestCase):
             "restaurant_latitude":"43.431489",
             "restaurant_longitude":"10.242911",
         }
-        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        reply = send_registration_form(tested_app, '/create_operator', form)
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
@@ -65,7 +51,7 @@ class TestRegistration(unittest.TestCase):
             "restaurant_latitude":"43.431481",
             "restaurant_longitude":"10.242915",
         }
-        reply = self.send_registration_form(tested_app, '/create_operator', form)
+        reply = send_registration_form(tested_app, '/create_operator', form)
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
@@ -73,9 +59,6 @@ class TestRegistration(unittest.TestCase):
             reply["help-block"],
             'success, Operator registerd succesfully')
         return tested_app
-
-    def do_login(self,client, email, password):
-        return client.t_post('/login',data={"email":email, "password": password})
 
     def get_my_restaurant_id(self, client):
         #alrady logged as we created a user right now
@@ -95,14 +78,14 @@ class TestRegistration(unittest.TestCase):
 
     def test_get_edit_id(self):
         client = self.setup_app()
-        self.do_login(client,"testerGoodFormOperator@test.me", "42")
+        do_login(client,"testerGoodFormOperator@test.me", "42")
         id = self.get_my_restaurant_id(client)
         reply = client.t_get('/restaurants/'+str(id)+"/edit")
         self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
 
     def test_post_edit(self):
         client = self.setup_app()
-        self.do_login(client,"testerGoodFormOperator@test.me", "42")
+        do_login(client,"testerGoodFormOperator@test.me", "42")
         id = self.get_my_restaurant_id(client)
         form = {
             "name":"Restaurant at the End of the Universe",
@@ -133,7 +116,7 @@ class TestRegistration(unittest.TestCase):
 
     def test_post_edit_wrong_user(self):
         client = self.setup_app()
-        self.do_login(client,"testerGoodFormOperator2@test.me", "42")
+        do_login(client,"testerGoodFormOperator2@test.me", "42")
         id = self.get_my_restaurant_id(client)
         form = {
             "name":"Restaurant at the End of the Universe",
@@ -155,7 +138,7 @@ class TestRegistration(unittest.TestCase):
 
     def test_post_edit_wrong_data(self):
         client = self.setup_app()
-        self.do_login(client,"testerGoodFormOperator@test.me", "42")
+        do_login(client,"testerGoodFormOperator@test.me", "42")
         id = self.get_my_restaurant_id(client)
         form = {
             "name": None,
