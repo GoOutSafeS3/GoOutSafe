@@ -5,6 +5,38 @@ from monolith.views import blueprints
 from monolith.auth import login_manager
 
 import datetime
+import configparser
+
+DEFAULT_CONFIGURATION = {
+
+    "fake_data" : False,
+    "remove_db" : False,
+    "db_dropall" : False,
+
+    "wtf_csrf_secret_key" : 'A SECRET KEY',
+    "secret_key" : 'ANOTHER ONE',
+    "sqlalchemy_database_uri" : 'sqlite:///gooutsafe.db',
+    "sqlalchemy_track_modifications" : False
+    
+}
+
+def get_config(configuration):
+    parser = configparser.ConfigParser()
+    if parser.read('config.ini') != []:
+        
+        if type(configuration) != str:
+            configuration = parser["CONFIG"]["CONFIG"]
+
+        print("- GoOutSafe CONFIGURATION:",configuration)
+        configuration = parser._sections[configuration]
+
+        for k,v in DEFAULT_CONFIGURATION.items():
+            if not k in configuration:
+                configuration[k] = v
+
+        return configuration
+    else:
+        return DEFAULT_CONFIGURATION
 
 def fake_data():
 
@@ -169,18 +201,23 @@ def init():
         db.session.add(auth)
         db.session.commit()
 
+def create_app(configuration):
 
-def create_app_testing():
-    try:
-        os.remove("monolith/gooutsafe_test.db")
-        os.remove("test.txt")
-    except:
-        pass
     app = Flask(__name__)
-    app.config['WTF_CSRF_SECRET_KEY'] = 'A SECRET KEY'
-    app.config['SECRET_KEY'] = 'ANOTHER ONE'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///gooutsafe_test.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    config = get_config(configuration)
+
+    if config["remove_db"]:
+        try:
+            os.remove("monolith/gooutsafe_test.db")
+        except:
+            pass
+
+    
+    app.config['WTF_CSRF_SECRET_KEY'] = config["wtf_csrf_secret_key"]
+    app.config['SECRET_KEY'] = config["secret_key"]
+    app.config['SQLALCHEMY_DATABASE_URI'] = config["sqlalchemy_database_uri"]
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config["sqlalchemy_track_modifications"]
 
     for bp in blueprints:
         app.register_blueprint(bp)
@@ -188,43 +225,20 @@ def create_app_testing():
 
     db.init_app(app)
     login_manager.init_app(app)
-    db.drop_all(app=app)
+
+    if config["db_dropall"]:
+        db.drop_all(app=app)
+
     db.create_all(app=app)
 
     # create a first admin user
     with app.app_context():
         init()
-        fake_data()
+        if config["fake_data"]:
+            fake_data()
 
     return app
-
-
-def create_app_production():
-    app = Flask(__name__)
-    app.config['WTF_CSRF_SECRET_KEY'] = 'A SECRET KEY'
-    app.config['SECRET_KEY'] = 'ANOTHER ONE'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///gooutsafe.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config.update(
-        CELERY_BROKER_URL='redis://localhost:6379',
-        CELERY_RESULT_BACKEND='redis://localhost:6379'
-    )
-
-    for bp in blueprints:
-        app.register_blueprint(bp)
-        bp.app = app
-
-    db.init_app(app)
-    login_manager.init_app(app)
-    db.create_all(app=app)
-
-    # create a first admin user
-    with app.app_context():
-        init()
-
-    return app
-
 
 if __name__ == '__main__':
-    app = create_app_production()
+    app = create_app()
     app.run()

@@ -1,5 +1,5 @@
 import unittest
-from monolith.app import create_app_testing
+from monolith.app import create_app
 from flask_test_with_csrf import FlaskClient
 from flask import url_for
 from flask_login import current_user
@@ -8,7 +8,7 @@ from utils import do_login
 class TestRestaurant(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self.app = create_app_testing()
+        self.app = create_app("TEST")
         self.app.test_client_class = FlaskClient
 
     def test_restaurant_list(self):
