@@ -1,24 +1,25 @@
 {% extends 'layout.html' %}
 {% block content %}
-    <h1>{{name}} -- Likes: {{likes}}</h1> 
-    <h2>Phone: {{phone}}</h2>
+    <h1 style="color: darkred">{{name}}</h1>
+    <h4>{{likes}} Likes</h4>
+    <h4>Phone: {{phone}}</h4>
     <div class="cuisine_type">
-      <h3>Cuisine type:</h3>
-      {{cuisine_type}}
-    </div>
+    <h4>Cuisine type: {{cuisine_type}}</h4>
 
+    </div>
+    <br>
     <ul>
       <iframe width="600" height="400" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" 
       src="https://www.openstreetmap.org/export/embed.html?bbox={{lon - 0.001}}%2C{{lat - 0.001}}%2C{{lon + 0.001}}%2C{{lat + 0.001}}&amp;layer=mapnik&amp;marker={{lat}}%2C{{lon}}" style="border: 1px solid black"></iframe><br/><small><a href="https://www.openstreetmap.org/#map=17/{{lat}}/{{lon}}">See it Larger</a></small>
     </ul>
 
     <div class="menu">
-      <h3>Menu</h3>
+      <h4>Menu</h4>
       {{menu}}
     </div>
-
+    <br>
     <div class="opening_hours">
-      <h3>Opening hours</h3>
+      <h4>Opening hours</h4>
       <p>Lunch: {{lunch_opening}}:00 - {{lunch_closing}}:00</p>
       <p>Dinner: {{dinner_opening}}:00 - {{dinner_closing}}:00</p>
     </div>
@@ -32,29 +33,30 @@
       </ul>
     </div>
     {% if current_user.is_operator and current_user.rest_id == id %}
-      <a href="/restaurants/{{ id }}/edit"> Edit Restaurant  </a>
+
       <div class="restaurant_tables">
-        <h3>Your bookings</h3>
+      <br>
+        <h4>Your bookings</h4>
         <ul>
           {% for table in tables: %}
-            <li>
-              Capacity: {{table.capacity}}
-              <a href="{{base_url}}/tables/{{table.id}}/edit">Edit</a>
-              <a href="{{base_url}}/tables/{{table.id}}/delete">Delete</a>
+            <li> Table with Capacity: {{table.capacity}} people
+              <a  href="{{base_url}}/tables/{{table.id}}/edit">Edit</a>
+              <a  href="{{base_url}}/tables/{{table.id}}/delete">Delete</a>
             </li>
           {% endfor %}
           <li><a href="{{base_url}}/tables/add">Add a table</a></li>
         </ul>
       </div>
+       <br>
+      <a class="btn btn-outline-secondary btn-sm" href="/restaurants/{{ id }}/edit"> Edit Restaurant  </a>
     {% endif %}
 
     {% if not current_user.is_operator %}
     <form action="{{base_url}}/restaurants/{{id}}/book">
-      <input type="submit" value="Book a Table!" />
+      <a  class="btn btn-outline-secondary btn-sm" href="/restaurants"> Back to List</a>
+      <input class="btn btn-outline-secondary btn-sm" type="submit" value="Book a Table!" />
     </form>
     {% endif %}
 
-
-    <a href="/"> Back to Homepage </a>
 {% endblock %}
 

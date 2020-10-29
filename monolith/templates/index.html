@@ -1,15 +1,23 @@
 {% extends 'homepage.html' %}
     {% block content %}
         {% if current_user.is_authenticated %}
-          <h3>Hi {{ current_user.firstname }}!<h3>
+          <h3>Welcome back {{ current_user.firstname }}!<h3>
+
           {% if current_user.is_operator %}
-            <h4>Your Restaurants</h4>
+            <br>
+            <h3>Your Restaurant:</h3>
             {% for restaurant in restaurants%}
               <div>
                 <li>
-                 <a href="/restaurants/{{ restaurant.id }}"> {{restaurant.name}}  </a> -- Likes: {{restaurant.likes}} <a href="/restaurants/{{ restaurant.id }}/edit"> Edit Restaurant  </a>
+                   <h5>
+                       <a href="/restaurants/{{ restaurant.id }}"> {{restaurant.name}}  </a>
+                         has {{restaurant.likes}} Likes
+                   </h5>
+
                 </li>
               </div>
+                <br>
+                  <a class="btn btn-outline-secondary btn-sm"  href="/restaurants/{{ restaurant.id }}/edit"> Edit Restaurant  </a>
             {% endfor %}
           {% endif %}
 
