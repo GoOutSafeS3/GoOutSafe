@@ -16,14 +16,14 @@ def admin_required(func):
     return _admin_required
 
 
-def health_auyhority_required(func):
+def health_authority_required(func):
     @functools.wraps(func)
-    def _health_auyhority_required(*args, **kw):
+    def _health_authority_required(*args, **kw):
         authority = current_user.is_authenticated and current_user.is_health_authority
         if not authority:
             return login_manager.unauthorized()
         return func(*args, **kw)
-    return _health_auyhority_required
+    return _health_authority_required
 
 
 def operator_required(func):

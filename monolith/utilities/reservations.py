@@ -21,7 +21,7 @@ def get_table(restaurant, number_of_people, booking_datetime):
                         .filter(Booking.rest_id == restaurant.id)\
                         .filter(starting_period < Booking.booking_datetime)\
                         .filter(Booking.booking_datetime < ending_period )\
-                        .all() #GB < or <= ? Better <
+                        .all()
 
     total = db.session.query(Table.id,Table.capacity).select_from(Table,Restaurant)\
                         .filter(Restaurant.id == Table.rest_id)\

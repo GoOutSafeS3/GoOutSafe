@@ -101,6 +101,7 @@ def fake_data():
         example_positive.dateofbirth = datetime.datetime(2020, 10, 5)
         example_positive.is_admin = False
         example_positive.is_positive = True
+        example_positive.positive_datetime = datetime.datetime.now()
         example_positive.set_password('positive')
         db.session.add(example_positive)
         db.session.commit()
