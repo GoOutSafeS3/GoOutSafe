@@ -88,7 +88,7 @@ def fake_data():
         example_op.phone = 555123456
         example_op.dateofbirth = datetime.datetime(2020, 10, 5)
         example_op.is_admin = False
-        example_op.set_password('operator2')
+        example_op.set_password('operator')
         example_op.rest_id = 2
         db.session.add(example_op)
         db.session.commit()
