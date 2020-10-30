@@ -3,5 +3,5 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 ADD . /code
 WORKDIR /code
-ENV FLASK_APP=monolith.app:create_app_testing
+ENV FLASK_APP=monolith.app:create_app
 CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]
