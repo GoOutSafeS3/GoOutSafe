@@ -1,20 +1,42 @@
 from flask import Blueprint, redirect, render_template, request, flash, make_response
 from flask_login import login_required, logout_user, current_user, login_user
+from sqlalchemy.orm import aliased
 
-from monolith.auth import admin_required, is_admin, operator_required
+from monolith.auth import admin_required, is_admin, operator_required, health_authority_required
 from monolith.forms import UserForm, OperatorForm, LoginForm
-from monolith.database import User, db, Restaurant
+from monolith.database import User, db, Restaurant, Booking
+from datetime import timedelta, datetime
 
 users = Blueprint('users', __name__)
 
-
 @users.route('/users')
-@login_required
 def _users():
     if is_admin():
         users = db.session.query(User)
         return render_template("users.html", users=users)
 
+def get_user_contacts(user_id, date_begin, date_end):
+    SimultaneousBooking = aliased(Booking)
+    contacts = db.session.query(User).\
+            join(Booking, Booking.user_id == User.id).\
+            filter(Booking.booking_datetime >= date_begin).\
+            filter(Booking.booking_datetime < date_end).\
+            join(Restaurant, Restaurant.id == Booking.rest_id).\
+            join(SimultaneousBooking,
+                SimultaneousBooking.user_id == user_id and \
+                Booking.rest_id == SimultaneousBooking.rest_id and \
+                Booking.booking_datetime.year == SimultaneousBooking.booking_datetime.year and \
+                Booking.booking_datetime.month == SimultaneousBooking.booking_datetime.month and \
+                Booking.booking_datetime.day == SimultaneousBooking.booking_datetime.day).\
+            filter(User.id != user_id).\
+            all()
+    return contacts
+
+@users.route('/users/<int:user_id>/contacts')
+@health_authority_required
+def user_contacts(user_id):
+    return render_template("users.html",
+        users=get_user_contacts(user_id, datetime.today() - timedelta(days=14), datetime.today()))
 
 @users.route('/delete', methods=['GET', 'POST'])
 @login_required
