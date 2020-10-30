@@ -5,7 +5,7 @@ from flask import url_for
 from flask_login import current_user
 from monolith.classes.tests.utils import do_login, do_logout
 
-class TestLogin(unittest.TestCase):
+class TestUnregistration(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.app = create_app("TEST")
@@ -64,7 +64,7 @@ class TestLogin(unittest.TestCase):
         self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
 
         reply = self.do_delete_operator(client, "operator@example.com","operator")
-        self.assertEqual(reply.status_code, 204, msg=reply.get_data(as_text=True))
+        self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
 
     def test_delete_log_as_customer(self):
         client = self.setup_app()        
@@ -77,7 +77,18 @@ class TestLogin(unittest.TestCase):
         self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
 
         reply = self.do_delete_customer(client, "customer@example.com","customer")
-        self.assertEqual(reply.status_code, 204, msg=reply.get_data(as_text=True))
+        self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
+        reply = client.t_get('/')
+        self.assertIn("success",reply.get_data(as_text=True),  msg=reply.get_data(as_text=True))
+
+    def test_delete_log_as_positive_customer(self):
+        client = self.setup_app()        
+        do_login(client, "positive@example.com","positive")
+
+        reply = self.do_delete_customer(client, "positive@example.com","positive")
+        self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
+        reply = client.t_get('/')
+        self.assertIn("You cannot delete your data as long as you are positive",reply.get_data(as_text=True),  msg=reply.get_data(as_text=True))
 
 
     def test_delete_post_wrong_pass(self):
