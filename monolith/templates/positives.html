@@ -1,14 +1,32 @@
 {% extends 'layout.html' %}
 {% block content %}
-    <h1>Positives</h1>
     <ul>
       {% for positive in positives: %}
       <li>
-      {{positive.lastname}} {{positive.firstname}} since {{positive.positive_datetime}}
-      <form action="{{base_url}}/positives/{{positive.id}}/unmark">
-        <input type=hidden />
-        <input type=submit value="Unmark" />
-      </form> 
+        {{positive.lastname}} {{positive.firstname}}
+        <ul>
+          <li>Date Of Birth: since {{positive.dateofbirth}}</li>
+          <li>Email: {{positive.email}}</li>
+          <li>Telephone: {{positive.phone}}</li>
+          {% if positive.ssn %}
+            <li>SSN: {{positive.ssn}}</li>
+          {% else %}
+            <li>SSN: Not Inserted</li>
+          {% endif %}
+          {% if positive.is_positive %}
+            <li>Positive since: {{positive.positive_datetime}}</li>
+            <form action="{{base_url}}/positives/{{positive.id}}/unmark">
+              <input type=hidden />
+              <input type=submit value="Unmark" />
+            </form> 
+          {% else %}
+            <li>Negative</li>
+            <form action="{{base_url}}/positives/{{positive.id}}/mark">
+              <input type=hidden />
+              <input type=submit value="Mark" />
+            </form> 
+          {% endif %}
+        </ul>
       </li>
       {% endfor %}
     </ul>

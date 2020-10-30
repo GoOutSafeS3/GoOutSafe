@@ -49,7 +49,7 @@ class TestLogin(unittest.TestCase):
         self.assertIn("Positive Positive",reply.get_data(as_text=True), msg=reply.get_data(as_text=True))
         do_logout(client)
 
-    def test_mark_unmark(self):
+    def test_mark_unmark_mail(self):
         client = self.app.test_client()
         client.set_app(self.app)
 
@@ -59,14 +59,94 @@ class TestLogin(unittest.TestCase):
 
         form = {
             "email":"customer@example.com",
-            "firstname":"Customer",
-            "lastname":"Customer",
-            "dateofbirth":"05/10/2020"
+            "telephone":"",
+            "ssn":""
             }
 
         for e in endpoints:
             reply = client.t_post(e,form)
             self.assertEqual(reply.status_code, 302, msg="endpoint: "+e+"\n"+reply.get_data(as_text=True))
+            self.assertEqual(reply.location, "http://localhost/positives", msg=reply.location)
+        do_logout(client)
+
+    def test_mark_unmark_telephone(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+
+        endpoints = ["/positives/mark","/positives/unmark"]
+
+        do_login(client, "health@authority.com", "health")
+
+        form = {
+            "email":"",
+            "telephone":"1234567890",
+            "ssn":""
+            }
+
+        for e in endpoints:
+            reply = client.t_post(e,form)
+            self.assertEqual(reply.status_code, 302, msg="endpoint: "+e+"\n"+reply.get_data(as_text=True))
+            self.assertEqual(reply.location, "http://localhost/positives", msg=reply.location)
+        do_logout(client)
+
+    def test_mark_unmark_ssn(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+
+        endpoints = ["/positives/mark","/positives/unmark"]
+
+        do_login(client, "health@authority.com", "health")
+
+        form = {
+            "email":"",
+            "telephone":"",
+            "ssn":"1234567890"
+            }
+
+        for e in endpoints:
+            reply = client.t_post(e,form)
+            self.assertEqual(reply.status_code, 302, msg="endpoint: "+e+"\n"+reply.get_data(as_text=True))
+            self.assertEqual(reply.location, "http://localhost/positives", msg=reply.location)
+        do_logout(client)
+
+    def test_mark_unmark_conflicting_data(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+
+        endpoints = ["/positives/mark","/positives/unmark"]
+
+        do_login(client, "health@authority.com", "health")
+
+        form = {
+            "email":"customer@example.com",
+            "telephone":"0987654321",
+            "ssn":"1234567890"
+            }
+
+        for e in endpoints:
+            reply = client.t_post(e,form)
+            self.assertEqual(reply.status_code, 200, msg="endpoint: "+e+"\n"+reply.get_data(as_text=True))
+            self.assertIn("User not found",reply.get_data(as_text=True), msg=reply.get_data(as_text=True))
+        do_logout(client)
+
+    def test_mark_unmark_empty_field(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+
+        endpoints = ["/positives/mark","/positives/unmark"]
+
+        do_login(client, "health@authority.com", "health")
+
+        form = {
+            "email":"",
+            "telephone":"",
+            "ssn":""
+            }
+
+        for e in endpoints:
+            reply = client.t_post(e,form)
+            self.assertEqual(reply.status_code, 200, msg="endpoint: "+e+"\n"+reply.get_data(as_text=True))
+            self.assertIn("Please fill in a field", reply.get_data(as_text=True), msg=reply.get_data(as_text=True))
         do_logout(client)
 
 
@@ -80,14 +160,14 @@ class TestLogin(unittest.TestCase):
 
         form = {
             "email":"the_customer@example.com",
-            "firstname":"Customer",
-            "lastname":"Customer",
-            "dateofbirth":"05/10/2020"
+            "telephone":"",
+            "ssn":""
             }
 
         for e in endpoints:
             reply = client.t_post(e,form)
-            self.assertEqual(reply.status_code, 404, msg="endpoint: "+e+"\n"+reply.get_data(as_text=True))
+            self.assertEqual(reply.status_code, 200, msg="endpoint: "+e+"\n"+reply.get_data(as_text=True))
+            self.assertIn("User not found",reply.get_data(as_text=True), msg=reply.get_data(as_text=True))
         do_logout(client)
 
     def test_mark_unmark_bad_form(self):
@@ -99,15 +179,14 @@ class TestLogin(unittest.TestCase):
         do_login(client, "health@authority.com", "health")
 
         form = {
-            "email":"customer@example.com",
-            "firstname":"Customer",
-            "lastname":"Customer",
-            "dateofbirth":"05/10/2020"
+            "email":"",
+            "telephone":"",
+            "ssn":""
             }
 
-        for f in ["firstname", "lastname"]:
+        for f in ["email","telephone","ssn"]:
             bad_form = form
-            bad_form[f] = "wrong"
+            bad_form[f] = None
             for e in endpoints:
                 reply = client.t_post(e,bad_form)
                 self.assertEqual(reply.status_code, 200, msg="form: "+str(bad_form)+"\nendpoint: "+e+"\n"+reply.get_data(as_text=True))
@@ -133,14 +212,44 @@ class TestLogin(unittest.TestCase):
 
         form = {
             "email":"customer@example.com",
-            "firstname":"Customer",
-            "lastname":"Customer",
-            "dateofbirth":"05/10/2020"
+            "telephone":"",
+            "ssn":""
             }
 
         client.t_post("/positives/unmark",form) # now we're sure the user isn't marked
         reply = client.t_post("/positives/unmark",form)
+        self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
+        self.assertIn("The user is not positive", reply.get_data(as_text=True), msg=reply.get_data(as_text=True))
+        do_logout(client)
+
+
+    def test_mark_with_id(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+
+        do_login(client, "health@authority.com", "health")
+
+        form = {
+            "email":"customer@example.com",
+            "telephone":"",
+            "ssn":""
+            }
+
+        client.t_post("/positives/unmark",form) # now we're sure that there is at least one negative user
+        match = get_positives_id(client)[0]
+        reply = client.t_get(f"/positives/{match}/mark")
         self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
+        self.assertEqual(reply.location, "http://localhost/positives", msg=reply.location)
+        do_logout(client)
+
+
+    def test_mark_with_id_404(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+
+        do_login(client, "health@authority.com", "health")
+        reply = client.t_get(f"/positives/99999/mark")
+        self.assertEqual(reply.status_code, 404, msg=reply.get_data(as_text=True))
         do_logout(client)
 
     def test_unmark_with_id(self):
@@ -151,15 +260,15 @@ class TestLogin(unittest.TestCase):
 
         form = {
             "email":"customer@example.com",
-            "firstname":"Customer",
-            "lastname":"Customer",
-            "dateofbirth":"05/10/2020"
+            "telephone":"",
+            "ssn":""
             }
 
         client.t_post("/positives/mark",form) # now we're sure that there is at least one positive user
         match = get_positives_id(client)[0]
         reply = client.t_get(f"/positives/{match}/unmark")
         self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
+        self.assertEqual(reply.location, "http://localhost/positives", msg=reply.location)
         do_logout(client)
 
 
@@ -181,9 +290,8 @@ class TestLogin(unittest.TestCase):
 
         form = {
             "email":"customer@example.com",
-            "firstname":"Customer",
-            "lastname":"Customer",
-            "dateofbirth":"05/10/2020"
+            "telephone":"",
+            "ssn":""
             }
 
         client.t_post("/positives/mark",form) # now we're sure that there is at least one positive user
