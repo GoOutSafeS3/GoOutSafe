@@ -6,4 +6,4 @@ ADD . /code
 WORKDIR /code
 ENV BROKER=redis://redis:6379
 ENV BACKEND=redis://redis:6379
-CMD ["pytest", "--cov=monolith"]
+CMD ["coverage","run","--source=monolith","pytest", "--cov=monolith"]
