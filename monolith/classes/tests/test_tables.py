@@ -105,13 +105,13 @@ class TestLogin(unittest.TestCase):
 
     def test_post_delete_table(self):
         client, rest_id, ms, tab_id = self.start_operator()
-        tab_id = 4
+        tab_id = 2
         reply = client.t_get("/tables/%d/delete"%tab_id)
         self.assertEqual(reply.status_code, 302)
     
     def test_post_old_booking_delete_table(self):
         client, rest_id, ms, tab_id = self.start_operator()
-        tab_id = 5
+        tab_id = 3
         reply = client.t_get("/tables/%d/delete"%tab_id)
         self.assertEqual(reply.status_code, 302)
 
@@ -128,5 +128,6 @@ class TestLogin(unittest.TestCase):
 
     def test_booked_delete_table(self):
         client, rest_id, ms, tab_id = self.start_operator()
+        tab_id = 4
         reply = client.t_get("/tables/%d/delete"%tab_id)
         self.assertEqual(reply.status_code, 412)
