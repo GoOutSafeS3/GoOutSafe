@@ -16,7 +16,7 @@ class UserForm(FlaskForm):
     lastname = f.StringField('Lastname', validators=[DataRequired()])
     password = f.PasswordField('Password', validators=[DataRequired()])
     password_repeat = f.PasswordField('Repeat Password', validators=[DataRequired()])
-    telephone = f.IntegerField('Telephone', validators=[InputRequired()]) 
+    telephone = f.StringField('Telephone', validators=[DataRequired()]) 
     dateofbirth = f.DateField('Date Of Birth', format='%d/%m/%Y')
 
     display = ['email', 'firstname', 'lastname', 'password','password_repeat', 'telephone', 'dateofbirth']
@@ -28,11 +28,11 @@ class OperatorForm(FlaskForm):
     lastname = f.StringField('Lastname', validators=[DataRequired()])
     password = f.PasswordField('Password', validators=[DataRequired()])
     password_repeat = f.PasswordField('Repeat Password', validators=[DataRequired()])
-    telephone = f.IntegerField('Telephone', validators=[InputRequired()]) 
+    telephone = f.StringField('Telephone', validators=[DataRequired()]) 
     dateofbirth = f.DateField('Date Of Birth', format='%d/%m/%Y')
 
     restaurant_name = f.StringField('Restaurant Name',validators=[DataRequired()])
-    restaurant_phone = f.IntegerField('Restaurant Phone', validators=[InputRequired()])
+    restaurant_phone = f.StringField('Restaurant Phone', validators=[DataRequired()])
     restaurant_latitude = f.FloatField('Restaurant latitude', validators=[InputRequired()])
     restaurant_longitude = f.FloatField('Restaurant Longitude', validators=[InputRequired()])
 
@@ -40,7 +40,7 @@ class OperatorForm(FlaskForm):
 
 class RestaurantEditForm(FlaskForm):
     name = f.StringField('Restaurant Name',validators=[DataRequired()])
-    phone = f.IntegerField('Restaurant Phone', validators=[InputRequired()])
+    phone = f.StringField('Restaurant Phone', validators=[DataRequired()])
     lat = f.FloatField('Restaurant latitude', validators=[InputRequired()])
     lon = f.FloatField('Restaurant Longitude', validators=[InputRequired()])
 
@@ -82,10 +82,9 @@ class BookingList(FlaskForm):
 
 class SearchUserForm(FlaskForm):
     
-    email = f.StringField('Email', validators=[DataRequired()])
-    firstname = f.StringField('Firstname', validators=[DataRequired()])
-    lastname = f.StringField('Lastname', validators=[DataRequired()])
-    dateofbirth = f.DateField('Date Of Birth', format='%d/%m/%Y')
+    email = f.StringField('Email')
+    telephone = f.StringField('Telephone')
+    ssn = f.StringField('SSN')
 
-    display = ['email', 'firstname', 'lastname', 'dateofbirth'] 
+    display = ['email', 'telephone', "ssn"] 
     

@@ -16,7 +16,8 @@ class User(db.Model):
     lastname = db.Column(db.Unicode(128))
     password = db.Column(db.Unicode(128))
     dateofbirth = db.Column(db.DateTime)
-    phone = db.Column(db.Integer)
+    phone = db.Column(db.Unicode(128))
+    ssn = db.Column(db.Unicode(128))
     
     rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), default=None)
     is_active = db.Column(db.Boolean, default=True)

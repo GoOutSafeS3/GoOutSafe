@@ -138,6 +138,33 @@ def fake_data():
         db.session.add(example_positive)
         db.session.commit()
 
+
+        example_positive1 = User()
+        example_positive1.firstname = 'Another'
+        example_positive1.lastname = 'Positive'
+        example_positive1.email = 'a.positive@example.com'
+        example_positive1.phone = "0987654321"
+        example_positive1.ssn = "987654321"
+        example_positive1.dateofbirth = datetime.datetime(2020, 10, 5)
+        example_positive1.is_admin = False
+        example_positive1.is_positive = True
+        example_positive1.positive_datetime = datetime.datetime.now()
+        example_positive1.set_password('positive')
+        db.session.add(example_positive1)
+        db.session.commit()
+
+        example_cust1 = User()
+        example_cust1.firstname = 'Another'
+        example_cust1.lastname = 'Customer'
+        example_cust1.email = 'a.customer@example.com'
+        example_cust1.phone = "1234567890"
+        example_cust1.ssn = "1234567890"
+        example_cust1.dateofbirth = datetime.datetime(2020, 10, 5)
+        example_cust1.is_admin = False
+        example_cust1.set_password('customer')
+        db.session.add(example_cust1)
+        db.session.commit()
+
         booking_1 = Booking()
         booking_1.rest_id = 1
         booking_1.user_id = example_cust.id

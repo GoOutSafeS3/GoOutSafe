@@ -230,26 +230,6 @@ class TestRegistration(unittest.TestCase):
             reply["status_code"],
             200,msg=reply)
 
-    def test_user_wrong_telephone_form(self):
-        tested_app = self.app.test_client()
-        tested_app.set_app(self.app)
-
-        form = {
-            "email":"testerWrongTelephone@test.me",
-            "firstname":"Tester",
-            "lastname":"WT",
-            "password":"42",
-            "password_repeat":"42",
-            "dateofbirth":"01/01/1970",
-            "telephone":"thisisatelephone",
-        }
-
-        reply = send_registration_form(tested_app, '/create_user', form)
-        
-        self.assertEqual(
-            reply["status_code"],
-            200,msg=reply)
-
     # --- CREATE_OPERATOR -------------------------------------------------------
 
     def test_operator_good_form(self):
@@ -534,53 +514,6 @@ class TestRegistration(unittest.TestCase):
             reply["status_code"],
             200,msg=reply)
 
-    def test_user_wrong_operator_telephone_form(self):
-        tested_app = self.app.test_client()
-        tested_app.set_app(self.app)
-
-        form = {
-            "email":"testerWrongTelephoneNumber@test.me",
-            "firstname":"Tester",
-            "lastname":"OWT",
-            "password":"42",
-            "password_repeat":"42",
-            "dateofbirth":"01/01/1970",
-            "telephone":"thisisatelephonenumber",
-            "restaurant_name":"The Restaurant at the End of the Universe",
-            "restaurant_phone":"1234567890",
-            "restaurant_latitude":"43.431489",
-            "restaurant_longitude":"10.242911",
-        }
-
-        reply = send_registration_form(tested_app, '/create_operator', form)
-        
-        self.assertEqual(
-            reply["status_code"],
-            200,msg=reply)
-
-    def test_user_wrong_rest_telephone_form(self):
-        tested_app = self.app.test_client()
-        tested_app.set_app(self.app)
-
-        form = {
-            "email":"testerWrongTelephoneNumber@test.me",
-            "firstname":"Tester",
-            "lastname":"OWRT",
-            "password":"42",
-            "password_repeat":"42",
-            "dateofbirth":"01/01/1970",
-            "telephone":"1234567890",
-            "restaurant_name":"The Restaurant at the End of the Universe",
-            "restaurant_phone":"thisisatelephonenumber",
-            "restaurant_latitude":"43.431489",
-            "restaurant_longitude":"10.242911",
-        }
-
-        reply = send_registration_form(tested_app, '/create_operator', form)
-        
-        self.assertEqual(
-            reply["status_code"],
-            200,msg=reply)
 
     def test_user_wrong_latitude_form(self):
         tested_app = self.app.test_client()
