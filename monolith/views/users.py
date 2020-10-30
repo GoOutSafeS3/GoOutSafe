@@ -27,19 +27,20 @@ def delete_user():
             email, password = form.data['email'], form.data['password']
             q = db.session.query(User).filter(User.email == email)
             user = q.first()
-            if user is not None:
-                print(q.first().id)
-            if user is not None and user.authenticate(password) and current_user.id == user.id:
-                logout_user()
-                db.session.delete(user)
-                db.session.commit()
-                flash('Your account has been deleted','success')
-                return redirect('/',code=204)
+            if user is not None and user.authenticate(password) and current_user.id == user.id :
+                if current_user.is_positive:
+                    flash('You cannot delete your data as long as you are positive','error')
+                else:
+                    logout_user()
+                    db.session.delete(user)
+                    db.session.commit()
+                    flash('Your account has been deleted','success')
+                return redirect('/', code=302)
             flash('Wrong email or password','error')
-            return make_response(render_template('login.html', form=form, title="Unregister"),400)
+            return make_response(render_template('form.html', form=form, title="Unregister"),400)
         flash('Bad form','error')
-        return make_response(render_template('login.html', form=form, title="Unregister"),400)
-    return make_response(render_template('login.html', form=form, title="Unregister"),200)
+        return make_response(render_template('form.html', form=form, title="Unregister"),400)
+    return make_response(render_template('form.html', form=form, title="Unregister"),200)
 
 
 @users.route('/delete_operator', methods=['GET', 'POST'])
@@ -51,8 +52,6 @@ def delete_operator():
             email, password = form.data['email'], form.data['password']
             q = db.session.query(User).filter(User.email == email)
             user = q.first()
-            if user is not None:
-                print(q.first().id)
             if user is not None and user.authenticate(password) and current_user.id == user.id:
                 q_r = db.session.query(Restaurant).filter_by(id = user.rest_id)
                 rest = q_r.first()
@@ -62,12 +61,12 @@ def delete_operator():
                     db.session.delete(rest)
                 db.session.commit()
                 flash('Your account has been deleted','success')
-                return redirect('/',code=204)
+                return redirect('/',code=302)
             flash('Wrong email or password','error')
-            return make_response(render_template('login.html', form=form, title="Unregister"),400)
+            return make_response(render_template('form.html', form=form, title="Unregister"),400)
         flash('Bad form','error')
-        return make_response(render_template('login.html', form=form, title="Unregister"),400)
-    return make_response(render_template('login.html', form=form, title="Unregister"),200)
+        return make_response(render_template('form.html', form=form, title="Unregister"),400)
+    return make_response(render_template('form.html', form=form, title="Unregister"),200)
 
 
 @users.route('/create_user', methods=['GET', 'POST'])
