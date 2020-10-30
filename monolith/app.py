@@ -50,7 +50,7 @@ def fake_data():
     example_cust.firstname = 'Customer'
     example_cust.lastname = 'Customer'
     example_cust.email = 'customer@example.com'
-    example_cust.phone = 555123456
+    example_cust.phone = 5551234561
     example_cust.dateofbirth = datetime.datetime(2020, 10, 5)
     example_cust.is_admin = False
     example_cust.set_password('customer')
@@ -111,7 +111,7 @@ def fake_data():
         example_op.firstname = 'Operator'
         example_op.lastname = 'Operator'
         example_op.email = 'operator@example.com'
-        example_op.phone = 555123456
+        example_op.phone = 5551234563
         example_op.dateofbirth = datetime.datetime(2020, 10, 5)
         example_op.is_admin = False
         example_op.set_password('operator')
@@ -123,7 +123,7 @@ def fake_data():
         example_op.firstname = 'Operator2'
         example_op.lastname = 'Operator2'
         example_op.email = 'operator2@example.com'
-        example_op.phone = 555123456
+        example_op.phone = 5551234564
         example_op.dateofbirth = datetime.datetime(2020, 10, 5)
         example_op.is_admin = False
         example_op.set_password('operator2')
@@ -135,7 +135,7 @@ def fake_data():
         example_positive.firstname = 'Positive'
         example_positive.lastname = 'Positive'
         example_positive.email = 'positive@example.com'
-        example_positive.phone = 555123456
+        example_positive.phone = 5551234565
         example_positive.dateofbirth = datetime.datetime(2020, 10, 5)
         example_positive.is_admin = False
         example_positive.is_positive = True

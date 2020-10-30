@@ -58,8 +58,16 @@ def create_user():
                 flash('Passwords do not match', 'warning')
                 return make_response(render_template('form.html', form=form, title="Sign in!"),200)
 
-            userGet = User.query.filter_by(email=form.email.data).first()
-            if userGet is None:
+            userGetMail = User.query.filter_by(email=form.email.data).first()
+            userGetPhone = User.query.filter_by(phone=form.telephone.data).first()
+            userGetSSN = None
+
+            if form.ssn.data is not None and form.ssn.data != "":
+                userGetSSN = User.query.filter_by(ssn=form.ssn.data).first()
+            else:
+                form.ssn.data = None
+
+            if userGetMail is None and userGetPhone is None and userGetSSN is None:
                 new_user = User()
                 new_user.firstname = form.firstname.data
                 new_user.lastname = form.lastname.data
@@ -67,6 +75,7 @@ def create_user():
                 new_user.set_password(form.password.data)
                 new_user.phone = form.telephone.data
                 new_user.dateofbirth = form.dateofbirth.data
+                new_user.ssn = form.ssn.data
                 try:
                     new_user.set_password(form.password.data)  # pw should be hashed with some salt
                     db.session.add(new_user)
@@ -98,15 +107,18 @@ def create_operator():
                 flash('Passwords do not match', 'warning')
                 return make_response(render_template('form.html', form=form, title="Sign in!"),200)
 
-            userGet = User.query.filter_by(email=form.email.data).first()
             userRestaurant = Restaurant.query.filter_by(name=form.restaurant_name.data).first()
+
+            userGetMail = User.query.filter_by(email=form.email.data).first()
+            userGetPhone = User.query.filter_by(phone=form.telephone.data).first()
+
             if userRestaurant is None:
                 new_rest = Restaurant()
                 new_rest.name = form.restaurant_name.data
                 new_rest.lat = form.restaurant_latitude.data
                 new_rest.lon = form.restaurant_longitude.data
                 new_rest.phone = form.restaurant_phone.data
-                if userGet is None:
+                if userGetMail is None and userGetPhone is None:
                     new_user = User()
                     new_user.firstname = form.firstname.data
                     new_user.lastname = form.lastname.data

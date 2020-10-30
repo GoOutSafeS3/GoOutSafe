@@ -21,7 +21,7 @@ class TestLogin2(unittest.TestCase):
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
-            "telephone":"1234567890",
+            "telephone":"12345678900",
             "restaurant_name":"Restaurant at the End of the Universe",
             "restaurant_phone":"1234567890",
             "restaurant_latitude":"43.431489",

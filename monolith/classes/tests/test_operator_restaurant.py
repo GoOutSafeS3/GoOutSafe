@@ -21,9 +21,9 @@ class TestRegistration(unittest.TestCase):
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
-            "telephone":"1234567890",
+            "telephone":"123456789001",
             "restaurant_name":"Restaurant at the End of the Universe",
-            "restaurant_phone":"1234567890",
+            "restaurant_phone":"123456789001",
             "restaurant_latitude":"43.431489",
             "restaurant_longitude":"10.242911",
         }
@@ -36,9 +36,9 @@ class TestRegistration(unittest.TestCase):
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
-            "telephone":"1234567890",
+            "telephone":"123456789002",
             "restaurant_name":"Restaurant at the End of the Pizza",
-            "restaurant_phone":"1234567891",
+            "restaurant_phone":"123456789100",
             "restaurant_latitude":"43.431481",
             "restaurant_longitude":"10.242915",
         }
@@ -63,7 +63,7 @@ class TestRegistration(unittest.TestCase):
         self.assertIsNotNone(id)
         form = {
             "name":"Restaurant at the End of the Universe",
-            "phone":"1234567890",
+            "phone":"123456789003",
             "lat":"43.431489",
             "lon":"10.242911",
             "opening_hour_lunch": "13",
@@ -96,7 +96,7 @@ class TestRegistration(unittest.TestCase):
         self.assertIsNotNone(id)
         form = {
             "name":"Restaurant at the End of the Universe",
-            "phone":"1234567890",
+            "phone":"123456789004",
             "lat":"43.431489",
             "lon":"10.242911",
             "opening_hour_lunch": "13",
@@ -120,7 +120,7 @@ class TestRegistration(unittest.TestCase):
         self.assertIsNotNone(id)
         form = {
             "name": None,
-            "phone":"1234567890",
+            "phone":"123456789005",
             "lat":"43.431489",
             "lon":"10.242911",
             "opening_hour_lunch": "13",

@@ -11,13 +11,13 @@ db = SQLAlchemy()
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    email = db.Column(db.Unicode(128), nullable=False)
+    email = db.Column(db.Unicode(128), nullable=False, unique=True)
     firstname = db.Column(db.Unicode(128))
     lastname = db.Column(db.Unicode(128))
     password = db.Column(db.Unicode(128))
     dateofbirth = db.Column(db.DateTime)
-    phone = db.Column(db.Unicode(128))
-    ssn = db.Column(db.Unicode(128))
+    phone = db.Column(db.Unicode(128), unique=True)
+    ssn = db.Column(db.Unicode(128), unique=True, default=None)
     
     rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), default=None)
     is_active = db.Column(db.Boolean, default=True)

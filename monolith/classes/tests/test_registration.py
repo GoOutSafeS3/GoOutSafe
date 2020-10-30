@@ -23,7 +23,8 @@ class TestRegistration(unittest.TestCase):
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
-            "telephone":"1234567890",
+            "telephone":"01234567890",
+            "ssn":""
         }
 
         reply = send_registration_form(tested_app, '/create_user', form)
@@ -43,7 +44,8 @@ class TestRegistration(unittest.TestCase):
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
-            "telephone":"1234567890",
+            "telephone":"01234567890",
+            "ssn":""
         }
 
         reply = send_registration_form(tested_app, '/create_user', form)
@@ -64,6 +66,7 @@ class TestRegistration(unittest.TestCase):
             "dateofbirth":"01/01/1970",
             "telephone":"1234567890",
             "password_repeat":"password",
+            "ssn":""
         }
 
         fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat"]
@@ -90,6 +93,7 @@ class TestRegistration(unittest.TestCase):
             "dateofbirth":"01/01/1970",
             "telephone":"1234567890",
             "password_repeat":"password",
+            "ssn":""
         }
 
         fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat"]
@@ -116,6 +120,7 @@ class TestRegistration(unittest.TestCase):
                 "dateofbirth":"01/01/1970",
                 "telephone":"1234567890",
                 "password_repeat":"password",
+                "ssn":""
             }
 
             fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat"]
@@ -142,6 +147,7 @@ class TestRegistration(unittest.TestCase):
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
             "telephone":"1234567890",
+            "ssn":""
         }
 
         reply = send_registration_form(tested_app, '/create_user', form)
@@ -161,7 +167,8 @@ class TestRegistration(unittest.TestCase):
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
-            "telephone":"1234567890",
+            "telephone":"12345678902",
+            "ssn":""
         }
 
         reply = send_registration_form(tested_app, '/create_user', form)
@@ -182,6 +189,7 @@ class TestRegistration(unittest.TestCase):
             "password_repeat":"42",
             "dateofbirth":"thisisadateofbirth",
             "telephone":"1234567890",
+            "ssn":""
         }
 
         reply = send_registration_form(tested_app, '/create_user', form)
@@ -202,6 +210,7 @@ class TestRegistration(unittest.TestCase):
             "password_repeat":"43",
             "dateofbirth":"01/01/1970",
             "telephone":"1234567890",
+            "ssn":""
         }
 
         reply = send_registration_form(tested_app, '/create_user', form)
@@ -222,13 +231,57 @@ class TestRegistration(unittest.TestCase):
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
             "telephone":"1234567890",
+            "ssn":""
         }
 
-        reply = send_registration_form(tested_app, '/create_operator', form)
+        reply = send_registration_form(tested_app, '/create_user', form)
         
         self.assertEqual(
             reply["status_code"],
             200,msg=reply)
+
+    def test_user_with_ssn_form(self):
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
+
+        form = {
+            "email":"testerSSN@test.me",
+            "firstname":"Tester",
+            "lastname":"SSN",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"0123456789001",
+            "ssn":"0192837465"
+        }
+
+        reply = send_registration_form(tested_app, '/create_user', form)
+        
+        self.assertEqual(
+            reply["status_code"],
+            200,msg=reply)
+
+    def test_user_with_ssn_form_existing(self):
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
+
+        form = {
+            "email":"testerSSN1@test.me",
+            "firstname":"Tester",
+            "lastname":"SSN",
+            "password":"42",
+            "password_repeat":"42",
+            "dateofbirth":"01/01/1970",
+            "telephone":"0123456789002",
+            "ssn":"0192837465"
+        }
+
+        reply = send_registration_form(tested_app, '/create_user', form)
+        
+        self.assertEqual(
+            reply["status_code"],
+            400,msg=reply)
+
 
     # --- CREATE_OPERATOR -------------------------------------------------------
 
@@ -243,7 +296,7 @@ class TestRegistration(unittest.TestCase):
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
-            "telephone":"1234567890",
+            "telephone":"12345678900",
             "restaurant_name":"Restaurant at the End of the Universe",
             "restaurant_phone":"1234567890",
             "restaurant_latitude":"43.431489",
@@ -267,7 +320,7 @@ class TestRegistration(unittest.TestCase):
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
-            "telephone":"1234567890",
+            "telephone":"12345678900",
             "restaurant_name":"Restaurant at the End of the Universe",
             "restaurant_phone":"1234567890",
             "restaurant_latitude":"43.431489",
@@ -291,7 +344,7 @@ class TestRegistration(unittest.TestCase):
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
-            "telephone":"1234567890",
+            "telephone":"12345678901",
             "restaurant_name":"The Restaurant (almost) at the End of the Universe",
             "restaurant_phone":"1234567890",
             "restaurant_latitude":"43.431489",
@@ -429,7 +482,7 @@ class TestRegistration(unittest.TestCase):
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
-            "telephone":"1234567890",
+            "telephone":"12345678903",
             "restaurant_name":"The Restaurant at the End of the Universe",
             "restaurant_phone":"1234567890",
             "restaurant_latitude":"43.431489",
@@ -623,7 +676,7 @@ class TestRegistration(unittest.TestCase):
             reply.status_code,
             200,msg=html)
 
-        for u in ["Admin Admin", "Tester GF", "Tester OENS", "Tester OGF", "Tester ENS"]:
+        for u in ["Admin Admin", "Tester GF", "Tester OENS", "Tester OGF", "Tester ENS", "Tester SSN"]:
             self.assertIn(u,html,msg=html)
 
 
