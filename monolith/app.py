@@ -3,9 +3,13 @@ from flask import Flask
 from monolith.database import db, User, Restaurant, Booking, Table
 from monolith.views import blueprints
 from monolith.auth import login_manager
-
+from monolith.background import init_celery
+from celery import Celery
+import sys
+import os
 import datetime
 import configparser
+
 
 DEFAULT_CONFIGURATION = {
 
@@ -16,11 +20,13 @@ DEFAULT_CONFIGURATION = {
     "wtf_csrf_secret_key" : 'A SECRET KEY',
     "secret_key" : 'ANOTHER ONE',
     "sqlalchemy_database_uri" : 'sqlite:///gooutsafe.db',
-    "sqlalchemy_track_modifications" : False
+    "sqlalchemy_track_modifications" : False,
     
+    "result_backend" : os.getenv("BACKEND", "redis://localhost:6379"),
+    "broker_url" : os.getenv("BROKER", "redis://localhost:6379")
 }
 
-def get_config(configuration):
+def get_config(configuration=None):
     parser = configparser.ConfigParser()
     if parser.read('config.ini') != []:
         
@@ -245,6 +251,8 @@ def create_app(configuration):
     app.config['SECRET_KEY'] = config["secret_key"]
     app.config['SQLALCHEMY_DATABASE_URI'] = config["sqlalchemy_database_uri"]
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config["sqlalchemy_track_modifications"]
+    app.config['result_backend'] = config['result_backend']
+    app.config['broker_url'] = config['broker_url']
 
     for bp in blueprints:
         app.register_blueprint(bp)
@@ -258,6 +266,8 @@ def create_app(configuration):
 
     db.create_all(app=app)
 
+    init_celery(app)
+
     # create a first admin user
     with app.app_context():
         init()
@@ -266,6 +276,25 @@ def create_app(configuration):
 
     return app
 
+def create_worker_app():
+    config = get_config()
+
+    app = Flask(__name__)
+    app.config['WTF_CSRF_SECRET_KEY'] = config["wtf_csrf_secret_key"]
+    app.config['SECRET_KEY'] = config["secret_key"]
+    app.config['SQLALCHEMY_DATABASE_URI'] = config["sqlalchemy_database_uri"]
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config["sqlalchemy_track_modifications"]
+    app.config['result_backend'] = config['result_backend']
+    app.config['broker_url'] = config['broker_url']
+
+    init_celery(app, worker=True)
+
+    return app
+
 if __name__ == '__main__':
-    app = create_app()
+    c = None
+    if len(sys.argv) > 1:
+        c = sys.argv[1]
+ 
+    app = create_app(c)
     app.run()

@@ -6,15 +6,39 @@ services:
       dockerfile: Dockerfile-test
     depends_on:
       - redis
+      - worker
   monolith:
     build:
       context: .
       dockerfile: Dockerfile
     depends_on:
       - redis
+      - worker
     ports:
       - "5000:5000"
   redis:
     image: "redis:alpine"
     expose:
       - "6379"
+  worker:
+    build:
+      context: .
+    user: nobody
+    environment:
+      - "BROKER=redis://redis:6379"
+      - "BACKEND=redis://redis:6379"
+    command: celery -A monolith.worker:celery worker -l info # -B -s /tmp/celerybeat-schedule 
+  worker-local:
+    build:
+      context: .
+    user: nobody
+    environment:
+      - "BROKER=redis://local:6379"
+      - "BACKEND=redis://local:6379"
+    command: celery -A monolith.worker:celery worker -l info # -B -s /tmp/celerybeat-schedule 
+  local:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    depends_on:
+      - worker-local

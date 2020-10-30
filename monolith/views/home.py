@@ -1,13 +1,17 @@
 from flask import Blueprint, render_template, make_response
 from monolith.database import db, Restaurant, Like
 from monolith.auth import current_user
-
+from monolith.background import log,add_together
 
 home = Blueprint('home', __name__)
 
 
 @home.route('/')
 def index():
+
+    log.s("Logging Stuff")
+    result = add_together.delay(5,3)
+    print(result.wait())
     if current_user is not None and hasattr(current_user, 'id'):
         restaurants = db.session.query(Restaurant).filter_by(id=current_user.rest_id)
     else:

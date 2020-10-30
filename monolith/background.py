@@ -1,12 +1,11 @@
 from celery import Celery
 from celery.schedules import crontab
-from monolith.database import db, User, Restaurant
+from monolith.database import db
 
-BACKEND = BROKER = 'redis://localhost:6379'
-celery = Celery(__name__, backend=BACKEND, broker=BROKER)
+from celery.utils.log import get_task_logger
+logger = get_task_logger(__name__)
 
-_APP = None
-
+celery = Celery()
 
 @celery.task(run_every=crontab(minute=1))
 def every_monday_morning():
@@ -17,20 +16,19 @@ def every_monday_morning():
 def add_together(a, b):
     return a + b
 
-result = add_together.delay(23, 42)
-print("ciao")
-print(result.wait())
-
 @celery.task
-def do_task():
-    global _APP
-    # lazy init
-    if _APP is None:
-        from monolith.app import create_app
-        app = create_app()
-        db.init_app(app)
-    else:
-        app = _APP
+def log(message):
+    logger.debug(message)
+    logger.info(message)
+    logger.warning(message)
+    logger.error(message)
+    logger.critical(message)
 
-    return []
+def init_celery(app, worker=False):
+    #print(app.config,flush=True)
+    # load celery config
+    celery.config_from_object(app.config)
 
+    if not worker:
+        # register celery irrelevant extensions
+        pass
