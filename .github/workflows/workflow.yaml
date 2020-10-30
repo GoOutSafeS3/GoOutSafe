@@ -11,3 +11,18 @@ jobs:
       run: docker-compose build
     - name: Run tests
       run: docker-compose run tests
+    - name: STEP 2. Set-Up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+    - name: STEP 3. Install dependencies
+      run: |
+        pip install --upgrade pip setuptools wheel
+    - name: STEP 4. Pytest Coverage
+      run: |
+        pip install coveralls
+    - name: Coveralls
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+          coveralls
