@@ -4,4 +4,6 @@ RUN pip install -r requirements.txt
 RUN pip install pytest pytest-cov
 ADD . /code
 WORKDIR /code
+ENV BROKER=redis://redis:6379
+ENV BACKEND=redis://redis:6379
 CMD ["pytest", "--cov=monolith"]
