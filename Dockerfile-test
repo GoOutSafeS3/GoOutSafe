@@ -7,4 +7,4 @@ WORKDIR /code
 ENV BROKER=redis://redis:6379
 ENV BACKEND=redis://redis:6379
 RUN chmod +x /code/test.sh
-CMD ["pytest", "--cov-config=/coverage/.coveragerc", "--cov=monolith"]
+CMD ["/code/test.sh"]
