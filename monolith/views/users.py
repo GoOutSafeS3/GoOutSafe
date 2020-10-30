@@ -16,10 +16,10 @@ def _users():
         return render_template("users.html", users=users)
 
 
-@users.route('/delete_user', methods=['GET', 'POST'])
+@users.route('/delete', methods=['GET', 'POST'])
 @login_required
 def delete_user():
-    if current_user.is_admin or current_user.is_health_authority or current_user.is_operator:
+    if current_user.is_admin or current_user.is_health_authority:
         return make_response(render_template('error.html', error='401'),401)
     form = LoginForm()
     if request.method == 'POST':
@@ -27,12 +27,16 @@ def delete_user():
             email, password = form.data['email'], form.data['password']
             q = db.session.query(User).filter(User.email == email)
             user = q.first()
-            if user is not None and user.authenticate(password) and current_user.id == user.id :
+            if user is not None and user.authenticate(password) and current_user.id == user.id:
                 if current_user.is_positive:
                     flash('You cannot delete your data as long as you are positive','error')
                 else:
+                    q_r = db.session.query(Restaurant).filter_by(id = user.rest_id)	
+                    rest = q_r.first()
                     logout_user()
                     db.session.delete(user)
+                    if rest is not None:	
+                        db.session.delete(rest)
                     db.session.commit()
                     flash('Your account has been deleted','success')
                 return redirect('/', code=302)
@@ -41,33 +45,6 @@ def delete_user():
         flash('Bad form','error')
         return make_response(render_template('form.html', form=form, title="Unregister"),400)
     return make_response(render_template('form.html', form=form, title="Unregister"),200)
-
-
-@users.route('/delete_operator', methods=['GET', 'POST'])
-@operator_required
-def delete_operator():
-    form = LoginForm()
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            email, password = form.data['email'], form.data['password']
-            q = db.session.query(User).filter(User.email == email)
-            user = q.first()
-            if user is not None and user.authenticate(password) and current_user.id == user.id:
-                q_r = db.session.query(Restaurant).filter_by(id = user.rest_id)
-                rest = q_r.first()
-                logout_user()
-                db.session.delete(user)
-                if rest is not None:
-                    db.session.delete(rest)
-                db.session.commit()
-                flash('Your account has been deleted','success')
-                return redirect('/',code=302)
-            flash('Wrong email or password','error')
-            return make_response(render_template('form.html', form=form, title="Unregister"),400)
-        flash('Bad form','error')
-        return make_response(render_template('form.html', form=form, title="Unregister"),400)
-    return make_response(render_template('form.html', form=form, title="Unregister"),200)
-
 
 @users.route('/create_user', methods=['GET', 'POST'])
 def create_user():

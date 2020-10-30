@@ -18,8 +18,9 @@ class UserForm(FlaskForm):
     password_repeat = f.PasswordField('Repeat Password', validators=[DataRequired()])
     telephone = f.StringField('Telephone', validators=[DataRequired()]) 
     dateofbirth = f.DateField('Date Of Birth', format='%d/%m/%Y')
+    ssn = f.StringField('SSN (if available)', validators=[])
 
-    display = ['email', 'firstname', 'lastname', 'password','password_repeat', 'telephone', 'dateofbirth']
+    display = ['email', 'firstname', 'lastname', 'password','password_repeat', 'telephone', 'dateofbirth', 'ssn']
 
 
 class OperatorForm(FlaskForm):

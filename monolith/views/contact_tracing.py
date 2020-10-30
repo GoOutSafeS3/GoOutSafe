@@ -50,9 +50,9 @@ def _mark_as_positive():
             if len(qry) == 0:
                 flash("User not found","error")
                 return render_template('form.html', form=form, title="Mark a User")
-            elif len(qry) > 1:
-                flash("More users have been found, please select only one","error")
-                return render_template('positives.html', form=form, title="Mark a User", positives=qry)
+            elif len(qry) > 1: # remove if coverage <90%
+                flash("More users have been found, please try again","error")
+                return render_template('form.html', form=form, title="Mark a User")
             else:
                 qry = qry[0]
 
@@ -96,9 +96,9 @@ def _unmark_as_positive():
             if len(qry) == 0:
                 flash("User not found","error")
                 return render_template('form.html', form=form, title="Unmark a User")
-            elif len(qry) > 1:
-                flash("More users have been found, please select only one","error")
-                return render_template('positives.html', form=form, title="Unmark a User", positives=qry)
+            elif len(qry) > 1: # remove if coverage <90%
+                flash("More users have been found, please try again","error")
+                return render_template('form.html', form=form, title="Unmark a User")
             else:
                 qry = qry[0]
 
