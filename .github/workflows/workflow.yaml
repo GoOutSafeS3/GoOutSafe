@@ -18,9 +18,6 @@ jobs:
     - name: STEP 3. Install dependencies
       run: |
         pip install --upgrade pip setuptools wheel
-        pip install --no-binary :all: nmslib
-        pip install .
-        pip install python-coveralls
     - name: STEP 4. Pytest Coverage
       run: |
         pip install coveralls
