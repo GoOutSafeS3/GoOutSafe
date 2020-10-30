@@ -2,7 +2,7 @@ import re
 
 def send_registration_form(tested_app, url, form):
     reply = tested_app.t_post(url, data=form)
-    return {"status_code":reply.status_code}
+    return {"status_code":reply.status_code, "html": reply.get_data(as_text=True)}
 
 def do_login(client, email, password):
     return client.t_post('/login',data={"email":email, "password": password})

@@ -31,7 +31,7 @@ class TestRegistration(unittest.TestCase):
         
         self.assertEqual(
             reply["status_code"],
-            200,msg=reply)
+            302,msg=reply)
 
     def test_user_regood_form(self):
         tested_app = self.app.test_client()
@@ -80,6 +80,7 @@ class TestRegistration(unittest.TestCase):
             self.assertEqual(
                 reply["status_code"],
                 200,msg=reply)
+            
 
     def test_user_empty_field(self):
         tested_app = self.app.test_client()
@@ -108,32 +109,32 @@ class TestRegistration(unittest.TestCase):
                 reply["status_code"],
                 200,msg=reply)
 
-    def test_user_empty_field(self):
-            tested_app = self.app.test_client()
-            tested_app.set_app(self.app)
+    def test_user_none_field(self):
+        tested_app = self.app.test_client()
+        tested_app.set_app(self.app)
 
-            form = {
-                "email":"email@email.com",
-                "firstname":"firstname",
-                "lastname":"lastname",
-                "password":"password",
-                "dateofbirth":"01/01/1970",
-                "telephone":"1234567890",
-                "password_repeat":"password",
-                "ssn":""
-            }
+        form = {
+            "email":"email@email.com",
+            "firstname":"firstname",
+            "lastname":"lastname",
+            "password":"password",
+            "dateofbirth":"01/01/1970",
+            "telephone":"1234567890",
+            "password_repeat":"password",
+            "ssn":""
+        }
 
-            fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat"]
+        fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat"]
 
-            for f in fields:
-                tested_form = form
-                tested_form[f] = None
+        for f in fields:
+            tested_form = form
+            tested_form[f] = None
 
-                reply = send_registration_form(tested_app, '/create_user', form)
-                
-                self.assertEqual(
-                    reply["status_code"],
-                    200,msg=reply)
+            reply = send_registration_form(tested_app, '/create_user', form)
+            
+            self.assertEqual(
+                reply["status_code"],
+                200,msg=reply)
 
     def test_user_existing_email(self):
         tested_app = self.app.test_client()
@@ -175,7 +176,7 @@ class TestRegistration(unittest.TestCase):
         
         self.assertEqual(
             reply["status_code"],
-            200,msg=reply) 
+            302,msg=reply) 
 
     def test_user_wrong_dateofbirth(self):
         tested_app = self.app.test_client()
@@ -259,7 +260,7 @@ class TestRegistration(unittest.TestCase):
         
         self.assertEqual(
             reply["status_code"],
-            200,msg=reply)
+            302,msg=reply)
 
     def test_user_with_ssn_form_existing(self):
         tested_app = self.app.test_client()
@@ -307,7 +308,7 @@ class TestRegistration(unittest.TestCase):
         
         self.assertEqual(
             reply["status_code"],
-            200,msg=reply)
+            302,msg=reply)
 
     def test_operator_regood_form(self):
         tested_app = self.app.test_client()
@@ -493,7 +494,7 @@ class TestRegistration(unittest.TestCase):
         
         self.assertEqual(
             reply["status_code"],
-            200,msg=reply) 
+            302,msg=reply) 
 
     def test_operator_wrong_dateofbirth(self):
         tested_app = self.app.test_client()

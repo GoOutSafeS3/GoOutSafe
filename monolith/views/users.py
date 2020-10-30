@@ -90,7 +90,7 @@ def create_user():
             if new_user is not None and new_user.authenticate(password):
                 login_user(new_user)
             flash('User registerd succesfully', 'success')
-            return make_response(render_template('index.html'), 200)
+            return redirect("/")
 
     return render_template('form.html', form=form, title="Sign in!")
 
@@ -147,7 +147,7 @@ def create_operator():
             if new_user is not None and new_user.authenticate(password):
                 login_user(new_user)
             flash('Restaurant registerd succesfully', 'success')
-            return make_response(render_template('index.html'),200)
+            return redirect("/")
 
     return render_template('form.html', form=form, title="Sign in!")
 

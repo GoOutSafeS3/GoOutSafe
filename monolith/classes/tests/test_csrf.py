@@ -31,4 +31,4 @@ class TestLogin2(unittest.TestCase):
         reply = send_registration_form(tested_app,'/create_operator', form)
         self.assertEqual(
             reply["status_code"],
-            200)
+            302)
