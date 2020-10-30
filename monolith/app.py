@@ -242,7 +242,7 @@ def create_app(configuration):
 
     if config["remove_db"]:
         try:
-            os.remove("monolith/gooutsafe_test.db")
+            os.remove(config["sqlalchemy_database_uri"])
         except:
             pass
 
