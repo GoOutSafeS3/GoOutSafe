@@ -92,7 +92,7 @@ def _booking_list(restaurant_id):
     return make_response(render_template('form.html', form=form),200)
 
 
-@reservations.route('/reservations/<int:reservation_id>', methods=['GET', 'DELETE', 'POST'])
+@reservations.route('/reservations/<int:reservation_id>', methods=['GET'])
 @operator_required
 def _reservation(reservation_id):
 
@@ -103,12 +103,24 @@ def _reservation(reservation_id):
     else:
         if qry.Booking.rest_id != current_user.get_rest_id():
             return make_response(render_template('error.html', error='401'),401)
+        
+        return render_template("reservation.html", reservation=qry)
+
+
+@reservations.route('/reservations/<int:reservation_id>/delete', methods=['GET', 'DELETE', 'POST'])
+@operator_required
+def _reservation_delete(reservation_id):
+
+    qry = db.session.query(Booking,User).filter(Booking.id == reservation_id).filter(User.id == Booking.user_id).first()
+    
+    if qry is None:
+        return make_response(render_template('error.html', error='404'),404)
+    else:
+        if qry.Booking.rest_id != current_user.get_rest_id():
+            return make_response(render_template('error.html', error='401'),401)
         else:
-            if request.method == "DELETE" or request.method == "POST":
-                db.session.query(Booking).filter_by(id = reservation_id).delete()
-                db.session.commit()
-                flash("Reservation deleted","success")
-                return redirect('/')
-            
-            elif request.method == "GET": # pragma: no cover
-                return render_template("reservation.html", reservation=qry)
+            db.session.query(Booking).filter_by(id = reservation_id).delete()
+            db.session.commit()
+            flash("Reservation deleted","success")
+            return redirect('/')
+        

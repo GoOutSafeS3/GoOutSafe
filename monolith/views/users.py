@@ -38,6 +38,26 @@ def user_contacts(user_id):
     return render_template("users.html",
         users=get_user_contacts(user_id, datetime.today() - timedelta(days=14), datetime.today()))
 
+
+@users.route('/bookings', methods=['GET', 'POST'])
+@login_required
+def user_bookings():
+    if current_user.is_admin or current_user.is_health_authority or current_user.rest_id is not None:
+        return make_response(render_template('error.html', error='404'),404)
+
+    now = datetime.now()
+
+    qry = db.session.query(Booking,Restaurant)\
+                    .filter(Booking.rest_id == Restaurant.id)\
+                    .filter(Booking.user_id == current_user.id)\
+                    .filter(Booking.booking_datetime >= now)\
+                    .order_by(Booking.booking_datetime).all()
+    
+    if qry == []:
+        flash("There are no reservations", "warning")
+
+    return make_response(render_template('bookings.html', bookings=qry, title="Your Bookings"),200)
+
 @users.route('/delete', methods=['GET', 'POST'])
 @login_required
 def delete_user():

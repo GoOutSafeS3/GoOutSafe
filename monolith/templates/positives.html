@@ -5,7 +5,7 @@
       <li>
         {{positive.lastname}} {{positive.firstname}}
         <ul>
-          <li>Date Of Birth: since {{positive.dateofbirth}}</li>
+          <li>Date Of Birth: {{positive.dateofbirth.strftime("%d %b %Y")}}</li>
           <li>Email: {{positive.email}}</li>
           <li>Telephone: {{positive.phone}}</li>
           {% if positive.ssn %}
@@ -14,21 +14,16 @@
             <li>SSN: Not Inserted</li>
           {% endif %}
           {% if positive.is_positive %}
-            <li>Positive since: {{positive.positive_datetime}}</li>
-            <form action="{{base_url}}/positives/{{positive.id}}/unmark">
-              <input type=hidden />
-              <input type=submit value="Unmark" />
-            </form> 
+            <li>Positive since: {{positive.positive_datetime.strftime("%d %b %Y, %H:%M")}}</li>
+            <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/positives/{{positive.id}}/unmark"> Unmark </a>
           {% else %}
             <li>Negative</li>
-            <form action="{{base_url}}/positives/{{positive.id}}/mark">
-              <input type=hidden />
-              <input type=submit value="Mark" />
+            <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/positives/{{positive.id}}/mark"> Mark </a>
             </form> 
           {% endif %}
         </ul>
       </li>
       {% endfor %}
     </ul>
-    <a href="/"> Back to Homepage </a>
+    <a class="btn btn-outline-secondary btn-sm"  href="/"> Back to Homepage </a>
 {% endblock %}

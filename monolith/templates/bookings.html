@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <ul>
+      {% for booking in bookings: %}
+      <li>
+        {{booking.Restaurant.name}}
+        <ul>
+          <li>{{ booking.Booking.booking_datetime.strftime("%a %d %b %Y, %H:%M") }}</li>
+          <li>For {{booking.Booking.person_number}} person</li>
+          <li>Telephone {{booking.Restaurant.phone}}</li>
+          <li><a  href="{{base_url}}/restaurants/{{booking.Booking.rest_id}}">Restaurant Profile</a></li>
+        </ul>
+      </li>
+      {% endfor %}
+    </ul>
+    <a class="btn btn-outline-secondary btn-sm"  href="/"> Back to Homepage </a>
+{% endblock %}

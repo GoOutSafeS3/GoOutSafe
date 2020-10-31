@@ -5,16 +5,10 @@
             {% for reservation in reservations%}
               <div>
                 <li>
-                  {{reservation.Booking.person_number}} person at {{reservation.Booking.booking_datetime}} by {{reservation.User.lastname}} {{reservation.User.firstname}} 
+                  {{reservation.Booking.person_number}} person at {{reservation.Booking.booking_datetime.strftime("%a %d %b %Y, %H:%M")}} by {{reservation.User.lastname}} {{reservation.User.firstname}} 
                   
-                  <form action="{{base_url}}/reservations/{{reservation.Booking.id}}">
-                    <input type=hidden />
-                    <input type=submit value="Detail"/>
-                  </form> 
-                  <form action="{{base_url}}/reservations/{{reservation.Booking.id}}/delete" method="post">
-                    <input type=hidden />
-                    <input type=submit value="Delete" />
-                  </form> 
+                  <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/reservations/{{reservation.Booking.id}}"> Detail </a>
+                  <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/reservations/{{reservation.Booking.id}}/delete"> Delete </a>
                 </li>
               </div>
             {% endfor %}
