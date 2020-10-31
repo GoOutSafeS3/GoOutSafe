@@ -317,7 +317,8 @@ def init():
 def create_app(configuration):
 
     app = Flask(__name__)
-
+    
+    configuration = os.getenv("CONFIG", configuration)
     config = get_config(configuration)
 
     if config["remove_db"]:
@@ -357,7 +358,8 @@ def create_app(configuration):
     return app
 
 def create_worker_app():
-    config = get_config()
+    configuration = os.getenv("CONFIG", "TEST")
+    config = get_config(configuration)
 
     app = Flask(__name__)
     app.config['WTF_CSRF_SECRET_KEY'] = config["wtf_csrf_secret_key"]
@@ -374,7 +376,7 @@ def create_worker_app():
 if __name__ == '__main__':
     c = None
     if len(sys.argv) > 1:
-        c = sys.argv[1]
- 
+        c = sys.argv[1]        
+
     app = create_app(c)
     app.run()
