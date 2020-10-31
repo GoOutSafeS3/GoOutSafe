@@ -193,3 +193,59 @@ def create_operator():
 
     return render_template('form.html', form=form, title="Sign in!")
 
+@users.route('/edit', methods=['GET', 'POST'])
+@login_required
+def edit_user():
+
+    if current_user.is_admin or current_user.is_health_authority:
+        return make_response(render_template('error.html', error='401'),401)
+
+    user = db.session.query(User).filter_by(id = current_user.id).first()
+
+    if user is None: #remove if coverage <90%
+        return make_response(render_template('error.html', error='404'), 404)
+
+    user.telephone = user.phone
+    form = UserForm(obj=user)
+
+    if request.method == 'POST':
+
+        if form.validate_on_submit():
+            password = request.form['password']
+            password_repeat = request.form['password_repeat']
+            if password != password_repeat:
+                flash('Passwords do not match', 'warning')
+                return make_response(render_template('form.html', form=form, title="Modify your profile!"),200)
+
+            userGetMail = User.query.filter(User.id != current_user.id).filter_by(email=form.email.data).first()
+            userGetPhone = User.query.filter(User.id != current_user.id).filter_by(phone=form.telephone.data).first()
+            userGetSSN = None
+
+            if form.ssn.data is not None and form.ssn.data != "":
+                userGetSSN = User.query.filter(User.id != current_user.id).filter_by(ssn=form.ssn.data).first()
+            else:
+                form.ssn.data = None
+
+            if userGetMail is None and userGetPhone is None and userGetSSN is None:
+                user.firstname = form.firstname.data
+                user.lastname = form.lastname.data
+                user.email = form.email.data
+                user.set_password(form.password.data)
+                user.phone = form.telephone.data
+                user.dateofbirth = form.dateofbirth.data
+                user.ssn = form.ssn.data
+                try:
+                    user.set_password(form.password.data)  # pw should be hashed with some salt
+                    db.session.add(user)
+                    db.session.commit()
+                except: # Remove if coverage < 90%
+                    flash('An error occured, please try again','error')
+                    return make_response(render_template('form.html', form=form, title="Modify your profile!"),500)
+            else:
+                flash('A user already exists with this data', 'error')
+                return make_response(render_template('form.html', form=form, title="Modify your profile!"),400)
+
+            flash('The data has been changed!', 'success')
+            return redirect("/")
+
+    return render_template('form.html', form=form, title="Modify your profile!")
