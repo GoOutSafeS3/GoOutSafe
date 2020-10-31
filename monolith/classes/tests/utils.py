@@ -17,8 +17,9 @@ def get_restaurant_id(client, name=""):
     reply = client.t_get('/restaurants')
     text = reply.get_data(as_text=True)
     text = text[text.find(name):]
-    id = text[text.find("/restaurants/")+len("/restaurants/"):].split("/")[0]
+    matches = re.findall(r"\/restaurants\/([0-9]+)[^0-9]+",text)
     try:
+        id = matches[0]
         id = int(id)
     except:
         return None
@@ -28,8 +29,9 @@ def get_my_restaurant_id(client, name=""):
     reply = client.t_get('/')
     text = reply.get_data(as_text=True)
     text = text[text.find(name):]
-    id = text[text.find("/restaurants/")+len("/restaurants/"):].split("\"")[0]
+    matches = re.findall(r"\/restaurants\/([0-9]+)[^0-9]+",text)
     try:
+        id = matches[0]
         id = int(id)
     except:
         return None
@@ -37,8 +39,8 @@ def get_my_restaurant_id(client, name=""):
 
 def get_tables_ids(client, rest_id):
     reply = client.t_get('/restaurants/'+str(rest_id))
-    matches = re.findall(r"\/tables\/([0-9]+)\/edit",reply.get_data(as_text=True))
-    return [int(match) for match in matches]
+    matches = re.findall(r"\/tables\/([0-9]+)[^0-9]+",reply.get_data(as_text=True))
+    return list(dict.fromkeys([int(match) for match in matches])) # unique ids
 
 def get_positives_id(client):
     reply = client.t_get("/positives")
