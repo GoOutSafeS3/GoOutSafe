@@ -17,8 +17,16 @@
       <a class="btn btn-outline-secondary btn-sm" href="{{base_url}}/{{restaurant.id}}/like">Like it</a>
       <a class="btn btn-outline-secondary btn-sm" href="{{base_url}}/{{restaurant.id}}">See Details</a>
       {% endif %}
-
       </li>
+      <br>
       {% endfor %}
     </ul>
+    <br>
+     {{googlemap("sndmap",
+        lat=43.72,
+        lng=10.40,
+        markers = sndmap.markers,
+        style = sndmap.style,
+        zoom=sndmap.zoom)}}
+
 {% endblock %}
