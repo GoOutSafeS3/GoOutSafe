@@ -1,7 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
 export FLASK_APP="monolith/app.py:create_app"
-
 if [[ "$1" == "local" ]]; then 
     docker-compose up local &
     flask run
