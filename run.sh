@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export FLASK_APP="monolith/app.py:create_app"
-docker-compose build
+#docker-compose build
 
 if [[ "$1" == "local" ]]; then 
     docker-compose up local &
