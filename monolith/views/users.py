@@ -16,21 +16,23 @@ def _users():
         return render_template("users.html", users=users)
 
 def get_user_contacts(user_id, date_begin, date_end):
-    SimultaneousBooking = aliased(Booking)
-    contacts = db.session.query(User).\
-            join(Booking, Booking.user_id == User.id).\
-            filter(Booking.booking_datetime >= date_begin).\
-            filter(Booking.booking_datetime < date_end).\
-            join(Restaurant, Restaurant.id == Booking.rest_id).\
-            join(SimultaneousBooking,
-                SimultaneousBooking.user_id == user_id and \
-                Booking.rest_id == SimultaneousBooking.rest_id and \
-                Booking.booking_datetime.year == SimultaneousBooking.booking_datetime.year and \
-                Booking.booking_datetime.month == SimultaneousBooking.booking_datetime.month and \
-                Booking.booking_datetime.day == SimultaneousBooking.booking_datetime.day).\
-            filter(User.id != user_id).\
-            all()
-    return contacts
+    result = db.session.execute(
+    """SELECT * FROM user AS User1 WHERE User1.id IN (
+    SELECT user_id FROM booking AS Booking1 WHERE EXISTS(
+        SELECT * FROM booking AS Booking2
+        JOIN restaurant AS R ON Booking2.rest_id = R.id
+        WHERE
+            Booking2.rest_id = Booking1.rest_id AND
+            Booking2.user_id = :user_id AND
+            datetime(Booking2.booking_datetime) >= datetime(:date_begin) AND
+            datetime(Booking2.booking_datetime) <= datetime(:date_end) AND
+            datetime(Booking2.booking_datetime) <= datetime(Booking1.booking_datetime) + strftime('%H', R.occupation_time) AND
+            datetime(Booking1.booking_datetime) <= datetime(Booking2.booking_datetime) + strftime('%H', R.occupation_time)
+    ) AND Booking1.user_id != :user_id)""",
+        {"user_id": user_id, "date_begin": date_begin, "date_end": date_end}).\
+        fetchall()
+
+    return result
 
 @users.route('/users/<int:user_id>/contacts')
 @health_authority_required
