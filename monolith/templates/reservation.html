@@ -9,6 +9,15 @@
                   <li>At: {{reservation.Booking.booking_datetime.strftime("%a %d %b %Y, %H:%M")}}</li>
                   <li>Phone: {{reservation.User.phone}}</li>
                   <li>Email: {{reservation.User.email}}</li>
+                  {% if reservation.Booking.entrance_datetime is not none %}
+                    <li>
+                          Entrance registered on: {{reservation.Booking.entrance_datetime.strftime("%a %d %b %Y, %H:%M")}}
+                    </li>
+                  {% endif %}
+
+                  {% if reservation.Booking.entrance_datetime is none %}
+                    <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/reservations/{{reservation.Booking.id}}/entrance"> Register Entrance </a>
+                  {% endif %}
                   
                   <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/reservations/{{reservation.Booking.id}}/delete"> Delete </a>
               </div>

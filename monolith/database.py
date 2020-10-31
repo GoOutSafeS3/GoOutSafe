@@ -121,6 +121,7 @@ class Booking(db.Model):
     rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
     people_number = db.Column(db.Integer)
     booking_datetime = db.Column(db.DateTime)
+    entrance_datetime = db.Column(db.DateTime, default = None)
     table_id = db.Column(db.Integer, db.ForeignKey('table.id'))
 
     user = relationship('User')
