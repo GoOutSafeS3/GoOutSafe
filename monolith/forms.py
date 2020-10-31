@@ -42,7 +42,7 @@ class OperatorForm(FlaskForm):
 class RestaurantEditForm(FlaskForm):
     name = f.StringField('Restaurant Name',validators=[DataRequired()])
     phone = f.StringField('Restaurant Phone', validators=[DataRequired()])
-    lat = f.FloatField('Restaurant latitude', validators=[InputRequired()])
+    lat = f.FloatField('Restaurant Latitude', validators=[InputRequired()])
     lon = f.FloatField('Restaurant Longitude', validators=[InputRequired()])
 
     opening_hour_lunch = f.IntegerField('Opening hour for lunch', validators=[InputRequired()])  # the opening hour for the lunch
@@ -88,4 +88,13 @@ class SearchUserForm(FlaskForm):
     ssn = f.StringField('SSN')
 
     display = ['email', 'telephone', "ssn"] 
+
+class SearchRestaurantForm(FlaskForm):
     
+    name = f.StringField('Restaurant Name')
+    opening_time = f.SelectField('Open at', choices=["Not Specified"]+([x for x in range(24)]))
+    open_day = f.SelectField('Open on',  choices=[("0","Not Specified"), ("1","Monday"), ("2","Tuesday"), ("3","Wednesday"), ("4","Thursday"),("5","Friday"), ("6","Saturday"),("7","Sunday")])
+    cuisine_type = f.StringField('Cousine type')
+    menu = f.StringField('Restaurant menu')
+
+    display = ['name', 'opening_time', 'open_day', 'cuisine_type', 'menu']

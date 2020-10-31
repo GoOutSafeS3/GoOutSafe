@@ -3,7 +3,7 @@
     {% if message %}
      <div class="alert alert-warning alert-dismissible" role="alert">{{ message }}</div>
     {% endif %}
-    <h3>Restaurant List</h3>
+    <h3>Restaurant List <a class="btn btn-outline-secondary btn-sm" href="{{base_url}}/search">Search!</a></h3>
     <br>
     <ul>
       {% for restaurant in restaurants: %}

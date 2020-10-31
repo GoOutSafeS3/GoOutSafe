@@ -4,7 +4,7 @@ from flask_googlemaps import Map
 from monolith.database import db, Restaurant, Like, Booking, User, Table
 from monolith.auth import admin_required, current_user, is_admin, operator_required
 from flask_login import current_user, login_user, logout_user, login_required
-from monolith.forms import UserForm, BookingForm, BookingList, RestaurantEditForm, TableAddForm
+from monolith.forms import UserForm, BookingForm, BookingList, RestaurantEditForm, TableAddForm, SearchRestaurantForm
 from monolith.utilities.restaurant import is_busy_table
 
 restaurants = Blueprint('restaurants', __name__)
@@ -167,3 +167,52 @@ def delete_table(table_id):
         return redirect(f'/restaurants/{current_user.rest_id}')
     else:
         return make_response(render_template('error.html', error='401'),401)
+
+
+@restaurants.route('/restaurants/search', methods=["GET","POST"])
+def search_res():
+    form = SearchRestaurantForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            allrestaurants = db.session.query(Restaurant).all()
+            
+            markers_to_add = []
+            matches = []
+            for restaurant in allrestaurants:
+
+                if request.form["name"].lower() in restaurant.name.lower()\
+                    and request.form["cuisine_type"].lower() in restaurant.cuisine_type.lower()\
+                    and request.form["menu"].lower() in restaurant.menu.lower()\
+                    and request.form["open_day"].lower() not in restaurant.closed_days.lower()\
+                    and (\
+                        (request.form["opening_time"].lower() == "not specified")\
+                        or (restaurant.opening_hour_lunch is not None and restaurant.closing_hour_lunch is not None and restaurant.opening_hour_lunch <= int(request.form["opening_time"]) <= restaurant.closing_hour_lunch )\
+                        or (restaurant.opening_hour_dinner is not None and restaurant.closing_hour_dinner is not None and restaurant.opening_hour_dinner <= int(request.form["opening_time"]) <= restaurant.closing_hour_dinner )\
+                    ):
+
+                    rest = {
+                        'icon': 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                        'lat': restaurant.lat,
+                        'lng': restaurant.lon,
+                        'infobox': restaurant.name
+                    }
+                    markers_to_add.append(rest)
+                    matches.append(restaurant)
+        
+            if matches == []:
+                flash("No restaurant found","error")
+                return make_response(render_template('form.html', form=form, title="Find a restaurant!"), 404)
+
+            sndmap = Map(
+                identifier="sndmap",
+                lat=43.72,
+                lng=10.40,
+                markers=markers_to_add,
+                zoom_control=True,
+                style="height:600px;width:1000px;margin:0;",
+                zoom=15
+            )
+            return render_template("restaurants.html", sndmap=sndmap, restaurants=matches, base_url="http://127.0.0.1:5000/restaurants")
+        flash("Bad form","error")
+        return make_response(render_template('form.html', form=form, title="Find a restaurant!"), 400)
+    return make_response(render_template('form.html', form=form, title="Find a restaurant!"), 200)
