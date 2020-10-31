@@ -3,7 +3,7 @@ from monolith.app import create_app
 from flask_test_with_csrf import FlaskClient
 from flask import url_for
 from flask_login import current_user
-from utils import do_login
+from utils import do_login, do_logout
 
 class TestRestaurant(unittest.TestCase):
     @classmethod
@@ -21,6 +21,13 @@ class TestRestaurant(unittest.TestCase):
             self.assertTrue("Trial Restaurant" in reply_data)
             self.assertIn("True Italian Restaurant", reply_data)
 
+    def test_restaurants_map(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "customer@example.com", "customer")
+        reply = client.t_get("/restaurants_map")
+        do_logout(client)
+        self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text = True))
 
     def test_profile_has_name(self):
         client = self.app.test_client()

@@ -268,6 +268,25 @@ def fake_data():
         db.session.add(booking_1)
         db.session.commit()
 
+
+        booking_6 = Booking()
+        booking_6.rest_id = 1
+        booking_6.user_id = example_positive.id
+        booking_6.booking_datetime = datetime.datetime(2021,10,5,18,30,0,0)
+        booking_6.people_number = 5
+        booking_6.table_id = 5
+        db.session.add(booking_6)
+        db.session.commit()
+
+        booking_7 = Booking()
+        booking_7.rest_id = 1
+        booking_7.user_id = example_cust.id
+        booking_7.booking_datetime = datetime.datetime(2010,10,5,18,30,0,0)
+        booking_7.people_number = 5
+        booking_7.table_id = 5
+        db.session.add(booking_7)
+        db.session.commit()
+
 def init():
     q = db.session.query(User).filter(User.email == 'example@example.com')
     admin = q.first()

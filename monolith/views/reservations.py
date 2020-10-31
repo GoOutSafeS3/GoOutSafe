@@ -137,7 +137,14 @@ def _reservation_edit(reservation_id):
             return make_response(render_template('error.html', error='401'),401)
         else:
             if current_user.is_positive:
-                return make_response(render_template('error.html', error="You cannot book as long as you are positive"), 401)
+                flash("You cannot book as long as you are positive","error")
+                return make_response(render_template('error.html', error="401"), 401)
+
+            now = datetime.datetime.now()
+
+            if qry.booking_datetime <= now:
+                flash("The reservation has expired","error")
+                return make_response(render_template('error.html', error='404'), 404)
 
             restaurant_id = qry.rest_id
 
@@ -149,7 +156,6 @@ def _reservation_edit(reservation_id):
                     booking_hr = request.form["booking_hr"]
                     booking_min = request.form["booking_min"]
 
-                    now = datetime.datetime.now()
                     day, month, year = (int(x) for x in booking_date.split('/'))   
                     booking_datetime = now.replace(year=year,month=month,day=day,hour=int(booking_hr),minute=int(booking_min),second=0,microsecond=0)
                     
@@ -160,7 +166,7 @@ def _reservation_edit(reservation_id):
                     if try_to_update(qry, int(number_of_people), booking_datetime):
                         flash("The changes were confirmed","success")
                         return redirect(f"/restaurants/{restaurant_id}")
-                    else:
+                    else: 
                         flash("The reservation could not be made","error")
                         return make_response(render_template('form.html', form=form, title = "Edit your booking"),400)
             elif request.method == "GET":
