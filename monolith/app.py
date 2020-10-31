@@ -21,7 +21,7 @@ DEFAULT_CONFIGURATION = {
 
     "wtf_csrf_secret_key" : 'A SECRET KEY',
     "secret_key" : 'ANOTHER ONE',
-    "sqlalchemy_database_uri" : 'sqlite:///gooutsafe.db',
+    "sqlalchemy_database_uri" : 'sqlite:///db/gooutsafe.db',
     "sqlalchemy_track_modifications" : False,
     
     "result_backend" : os.getenv("BACKEND", "redis://localhost:6379"),
@@ -335,6 +335,11 @@ def init():
 def create_app(configuration):
 
     app = Flask(__name__)
+
+    try: 
+        os.mkdir("monolith/db") 
+    except OSError as error: 
+        pass   
     
     configuration = os.getenv("CONFIG", configuration)
     config = get_config(configuration)
