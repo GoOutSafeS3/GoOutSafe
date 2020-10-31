@@ -2,14 +2,22 @@ from monolith.database import db, Restaurant, Like, Booking, User, Table
 from monolith.auth import current_user
 from datetime import timedelta
 
-def book_a_table(restaurant, number_of_person, booking_datetime, table):
+def book_a_table(restaurant, number_of_people, booking_datetime, table):
     new_booking = Booking()
     new_booking.user_id = current_user.id
     new_booking.rest_id = restaurant.id
-    new_booking.person_number = number_of_person
+    new_booking.people_number = number_of_people
     new_booking.booking_datetime = booking_datetime
     new_booking.table_id = table
     db.session.add(new_booking)
+    db.session.commit()
+
+
+def update_a_reservation(record, number_of_people, booking_datetime, table):
+    record.people_number = number_of_people
+    record.booking_datetime = booking_datetime
+    record.table_id = table
+    db.session.add(record)
     db.session.commit()
 
 def get_table(restaurant, number_of_people, booking_datetime):
@@ -36,10 +44,24 @@ def get_table(restaurant, number_of_people, booking_datetime):
 
 
 def try_to_book(restaurant_id, number_of_people, booking_datetime):
-    record = db.session.query(Restaurant).filter_by(id = restaurant_id).all()[0]
+    record = db.session.query(Restaurant).filter_by(id = restaurant_id).first()
+    if record is None:
+        return False
     if record.is_open(booking_datetime):
         table = get_table(record, number_of_people, booking_datetime)
         if table is not None:
             book_a_table(record, number_of_people, booking_datetime, table)
+            return True
+    return False
+
+
+def try_to_update(record, number_of_people, booking_datetime):
+    rest = db.session.query(Restaurant).filter_by(id = record.rest_id).first()
+    if rest is None:
+        return False
+    if rest.is_open(booking_datetime):
+        table = get_table(rest, number_of_people, booking_datetime)
+        if table is not None:
+            update_a_reservation(record, number_of_people, booking_datetime, table)
             return True
     return False

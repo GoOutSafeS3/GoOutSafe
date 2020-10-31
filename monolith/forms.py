@@ -64,11 +64,11 @@ class TableAddForm(FlaskForm):
     display = ['capacity']
 
 class BookingForm(FlaskForm):
-    number_of_person = f.IntegerField("Number of Person", validators=[InputRequired(), NumberRange(min=1)])
+    number_of_people = f.IntegerField("Number of people", validators=[InputRequired(), NumberRange(min=1)])
     booking_date = f.DateField('Date', format='%d/%m/%Y')
     booking_hr = f.SelectField('Hour', choices=range(0,23))
     booking_min = f.SelectField('Minutes', choices=range(0,60,15))
-    display = ['number_of_person','booking_date','booking_hr','booking_min']
+    display = ['number_of_people','booking_date','booking_hr','booking_min']
 
 class BookingList(FlaskForm):
     from_date = f.DateField('From Date', format='%d/%m/%Y')

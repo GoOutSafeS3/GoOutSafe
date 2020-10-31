@@ -39,7 +39,7 @@ def user_contacts(user_id):
         users=get_user_contacts(user_id, datetime.today() - timedelta(days=14), datetime.today()))
 
 
-@users.route('/bookings', methods=['GET', 'POST'])
+@users.route('/reservations', methods=['GET', 'POST'])
 @login_required
 def user_bookings():
     if current_user.is_admin or current_user.is_health_authority or current_user.rest_id is not None:
@@ -56,7 +56,7 @@ def user_bookings():
     if qry == []:
         flash("There are no reservations", "warning")
 
-    return make_response(render_template('bookings.html', bookings=qry, title="Your Bookings"),200)
+    return make_response(render_template('bookings.html', bookings=qry, title="Your Reservations"),200)
 
 @users.route('/delete', methods=['GET', 'POST'])
 @login_required

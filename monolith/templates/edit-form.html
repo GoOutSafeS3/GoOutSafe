@@ -1,0 +1,25 @@
+<html>
+    {% extends 'layout.html' %}
+
+    {% block content %}
+        <form action="" method="POST">
+        {{ form.hidden_tag() }}
+            <dl>
+             {% for field in form.display %}
+             <dt>{{ form[field].label }}</dt>
+             <dd>{{ form[field](value=edited[field]) }}</dd>
+               {% if form[field].errors %}
+                  {% for e in form[field].errors %}
+                   <p class="help-block">{{ e }}</p>
+                  {% endfor %}
+               {% endif %}
+             {% endfor %}
+            </dl>
+            <p>
+        <input class="btn btn-secondary btn-sm" type=submit value="Confirm">
+        </form>
+        <br>
+    <a class="btn btn-outline-secondary btn-sm" href="/"> Back to Homepage </a>
+    {% endblock %}
+</html>
+

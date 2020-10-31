@@ -119,7 +119,7 @@ class Booking(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
-    person_number = db.Column(db.Integer)
+    people_number = db.Column(db.Integer)
     booking_datetime = db.Column(db.DateTime)
     table_id = db.Column(db.Integer, db.ForeignKey('table.id'))
 

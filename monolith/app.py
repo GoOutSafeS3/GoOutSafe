@@ -175,7 +175,7 @@ def fake_data():
         booking_1.rest_id = 1
         booking_1.user_id = example_cust.id
         booking_1.booking_datetime = datetime.datetime(2020,10,5,10,15,0,0)
-        booking_1.person_number = 5
+        booking_1.people_number = 5
         booking_1.table_id = 1
         db.session.add(booking_1)
         db.session.commit()
@@ -184,7 +184,7 @@ def fake_data():
         booking_2.rest_id = 1
         booking_2.user_id = example_cust1.id
         booking_2.booking_datetime = datetime.datetime(2020,10,5,10,15,0,0)
-        booking_2.person_number = 5
+        booking_2.people_number = 5
         booking_2.table_id = 2
         db.session.add(booking_2)
         db.session.commit()
@@ -193,7 +193,7 @@ def fake_data():
         booking_3.rest_id = 1
         booking_3.user_id = example_cust.id
         booking_3.booking_datetime = datetime.datetime(2020,10,5,11,30,0,0)
-        booking_3.person_number = 5
+        booking_3.people_number = 5
         booking_3.table_id = 3
         db.session.add(booking_3)
         db.session.commit()
@@ -202,7 +202,7 @@ def fake_data():
         booking_4.rest_id = 1
         booking_4.user_id = example_positive.id
         booking_4.booking_datetime = datetime.datetime(2020,10,5,18,30,0,0)
-        booking_4.person_number = 5
+        booking_4.people_number = 5
         booking_4.table_id = 5
         db.session.add(booking_4)
         db.session.commit()
@@ -211,7 +211,7 @@ def fake_data():
         booking_1.rest_id = 1
         booking_1.user_id = example_cust.id
         booking_1.booking_datetime = datetime.datetime.now() + datetime.timedelta(days=1)
-        booking_1.person_number = 5
+        booking_1.people_number = 5
         booking_1.table_id = 4
         db.session.add(booking_1)
         db.session.commit()

@@ -19,7 +19,7 @@ class TestReservation(unittest.TestCase):
             reply = client.t_post('/login', data=form)
             self.assertEqual(reply.status_code, 302)
             form = {
-                "number_of_person": "2",
+                "number_of_people": "2",
                 "booking_date": "04/10/2022",
                 "booking_hr": "13",
                 "booking_min": "30"
@@ -37,7 +37,7 @@ class TestReservation(unittest.TestCase):
             reply = client.t_post('/login', data=form)
             self.assertEqual(reply.status_code, 302)
             form = {
-                "number_of_person": "2",
+                "number_of_people": "2",
                 "booking_date": "04/10/2022",
                 "booking_hr": "13",
                 "booking_min": "30"
@@ -91,7 +91,7 @@ class TestReservation(unittest.TestCase):
             reply = client.t_post('/login', data=form)
             self.assertEqual(reply.status_code, 302)
             form = {
-                "number_of_person": "500",
+                "number_of_people": "500",
                 "booking_date": "04/10/2022",
                 "booking_hr": "13",
                 "booking_min": "30"
@@ -109,7 +109,7 @@ class TestReservation(unittest.TestCase):
             reply = client.t_post('/login', data=form)
             self.assertEqual(reply.status_code, 302)
             form = {
-                "number_of_person": "2",
+                "number_of_people": "2",
                 "booking_date": "04/10/2010",
                 "booking_hr": "13",
                 "booking_min": "30"
@@ -269,7 +269,7 @@ class TestReservation(unittest.TestCase):
             reply = client.t_post('/login', data=form)
             self.assertEqual(reply.status_code, 302)
 
-            reply = client.t_post("/reservations/1")
+            reply = client.t_post("/reservations/1/delete")
             self.assertEqual(reply.status_code, 302)
 
 if __name__ == '__main__':

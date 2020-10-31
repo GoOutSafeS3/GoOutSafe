@@ -5,7 +5,7 @@
               <div>
                   <li>Reservation Id: {{reservation.Booking.id}}</li>
                   <li>Customer: {{reservation.User.lastname}} {{reservation.User.firstname}}</li>
-                  <li>For {{reservation.Booking.person_number}} person</li>
+                  <li>For {{reservation.Booking.people_number}} people</li>
                   <li>At: {{reservation.Booking.booking_datetime.strftime("%a %d %b %Y, %H:%M")}}</li>
                   <li>Phone: {{reservation.User.phone}}</li>
                   <li>Email: {{reservation.User.email}}</li>
