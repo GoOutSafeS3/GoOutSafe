@@ -1,15 +1,36 @@
 from flask import Blueprint, redirect, render_template, request, make_response, flash
+from flask_googlemaps import Map
+
 from monolith.database import db, Restaurant, Like, Booking, User, Table
 from monolith.auth import admin_required, current_user, is_admin, operator_required
 from flask_login import current_user, login_user, logout_user, login_required
 from monolith.forms import UserForm, BookingForm, BookingList, RestaurantEditForm, TableAddForm
 from monolith.utilities.restaurant import is_busy_table
+
 restaurants = Blueprint('restaurants', __name__)
 
 @restaurants.route('/restaurants')
 def _restaurants(message=''):
     allrestaurants = db.session.query(Restaurant)
-    return render_template("restaurants.html", message=message, restaurants=allrestaurants, base_url="http://127.0.0.1:5000/restaurants")
+    markers_to_add = []
+    for restaurant in allrestaurants:
+        rest = {
+            'icon': 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+            'lat': restaurant.lat,
+            'lng': restaurant.lon,
+            'infobox': restaurant.name
+        }
+        markers_to_add.append(rest)
+    sndmap = Map(
+        identifier="sndmap",
+        lat=43.72,
+        lng=10.40,
+        markers=markers_to_add,
+        zoom_control=True,
+        style="height:600px;width:1000px;margin:0;",
+        zoom=15
+    )
+    return render_template("restaurants.html", message=message, sndmap=sndmap, restaurants=allrestaurants, base_url="http://127.0.0.1:5000/restaurants")
 
 @restaurants.route('/restaurants/<int:restaurant_id>')
 def restaurant_sheet(restaurant_id):

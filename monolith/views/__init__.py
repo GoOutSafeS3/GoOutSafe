@@ -4,6 +4,7 @@ from .users import users
 from .restaurants import restaurants
 from .contact_tracing import contact_tracing
 from .reservations import reservations
+from .map import map
 
 
-blueprints = [home, auth, users, restaurants, contact_tracing, reservations]
+blueprints = [home, auth, users, restaurants, contact_tracing, reservations, map]

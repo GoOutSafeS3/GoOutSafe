@@ -1,5 +1,7 @@
 import os
 from flask import Flask
+from flask_googlemaps import GoogleMaps, Map
+
 from monolith.database import db, User, Restaurant, Booking, Table
 from monolith.views import blueprints
 from monolith.auth import login_manager
@@ -119,11 +121,31 @@ def fake_data():
         db.session.add(example_op)
         db.session.commit()
 
+    q = db.session.query(Restaurant).filter(Restaurant.id == 2)
+    restaurant = q.first()
+    if restaurant is None:
+        example = Restaurant()
+        example.name = 'Osteria dei Santi'
+        example.likes = 102
+        example.phone = 555127156
+        example.lat = 43.7191589
+        example.lon = 10.3973009
+        example.opening_hour_lunch = 11
+        example.closing_hour_lunch = 16
+        example.opening_hour_dinner = 20
+        example.closing_hour_dinner = 23
+        example.occupation_time = 2
+        example.closed_days = "17"
+        example.cuisine_type = "typical Tuscan cuisine"
+        example.menu = "Primi\nSecondi\nDolci"
+        db.session.add(example)
+        db.session.commit()
+
         example_op = User()
         example_op.firstname = 'Operator2'
         example_op.lastname = 'Operator2'
         example_op.email = 'operator2@example.com'
-        example_op.phone = 5551234564
+        example_op.phone = 3484051562
         example_op.dateofbirth = datetime.datetime(2020, 10, 5)
         example_op.is_admin = False
         example_op.set_password('operator2')
@@ -131,45 +153,50 @@ def fake_data():
         db.session.add(example_op)
         db.session.commit()
 
-        example_positive = User()
-        example_positive.firstname = 'Positive'
-        example_positive.lastname = 'Positive'
-        example_positive.email = 'positive@example.com'
-        example_positive.phone = 5551234565
-        example_positive.dateofbirth = datetime.datetime(2020, 10, 5)
-        example_positive.is_admin = False
-        example_positive.is_positive = True
-        example_positive.positive_datetime = datetime.datetime.now()
-        example_positive.set_password('positive')
-        db.session.add(example_positive)
+    q = db.session.query(Restaurant).filter(Restaurant.id == 3)
+    restaurant = q.first()
+    if restaurant is None:
+        example = Restaurant()
+        example.name = 'Le Bandierine'
+        example.likes = 140
+        example.phone = 555427156
+        example.lat = 43.7177699
+        example.lon = 10.4038814
+        example.opening_hour_lunch = 11
+        example.closing_hour_lunch = 16
+        example.opening_hour_dinner = None
+        example.closing_hour_dinner = None
+        example.occupation_time = 2
+        example.closed_days = "1"
+        example.cuisine_type = "typical Tuscan cuisine"
+        example.menu = "Primi\nSecondi\nDolci"
+        db.session.add(example)
         db.session.commit()
 
-
-        example_positive1 = User()
-        example_positive1.firstname = 'Another'
-        example_positive1.lastname = 'Positive'
-        example_positive1.email = 'a.positive@example.com'
-        example_positive1.phone = "0987654321"
-        example_positive1.ssn = "987654321"
-        example_positive1.dateofbirth = datetime.datetime(2020, 10, 5)
-        example_positive1.is_admin = False
-        example_positive1.is_positive = True
-        example_positive1.positive_datetime = datetime.datetime.now()
-        example_positive1.set_password('positive')
-        db.session.add(example_positive1)
+        example_op = User()
+        example_op.firstname = 'Operator3'
+        example_op.lastname = 'Operator3'
+        example_op.email = 'operator3@example.com'
+        example_op.phone = 3484051566
+        example_op.dateofbirth = datetime.datetime(2020, 10, 5)
+        example_op.is_admin = False
+        example_op.set_password('operator3')
+        example_op.rest_id = 3
+        db.session.add(example_op)
         db.session.commit()
 
-        example_cust1 = User()
-        example_cust1.firstname = 'Another'
-        example_cust1.lastname = 'Customer'
-        example_cust1.email = 'a.customer@example.com'
-        example_cust1.phone = "1234567890"
-        example_cust1.ssn = "1234567890"
-        example_cust1.dateofbirth = datetime.datetime(2020, 10, 5)
-        example_cust1.is_admin = False
-        example_cust1.set_password('customer')
-        db.session.add(example_cust1)
-        db.session.commit()
+    example_positive = User()
+    example_positive.firstname = 'Positive'
+    example_positive.lastname = 'Positive'
+    example_positive.email = 'positive@example.com'
+    example_positive.phone = 5551234565
+    example_positive.dateofbirth = datetime.datetime(2020, 10, 5)
+    example_positive.is_admin = False
+    example_positive.is_positive = True
+    example_positive.positive_datetime = datetime.datetime.now()
+    example_positive.set_password('positive')
+    db.session.add(example_positive)
+    db.session.commit()
 
         booking_1 = Booking()
         booking_1.rest_id = 1
@@ -255,7 +282,6 @@ def create_app(configuration):
         except:
             pass
 
-    
     app.config['WTF_CSRF_SECRET_KEY'] = config["wtf_csrf_secret_key"]
     app.config['SECRET_KEY'] = config["secret_key"]
     app.config['SQLALCHEMY_DATABASE_URI'] = config["sqlalchemy_database_uri"]
@@ -276,6 +302,7 @@ def create_app(configuration):
     db.create_all(app=app)
 
     init_celery(app)
+    GoogleMaps(app)
 
     # create a first admin user
     with app.app_context():

@@ -21,8 +21,18 @@
     <br>
     <div class="opening_hours">
       <h4>Opening hours</h4>
-      <p>Lunch: {{lunch_opening}}:00 - {{lunch_closing}}:00</p>
-      <p>Dinner: {{dinner_opening}}:00 - {{dinner_closing}}:00</p>
+        <p> Lunch:
+        {% if lunch_opening == None %}
+             closed
+        {% else %}  {{lunch_opening}}:00 -  {{lunch_closing}}:00
+        {% endif %}
+        </p>
+      <p>Dinner:
+        {% if dinner_opening == None %}
+             closed
+        {% else %}  {{dinner_opening}}:00 -  {{dinner_closing}}:00
+        {% endif %}
+        </p>
     </div>
 
     <div class="closed_days">
