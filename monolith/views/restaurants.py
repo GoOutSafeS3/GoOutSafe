@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request, make_response, flash
 from flask_googlemaps import Map
-
+from monolith.utilities.restaurant import validate_hours
 from monolith.database import db, Restaurant, Like, Booking, User, Table
 from monolith.auth import admin_required, current_user, is_admin, operator_required
 from flask_login import current_user, login_user, logout_user, login_required
@@ -8,6 +8,7 @@ from monolith.forms import UserForm, BookingForm, BookingList, RestaurantEditFor
 from monolith.utilities.restaurant import is_busy_table
 
 restaurants = Blueprint('restaurants', __name__)
+
 
 @restaurants.route('/restaurants')
 def _restaurants(message=''):
@@ -30,29 +31,34 @@ def _restaurants(message=''):
         style="height:600px;width:1000px;margin:0;",
         zoom=15
     )
-    return render_template("restaurants.html", message=message, sndmap=sndmap, restaurants=allrestaurants, base_url="http://127.0.0.1:5000/restaurants")
+    return render_template("restaurants.html", message=message, sndmap=sndmap, restaurants=allrestaurants,
+                           base_url="http://127.0.0.1:5000/restaurants")
 
-@restaurants.route('/restaurants/search', methods=["GET","POST"])
+
+@restaurants.route('/restaurants/search', methods=["GET", "POST"])
 def search_res():
     form = SearchRestaurantForm()
     if request.method == 'POST':
         if form.validate_on_submit():
             allrestaurants = db.session.query(Restaurant).all()
-            
+
             markers_to_add = []
             matches = []
             for restaurant in allrestaurants:
 
-                if request.form["name"].lower() in restaurant.name.lower()\
-                    and request.form["cuisine_type"].lower() in restaurant.cuisine_type.lower()\
-                    and request.form["menu"].lower() in restaurant.menu.lower()\
-                    and request.form["open_day"].lower() not in restaurant.closed_days.lower()\
-                    and (\
-                        (request.form["opening_time"].lower() == "not specified")\
-                        or (restaurant.opening_hour_lunch is not None and restaurant.closing_hour_lunch is not None and restaurant.opening_hour_lunch <= int(request.form["opening_time"]) <= restaurant.closing_hour_lunch )\
-                        or (restaurant.opening_hour_dinner is not None and restaurant.closing_hour_dinner is not None and restaurant.opening_hour_dinner <= int(request.form["opening_time"]) <= restaurant.closing_hour_dinner )\
-                    ):
-
+                if request.form["name"].lower() in restaurant.name.lower() \
+                        and request.form["cuisine_type"].lower() in restaurant.cuisine_type.lower() \
+                        and request.form["menu"].lower() in restaurant.menu.lower() \
+                        and request.form["open_day"].lower() not in restaurant.closed_days.lower() \
+                        and ( \
+                                (request.form["opening_time"].lower() == "not specified") \
+                                or (
+                                        restaurant.opening_hour_lunch is not None and restaurant.closing_hour_lunch is not None and restaurant.opening_hour_lunch <= int(
+                                    request.form["opening_time"]) <= restaurant.closing_hour_lunch) \
+                                or (
+                                        restaurant.opening_hour_dinner is not None and restaurant.closing_hour_dinner is not None and restaurant.opening_hour_dinner <= int(
+                                    request.form["opening_time"]) <= restaurant.closing_hour_dinner) \
+                        ):
                     rest = {
                         'icon': 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
                         'lat': restaurant.lat,
@@ -61,9 +67,9 @@ def search_res():
                     }
                     markers_to_add.append(rest)
                     matches.append(restaurant)
-        
+
             if matches == []:
-                flash("No restaurant found","error")
+                flash("No restaurant found", "error")
                 return make_response(render_template('form.html', form=form, title="Find a restaurant!"), 404)
 
             sndmap = Map(
@@ -75,16 +81,18 @@ def search_res():
                 style="height:600px;width:1000px;margin:0;",
                 zoom=15
             )
-            return render_template("restaurants.html", sndmap=sndmap, restaurants=matches, base_url="http://127.0.0.1:5000/restaurants")
-        flash("Bad form","error")
+            return render_template("restaurants.html", sndmap=sndmap, restaurants=matches,
+                                   base_url="http://127.0.0.1:5000/restaurants")
+        flash("Bad form", "error")
         return make_response(render_template('form.html', form=form, title="Find a restaurant!"), 400)
     return make_response(render_template('form.html', form=form, title="Find a restaurant!"), 200)
 
+
 @restaurants.route('/restaurants/<int:restaurant_id>')
 def restaurant_sheet(restaurant_id):
-    record = db.session.query(Restaurant).filter_by(id = restaurant_id).first()
+    record = db.session.query(Restaurant).filter_by(id=restaurant_id).first()
     if record is None:
-        return make_response(render_template('error.html', error='404'),404)
+        return make_response(render_template('error.html', error='404'), 404)
 
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     closed_days = []
@@ -92,27 +100,28 @@ def restaurant_sheet(restaurant_id):
         closed_days.append(days[int(day) - 1])
 
     return render_template("restaurantsheet.html",
-        name=record.name,
-        likes=record.likes,
-        lat=record.lat,
-        lon=record.lon,
-        phone=record.phone,
-        id=restaurant_id,
-        closed_days=closed_days,
-        lunch_opening=record.opening_hour_lunch,
-        lunch_closing=record.closing_hour_lunch,
-        dinner_opening=record.opening_hour_dinner,
-        dinner_closing=record.closing_hour_dinner,
-        cuisine_type=record.cuisine_type,
-        menu=record.menu,
-        tables=record.tables)
+                           name=record.name,
+                           likes=record.likes,
+                           lat=record.lat,
+                           lon=record.lon,
+                           phone=record.phone,
+                           id=restaurant_id,
+                           closed_days=closed_days,
+                           lunch_opening=record.opening_hour_lunch,
+                           lunch_closing=record.closing_hour_lunch,
+                           dinner_opening=record.opening_hour_dinner,
+                           dinner_closing=record.closing_hour_dinner,
+                           cuisine_type=record.cuisine_type,
+                           menu=record.menu,
+                           tables=record.tables)
+
 
 @restaurants.route('/restaurants/<int:restaurant_id>/like')
 @login_required
 def _like(restaurant_id):
-    record = db.session.query(Restaurant).filter_by(id = restaurant_id).first()
+    record = db.session.query(Restaurant).filter_by(id=restaurant_id).first()
     if record is None:
-        return make_response(render_template('error.html', error='404'),404)
+        return make_response(render_template('error.html', error='404'), 404)
 
     q = Like.query.filter_by(liker_id=current_user.id, restaurant_id=restaurant_id)
     if q.first() == None:
@@ -126,11 +135,11 @@ def _like(restaurant_id):
         message = 'You\'ve already liked this place!'
     return _restaurants(message)
 
+
 @restaurants.route('/restaurants/<int:restaurant_id>/edit', methods=['GET', 'POST'])
 @operator_required
 def _edit_restaurant(restaurant_id):
-    
-    record = db.session.query(Restaurant).filter_by(id = restaurant_id).first()
+    record = db.session.query(Restaurant).filter_by(id=restaurant_id).first()
 
     if record is None:
         return make_response(render_template('error.html', error='404'), 404)
@@ -141,15 +150,34 @@ def _edit_restaurant(restaurant_id):
     if request.method == 'POST':
         form = RestaurantEditForm()
         if form.validate_on_submit():
+            opening_lunch = form.opening_hour_lunch.data
+            opening_dinner = form.opening_hour_dinner.data
+            closing_lunch = form.closing_hour_lunch.data
+            closing_dinner = form.closing_hour_dinner.data
+            if opening_dinner is not None and opening_lunch is not None and \
+               closing_lunch is not None and closing_dinner is not None:
+                if not validate_hours(opening_lunch, closing_lunch, opening_dinner, closing_dinner):
+                    flash('Closing time cannot be before opening time','error')
+                    return make_response(render_template('edit_restaurant.html', form=form),400)
+            else:
+                if opening_lunch is None:
+                    if opening_dinner > closing_dinner:
+                        flash('Closing time cannot be before opening time', 'error')
+                        return make_response(render_template('edit_restaurant.html', form=form), 400)
+                elif opening_dinner is None:
+                    if opening_lunch > closing_lunch:
+                        flash('Closing time cannot be before opening time', 'error')
+                        return make_response(render_template('edit_restaurant.html', form=form), 400)
             form.populate_obj(record)
             record.closed_days = ''.join(request.form.getlist('closed_days'))
             db.session.add(record)
             db.session.commit()
             return redirect(f"/restaurants/{current_user.rest_id}")
-        flash("Bad form","error")
+        flash("Bad form", "error")
         return make_response(render_template('edit_restaurant.html', form=form), 400)
     form = RestaurantEditForm(obj=record)
     return render_template('edit_restaurant.html', form=form)
+
 
 @restaurants.route('/tables/add', methods=['GET', 'POST'])
 @operator_required
@@ -164,11 +192,12 @@ def _add_tables():
                 db.session.add(table)
                 db.session.commit()
                 return redirect(f"/restaurants/{current_user.rest_id}")
-            flash("Capacity must be strictly positive","error")
+            flash("Capacity must be strictly positive", "error")
             return make_response(render_template('form.html', form=form), 400)
-        flash("Bad form","error")
+        flash("Bad form", "error")
         return make_response(render_template('form.html', form=form), 400)
     return make_response(render_template('form.html', form=form), 200)
+
 
 @restaurants.route('/tables/<int:table_id>/edit', methods=['GET', 'POST'])
 @operator_required
@@ -190,9 +219,9 @@ def _edit_tables(table_id):
                 db.session.add(table)
                 db.session.commit()
                 return redirect(f"/restaurants/{current_user.rest_id}")
-            flash("Capacity must be strictly positive","error")
+            flash("Capacity must be strictly positive", "error")
             return make_response(render_template('form.html', form=form), 400)
-        flash("Bad form","error")
+        flash("Bad form", "error")
         return make_response(render_template('form.html', form=form), 400)
     form = TableAddForm(obj=table)
     return make_response(render_template('form.html', form=form), 200)
@@ -215,4 +244,4 @@ def delete_table(table_id):
         db.session.commit()
         return redirect(f'/restaurants/{current_user.rest_id}')
     else:
-        return make_response(render_template('error.html', error='401'),401)
+        return make_response(render_template('error.html', error='401'), 401)
