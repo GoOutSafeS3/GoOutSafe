@@ -6,6 +6,7 @@ from monolith.auth import admin_required, current_user, is_admin, operator_requi
 from flask_login import current_user, login_user, logout_user, login_required
 from monolith.forms import UserForm, BookingForm, BookingList, RestaurantEditForm, TableAddForm, SearchRestaurantForm
 from monolith.utilities.restaurant import is_busy_table
+from datetime import datetime, timedelta
 
 restaurants = Blueprint('restaurants', __name__)
 
@@ -178,6 +179,32 @@ def _edit_restaurant(restaurant_id):
     form = RestaurantEditForm(obj=record)
     return render_template('edit_restaurant.html', form=form)
 
+@restaurants.route('/restaurants/<int:restaurant_id>/overview')
+@operator_required
+def restaurant_reservations_overview_today(restaurant_id):
+    today = datetime.today()
+    return redirect(f'/restaurants/{restaurant_id}/overview/{today.year}/{today.month}/{today.day}', code=302)
+
+@restaurants.route('/restaurants/<int:restaurant_id>/overview/<int:year>/<int:month>/<int:day>')
+@operator_required
+def restaurant_reservations_overview(restaurant_id, year, month, day):
+    date_start = datetime(year, month, day)
+    prev_day = date_start - timedelta(days=1)
+    date_end = date_start + timedelta(days=1)
+
+    reservations = db.session.query(Booking).\
+        filter(Booking.rest_id == restaurant_id).\
+        filter(Booking.booking_datetime >= date_start).\
+        filter(Booking.booking_datetime < date_end).\
+        all()
+
+    return render_template('overview.html',
+        restaurant = db.session.query(Restaurant).filter(Restaurant.id == restaurant_id).first(),
+        reservations=reservations,
+        current = date_start,
+        prev = prev_day,
+        next = date_end,
+        today = datetime.today())
 
 @restaurants.route('/tables/add', methods=['GET', 'POST'])
 @operator_required

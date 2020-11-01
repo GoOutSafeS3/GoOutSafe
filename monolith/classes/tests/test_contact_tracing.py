@@ -4,7 +4,7 @@ from flask_test_with_csrf import FlaskClient
 from flask import url_for
 from flask_login import current_user
 from utils import do_login, do_logout, get_positives_id
-from monolith.utilities.contact_tracing import mark_as_positive, unmark_as_positive, get_user_contacts
+from monolith.utilities.contact_tracing import mark_as_positive, unmark_as_positive, get_user_contacts, get_user_visited_restaurants
 import datetime
 
 class TestLogin(unittest.TestCase):
@@ -310,8 +310,12 @@ class TestLogin(unittest.TestCase):
 
     def test_user_contacts(self):
         with self.app.app_context():
-            self.assertEqual(len(get_user_contacts(3, datetime.datetime(2020,10,4,10,15,0,0), datetime.datetime(2020,10,6,10,15,0,0))), 1)
+            self.assertEqual(len(get_user_contacts(3, datetime.datetime(2020,10,19,10,15,0,0), datetime.datetime(2020,10,21,10,15,0,0))), 1)
             self.assertEqual(len(get_user_contacts(3, datetime.datetime(2021,10,4,18,30,0,0), datetime.datetime(2021,10,6,18,30,0,0))), 0)
+    
+    def test_user_visited_restaurants(self):
+        with self.app.app_context():
+            self.assertEqual(len(get_user_visited_restaurants(3, datetime.datetime(2020,10,19,10,15,0,0), datetime.datetime(2020,10,21,10,15,0,0))), 1)
     
     def test_contacts_need_ha(self):
         client = self.app.test_client()
