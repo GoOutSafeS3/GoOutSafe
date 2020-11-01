@@ -9,7 +9,6 @@ ENV BROKER=redis://redis:6379
 ENV BACKEND=redis://redis:6379
 ENV CONFIG=PRODUCTION
 
-RUN rm *.db || echo "deleting old db"
 RUN cp /code/docker/* /code/
 RUN chmod +x /code/monolith.sh
 CMD ["/code/monolith.sh"]

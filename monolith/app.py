@@ -359,8 +359,9 @@ def create_app(configuration):
 
 def create_worker_app():
     configuration = os.getenv("CONFIG", "TEST")
+    print(configuration)
     config = get_config(configuration)
-
+    print(config)
     app = Flask(__name__)
     app.config['WTF_CSRF_SECRET_KEY'] = config["wtf_csrf_secret_key"]
     app.config['SECRET_KEY'] = config["secret_key"]
@@ -368,7 +369,7 @@ def create_worker_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config["sqlalchemy_track_modifications"]
     app.config['result_backend'] = config['result_backend']
     app.config['broker_url'] = config['broker_url']
-
+    db.init_app(app)
     init_celery(app, worker=True)
 
     return app

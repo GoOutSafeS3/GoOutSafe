@@ -42,20 +42,21 @@ services:
     image: "redis:alpine"
     expose:
       - "6379"
-  worker-local:
+  local:
     build:
       context: .
     environment:
-      - "BROKER=redis://local:6379"
-      - "BACKEND=redis://local:6379"
+      - "BROKER=redis://local-redis:6379"
+      - "BACKEND=redis://local-redis:6379"
+      - "CONFIG=TEST"
     command: celery -A monolith.worker:celery worker -l info # -B -s /tmp/celerybeat-schedule 
     volumes:
-      - ./:/code
-  local:
+      - ./monolith/db:/code/monolith/db
+    depends_on:
+      - local-redis
+  local-redis:
     image: "redis:alpine"
     ports:
       - "6379:6379"
-    depends_on:
-      - worker-local
 volumes:
   db:
