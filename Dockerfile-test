@@ -4,8 +4,8 @@ RUN pip install -r requirements.txt
 RUN pip install pytest pytest-cov
 ADD . /code
 WORKDIR /code
-ENV BROKER=redis://redis:6379
-ENV BACKEND=redis://redis:6379
+ENV BROKER=redis://local-redis:6379
+ENV BACKEND=redis://local-redis:6379
 RUN cp /code/docker/* /code/
 RUN chmod +x /code/test.sh
 CMD ["/code/test.sh"]

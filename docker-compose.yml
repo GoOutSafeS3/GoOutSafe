@@ -5,12 +5,10 @@ services:
       context: .
       dockerfile: Dockerfile-test
     depends_on:
-      - worker
+      - local
     volumes:
       - .:/coverage
-      - type: volume
-        source: db
-        target: /code/monolith/db
+      - ./monolith/db:/code/monolith/db
   monolith:
     build:
       context: .

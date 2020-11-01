@@ -11,7 +11,7 @@
                 <h5>
                   <li>
                        <a href="/restaurants/{{ restaurant.id }}"> {{restaurant.name}}  </a>
-                         {% if restaurant.likes is None %}
+                         {% if restaurant.likes is none %}
                             has No Likes
                          {% else %}
                             has {{restaurant.likes}} Likes

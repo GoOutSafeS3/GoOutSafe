@@ -310,8 +310,8 @@ class TestLogin(unittest.TestCase):
 
     def test_user_contacts(self):
         with self.app.app_context():
-            self.assertEquals(len(get_user_contacts(3, datetime.datetime(2020,10,4,10,15,0,0), datetime.datetime(2020,10,6,10,15,0,0))), 1)
-            self.assertEquals(len(get_user_contacts(3, datetime.datetime(2021,10,4,18,30,0,0), datetime.datetime(2021,10,6,18,30,0,0))), 0)
+            self.assertEqual(len(get_user_contacts(3, datetime.datetime(2020,10,4,10,15,0,0), datetime.datetime(2020,10,6,10,15,0,0))), 1)
+            self.assertEqual(len(get_user_contacts(3, datetime.datetime(2021,10,4,18,30,0,0), datetime.datetime(2021,10,6,18,30,0,0))), 0)
     
     def test_contacts_need_ha(self):
         client = self.app.test_client()

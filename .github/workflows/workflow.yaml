@@ -10,7 +10,7 @@ jobs:
     - name: Build Docker images
       run: docker-compose build
     - name: Run tests
-      run: docker-compose run tests
+      run: docker-compose up --exit-code-from tests tests
     - name: STEP 2. Set-Up Python
       uses: actions/setup-python@v1
       with:

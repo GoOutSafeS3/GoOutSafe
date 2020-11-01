@@ -10,7 +10,7 @@ elif [[ "$1" == "local-tests" ]]; then
     docker-compose up local &
     pytest --cov=monolith --cov-report term-missing --cov-report html --html=report.html
 elif [[ "$1" == "tests" ]]; then 
-    docker-compose up tests
+    docker-compose up --exit-code-from tests tests
 elif [[ "$1" == "monolith" ]]; then 
     docker-compose up monolith
 else
