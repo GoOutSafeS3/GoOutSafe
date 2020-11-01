@@ -179,6 +179,12 @@ def _edit_restaurant(restaurant_id):
     form = RestaurantEditForm(obj=record)
     return render_template('edit_restaurant.html', form=form)
 
+@restaurants.route('/restaurants/<int:restaurant_id>/overview')
+@operator_required
+def restaurant_reservations_overview_today(restaurant_id):
+    today = datetime.today()
+    return redirect(f'/restaurants/{restaurant_id}/overview/{today.year}/{today.month}/{today.day}', code=302)
+
 @restaurants.route('/restaurants/<int:restaurant_id>/overview/<int:year>/<int:month>/<int:day>')
 @operator_required
 def restaurant_reservations_overview(restaurant_id, year, month, day):
