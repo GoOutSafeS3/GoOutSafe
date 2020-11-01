@@ -48,7 +48,6 @@
           {% else %}
               <li class="nav-item"><a class="nav-link" href="/restaurants">Restaurants</a></li>
               <li class="nav-item"><a class="nav-link" href="/reservations">Reservations</a></li>
-              <li class="nav-item"><a class="nav-link" href="/restaurants_map">Map</a></li>
               <li class="nav-item"><a class="nav-link" href="/notifications">Notifications</a></li>
               <li class="nav-item"><a class="nav-link" href="/edit">Settings</a></li>
           {% endif %}
@@ -74,19 +73,29 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for message in messages %}
-                    {% for category, message in messages %}
-                        {% if category == 'success' %}
-                            <div class="alert alert-success alert-dismissible" role="alert"> {{ message }}</div>
-                        {% elif category == 'error' %}
-                            <div class="alert alert-danger alert-dismissible" role="alert">{{ message }}</div>
-                        {% elif category == "warning" %}
-                            <div class="alert alert-warning alert-dismissible" role="alert">{{ message }}</div>
-                        {% endif %}
+                   {% if category == 'success' %}
+                            <div class="alert alert-success alert-dismissible fade show" role="alert"> {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button></div>
+                   {% elif category == 'error' %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">{{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                   {% elif category == "warning" %}
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">{{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                   {% endif %}
                     {% endfor %}
                  {% endfor %}
              {% endif %}
         {% endwith %}
-        <h2> {{title}}</h2>
+        <h2 style="color: darkred"> {{title}}</h2>
         {% block content %}
 
         {% endblock %}
