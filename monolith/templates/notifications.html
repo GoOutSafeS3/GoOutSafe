@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+    {% block content %}
+        {% if current_user.is_authenticated %}
+
+             <h5> To read </h5>
+            {% for notification in notifications %}
+                {% if notification.already_read == False %}
+                    <div class="alert alert-danger" role="alert">
+                    <strong> [{{notification.datetime}}] - You have had contact with a Covid-19 positive in the last 14 days.
+                    </strong>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            <h5>Already read </h5>
+            {% for notification in notifications %}
+                {% if notification.already_read == True %}
+                    <div class="alert alert-dark" role="alert">
+                     [{{notification.datetime}}] - You have had contact with a Covid-19 positive in the last 14 days.
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+        {% endif %}
+    {% endblock %}

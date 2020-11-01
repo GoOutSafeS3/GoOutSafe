@@ -1,12 +1,12 @@
 from flask import Blueprint, redirect, render_template, request, flash, make_response, current_app
 from flask_login import login_required
-
 from monolith.auth import admin_required, is_admin, health_authority_required
 from monolith.forms import UserForm, OperatorForm, SearchUserForm
-from monolith.database import User, db, Restaurant
-from monolith.utilities.contact_tracing import mark_as_positive, unmark_as_positive
-
+from monolith.database import User, db, Restaurant, Notification
+from monolith.utilities.contact_tracing import mark_as_positive, unmark_as_positive, get_user_contacts
 import datetime
+from datetime import timedelta, datetime
+from monolith.utilities.notification import add_notification
 
 contact_tracing = Blueprint('contact_tracing', __name__)
 
@@ -58,6 +58,12 @@ def _mark_as_positive():
 
             if mark_as_positive(qry.id):
                 flash("The user was marked","success")
+                two_weeks = timedelta(days=14)
+                today = datetime.today()
+                date_start = today - two_weeks
+                users_to_be_notificated = get_user_contacts(qry.id, date_start, today)
+                for user in users_to_be_notificated:
+                    add_notification(qry.id, user.id)
                 return redirect("/positives")
             else: # remove if coverage <90%
                 flash("User not found","error")
@@ -133,6 +139,12 @@ def _mark_as_positive_by_id(pos_id):
 
     if mark_as_positive(qry.id):
         flash("The user was marked","success")
+        two_weeks = timedelta(days=14)
+        today = datetime.today()
+        date_end = today - two_weeks
+        users_to_be_notificated = get_user_contacts(qry.id, today, date_end)
+        for user in users_to_be_notificated:
+            add_notification(qry.id, user.id)
         return redirect("/positives")
     else: # remove if coverage <90%
         flash("User not found","error")

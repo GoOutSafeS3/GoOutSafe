@@ -109,8 +109,6 @@ class Table(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
     capacity = db.Column(db.Integer)
-
-
     restaurant = relationship('Restaurant')
     bookings = relationship('Booking')
 
@@ -139,4 +137,15 @@ class Like(db.Model):
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), primary_key=True)
     restaurant = relationship('Restaurant', foreign_keys='Like.restaurant_id')
 
-    marked = db.Column(db.Boolean, default = False) # True iff it has been counted in Restaurant.likes 
+    marked = db.Column(db.Boolean, default = False) # True iff it has been counted in Restaurant.likes
+
+
+class Notification(db.Model):
+    __tablename__ = 'notification'
+
+    notification_id = db.Column(db.Integer, autoincrement=True)
+    user_positive_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key = True)
+    user_notified_id= db.Column(db.Integer, db.ForeignKey('user.id'), primary_key = True)
+    already_read = db.Column(db.Boolean, default=False)
+    datetime = db.Column(db.DateTime, default = None)
+

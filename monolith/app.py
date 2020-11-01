@@ -47,7 +47,6 @@ def get_config(configuration=None):
         return DEFAULT_CONFIGURATION
 
 def fake_data():
-
     example_cust = User()
     example_cust.firstname = 'Customer'
     example_cust.lastname = 'Customer'
@@ -304,6 +303,46 @@ def fake_data():
         booking_9.table_id = 1
         db.session.add(booking_9)
         db.session.commit()
+
+    user_to_add = User()
+    user_to_add.firstname = 'Gianni'
+    user_to_add.lastname = 'Verdi'
+    user_to_add.email = 'gianni@example.com'
+    user_to_add.phone = 2351235651
+    user_to_add.dateofbirth = datetime.datetime(1950, 10, 5)
+    user_to_add.is_admin = False
+    user_to_add.set_password('gianni')
+    db.session.add(user_to_add)
+    db.session.commit()
+
+    booking_10 = Booking()
+    booking_10.rest_id = 1
+    booking_10.user_id = user_to_add.id
+    booking_10.booking_datetime = datetime.datetime.now() - datetime.timedelta(days=2)
+    booking_10.people_number = 2
+    booking_10.table_id = 2
+    db.session.add(booking_10)
+    db.session.commit()
+
+    user_to_add = User()
+    user_to_add.firstname = 'Alice'
+    user_to_add.lastname = 'Rossi'
+    user_to_add.email = 'alice@example.com'
+    user_to_add.phone = 2354673561
+    user_to_add.dateofbirth = datetime.datetime(1960, 11, 6)
+    user_to_add.is_admin = False
+    user_to_add.set_password('alice')
+    db.session.add(user_to_add)
+    db.session.commit()
+
+    booking_11 = Booking()
+    booking_11.rest_id = 1
+    booking_11.user_id = user_to_add.id
+    booking_11.booking_datetime = datetime.datetime.now() - datetime.timedelta(days=2)
+    booking_11.people_number = 2
+    booking_11.table_id = 3
+    db.session.add(booking_11)
+    db.session.commit()
 
 def init():
     q = db.session.query(User).filter(User.email == 'example@example.com')

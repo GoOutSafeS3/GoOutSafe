@@ -1,7 +1,14 @@
 {% extends 'homepage.html' %}
     {% block content %}
         {% if current_user.is_authenticated %}
-          <h3>Welcome back {{ current_user.firstname }}!</h3>
+            {% for notification in notifications %}
+                {% if notification.already_read == False %}
+                <div class="alert alert-danger" role="alert">
+                    You have had contact with a Covid-19 positive in the last 14 days. <a href="/{{ notification.user_positive_id }}/mark_as_read" class="alert-link">Mark as read</a>
+                </div>
+                {% endif %}
+            {% endfor %}
+            <h3>Welcome back {{ current_user.firstname }}!</h3>
 
           {% if current_user.is_operator %}
             <br>

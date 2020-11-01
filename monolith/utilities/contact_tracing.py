@@ -39,5 +39,5 @@ def get_user_contacts(user_id, date_begin, date_end):
             filter(Booking.booking_datetime >= b).all()
         for contact in contact_bookings:
             user_ids.add(contact.user_id)
-    
+
     return db.session.query(User).filter(User.id.in_(list(user_ids))).all()
