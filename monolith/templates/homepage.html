@@ -53,9 +53,9 @@
           {% endif %}
             <li><a class="nav-link" href="/logout"> Logout </a></li>
 
-        {% else %}
+      {% else %}
              <li><a class="nav-link" href="/login"> Login </a></li>
-        {% endif %}
+      {% endif %}
 
         </ul>
       </div>
@@ -72,7 +72,7 @@
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                {% for message in messages %}
+                {% for category, message in messages %}
                    {% if category == 'success' %}
                             <div class="alert alert-success alert-dismissible fade show" role="alert"> {{ message }}
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
