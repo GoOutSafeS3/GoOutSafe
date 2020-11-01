@@ -43,3 +43,14 @@ def get_user_contacts(user_id, date_begin, date_end):
             user_ids.add(contact.user_id)
     
     return db.session.query(User).filter(User.id.in_(list(user_ids))).all()
+
+def get_user_visited_restaurants(user_id, date_begin, date_end):
+    restaurants = db.session.query(Restaurant).\
+        join(Booking, Booking.rest_id == Restaurant.id).\
+        filter(Booking.user_id == user_id).\
+        filter(Booking.booking_datetime is not None).\
+        filter(Booking.entrance_datetime >= date_begin).\
+        filter(Booking.entrance_datetime <= date_end).\
+        all()
+    
+    return restaurants
