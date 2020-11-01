@@ -321,6 +321,7 @@ def fake_data():
     booking_10.rest_id = 1
     booking_10.user_id = user_to_add.id
     booking_10.booking_datetime = datetime.datetime.now() - datetime.timedelta(days=2)
+    booking_10.entrance_datetime = datetime.datetime.now() - datetime.timedelta(days=2)
     booking_10.people_number = 2
     booking_10.table_id = 2
     db.session.add(booking_10)
@@ -341,6 +342,7 @@ def fake_data():
     booking_11.rest_id = 1
     booking_11.user_id = user_to_add.id
     booking_11.booking_datetime = datetime.datetime.now() - datetime.timedelta(days=2)
+    booking_11.entrance_datetime = datetime.datetime.now() - datetime.timedelta(days=2)
     booking_11.people_number = 2
     booking_11.table_id = 3
     db.session.add(booking_11)

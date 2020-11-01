@@ -1,19 +1,36 @@
 {% extends 'homepage.html' %}
     {% block content %}
         {% if current_user.is_authenticated %}
-            {% for notification in notifications %}
-                {% if notification.already_read == False %}
-                <div class="alert alert-danger" role="alert">
-                    You have had contact with a Covid-19 positive in the last 14 days. <a href="/{{ notification.user_positive_id }}/mark_as_read" class="alert-link">Mark as read</a>
-                </div>
-                {% endif %}
-            {% endfor %}
+
+            {% if current_user.is_operator %}
+
+                {% for notification in notifications %}
+                    {% if notification.already_read == False %}
+                    <div class="alert alert-danger" role="alert">
+                        A customer that has been in your restaurant in the last 14 days is positive. <a href="/{{ notification.user_positive_id }}/mark_as_read" class="alert-link">Mark as read</a>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+
+            {% else %}
+
+                {% for notification in notifications %}
+                    {% if notification.already_read == False %}
+                    <div class="alert alert-danger" role="alert">
+                        You have had contact with a Covid-19 positive in the last 14 days. <a href="/{{ notification.user_positive_id }}/mark_as_read" class="alert-link">Mark as read</a>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+
+            {% endif %}
+
+
             <h3>Welcome back {{ current_user.firstname }}!</h3>
 
           {% if current_user.is_operator %}
             <br>
             <h3>Your Restaurant:</h3>
-            {% for restaurant in restaurants%}
+            {% for restaurant in restaurants %}
               <div>
                 <h5>
                   <li>

@@ -21,6 +21,7 @@ def unmark_as_positive(user_id):
         db.session.commit()
         return True
 
+
 def get_user_contacts(user_id, date_begin, date_end):
     user_bookings = db.session.query(Booking).\
         filter(Booking.user_id == user_id).\
@@ -43,6 +44,7 @@ def get_user_contacts(user_id, date_begin, date_end):
             user_ids.add(contact.user_id)
     return db.session.query(User).filter(User.id.in_(list(user_ids))).all()
 
+
 def get_user_visited_restaurants(user_id, date_begin, date_end):
     restaurants = db.session.query(Restaurant).\
         join(Booking, Booking.rest_id == Restaurant.id).\
@@ -51,5 +53,12 @@ def get_user_visited_restaurants(user_id, date_begin, date_end):
         filter(Booking.entrance_datetime >= date_begin).\
         filter(Booking.entrance_datetime <= date_end).\
         all()
-    
     return restaurants
+
+def get_operators_contacts(user_id, date_begin, date_end):
+    restaurants = get_user_visited_restaurants(user_id,date_begin,date_end)
+    operators_ids = set()
+    for restaurant in restaurants:
+        operator = User.query.filter_by(rest_id=restaurant.id).first()
+        operators_ids.add(operator.id)
+    return db.session.query(User).filter(User.id.in_(list(operators_ids))).all()
