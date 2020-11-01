@@ -24,19 +24,21 @@ def unmark_as_positive(user_id):
 def get_user_contacts(user_id, date_begin, date_end):
     user_bookings = db.session.query(Booking).\
         filter(Booking.user_id == user_id).\
-        filter(Booking.booking_datetime >= date_begin).\
-        filter(Booking.booking_datetime <= date_end).\
+        filter(Booking.booking_datetime is not None).\
+        filter(Booking.entrance_datetime >= date_begin).\
+        filter(Booking.entrance_datetime <= date_end).\
         all()
     user_ids = set()
     for booking in user_bookings:
         interval = timedelta(hours=booking.restaurant.occupation_time)
-        a = booking.booking_datetime + interval
-        b = booking.booking_datetime - interval
+        a = booking.entrance_datetime + interval
+        b = booking.entrance_datetime - interval
         contact_bookings = db.session.query(Booking).\
             filter(Booking.user_id != user_id).\
             filter(Booking.rest_id == booking.rest_id).\
-            filter(Booking.booking_datetime <= a).\
-            filter(Booking.booking_datetime >= b).all()
+            filter(Booking.entrance_datetime is not None).\
+            filter(Booking.entrance_datetime <= a).\
+            filter(Booking.entrance_datetime >= b).all()
         for contact in contact_bookings:
             user_ids.add(contact.user_id)
     
