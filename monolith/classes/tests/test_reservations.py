@@ -489,5 +489,67 @@ class TestReservation(unittest.TestCase):
         reply = client.t_get("/reservations/7/edit")
         self.assertEqual(reply.status_code, 404)
 
+    def test_get_todays_list(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "operator@example.com","operator")
+        reply = client.t_get("/restaurants/1/reservations/today")
+        reply_data = reply.get_data(as_text=True)
+        self.assertIn("Positive Positive",reply_data,msg=reply_data)
+        self.assertIn("Customer Customer",reply_data,msg=reply_data)
+        do_logout(client)
+
+    def test_get_todays_list_401(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "customer@example.com","customer")
+        reply = client.t_get("/restaurants/1/reservations/today")
+        self.assertEqual(reply.status_code, 401,msg=reply.get_data(as_text=True))
+        do_logout(client)
+
+    def test_entrance_401(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "customer@example.com","customer")
+        reply = client.t_get("/reservations/9/entrance")
+        self.assertEqual(reply.status_code, 401,msg=reply.get_data(as_text=True))
+        do_logout(client)
+
+    def test_entrance_401_operator(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "operator3@example.com","operator3")
+        reply = client.t_get("/reservations/9/entrance")
+        self.assertEqual(reply.status_code, 401,msg=reply.get_data(as_text=True))
+        do_logout(client)
+
+    def test_get_todays_list_401_operator(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "operator3@example.com","operator3")
+        reply = client.t_get("/restaurants/1/reservations/today")
+        self.assertEqual(reply.status_code, 401,msg=reply.get_data(as_text=True))
+        do_logout(client)
+
+    def test_register_entrance(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "operator@example.com","operator")
+        reply = client.t_get("/reservations/9/entrance")
+        self.assertEqual(reply.status_code, 302,msg=reply.get_data(as_text=True))
+        reply = client.t_get("/restaurants/1/reservations/today")
+        self.assertNotIn("The entrance of this reservation has already been registered",reply.get_data(as_text=True),msg=reply.get_data(as_text=True))
+        do_logout(client)
+
+    def test_register_entrance_2(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "operator@example.com","operator")
+        reply = client.t_get("/reservations/9/entrance")
+        self.assertEqual(reply.status_code, 302,msg=reply.get_data(as_text=True))
+        reply = client.t_get("/restaurants/1/reservations/today")
+        self.assertIn("The entrance of this reservation has already been registered",reply.get_data(as_text=True),msg=reply.get_data(as_text=True))
+        do_logout(client)
+
 if __name__ == '__main__':
     unittest.main()

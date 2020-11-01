@@ -1,10 +1,12 @@
 from flask import Blueprint, redirect, render_template, request, flash, make_response
 from flask_login import login_required, logout_user, current_user, login_user
 from sqlalchemy.orm import aliased
+import sys
 
 from monolith.auth import admin_required, is_admin, operator_required, health_authority_required
 from monolith.forms import UserForm, OperatorForm, LoginForm
 from monolith.database import User, db, Restaurant, Booking
+from monolith.utilities.contact_tracing import get_user_contacts
 from datetime import timedelta, datetime
 
 users = Blueprint('users', __name__)
@@ -14,25 +16,6 @@ def _users():
     if is_admin():
         users = db.session.query(User)
         return render_template("users.html", users=users)
-
-def get_user_contacts(user_id, date_begin, date_end):
-    result = db.session.execute(
-    """SELECT * FROM user AS User1 WHERE User1.id IN (
-    SELECT user_id FROM booking AS Booking1 WHERE EXISTS(
-        SELECT * FROM booking AS Booking2
-        JOIN restaurant AS R ON Booking2.rest_id = R.id
-        WHERE
-            Booking2.rest_id = Booking1.rest_id AND
-            Booking2.user_id = :user_id AND
-            datetime(Booking2.booking_datetime) >= datetime(:date_begin) AND
-            datetime(Booking2.booking_datetime) <= datetime(:date_end) AND
-            datetime(Booking2.booking_datetime) <= datetime(Booking1.booking_datetime) + strftime('%H', R.occupation_time) AND
-            datetime(Booking1.booking_datetime) <= datetime(Booking2.booking_datetime) + strftime('%H', R.occupation_time)
-    ) AND Booking1.user_id != :user_id)""",
-        {"user_id": user_id, "date_begin": date_begin, "date_end": date_end}).\
-        fetchall()
-
-    return result
 
 @users.route('/users/<int:user_id>/contacts')
 @health_authority_required

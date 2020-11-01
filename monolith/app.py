@@ -21,7 +21,7 @@ DEFAULT_CONFIGURATION = {
 
     "wtf_csrf_secret_key" : 'A SECRET KEY',
     "secret_key" : 'ANOTHER ONE',
-    "sqlalchemy_database_uri" : 'sqlite:///gooutsafe.db',
+    "sqlalchemy_database_uri" : 'sqlite:///db/gooutsafe.db',
     "sqlalchemy_track_modifications" : False,
     
     "result_backend" : os.getenv("BACKEND", "redis://localhost:6379"),
@@ -234,7 +234,7 @@ def fake_data():
 
         booking_2 = Booking()
         booking_2.rest_id = 1
-        booking_2.user_id = example_cust.id
+        booking_2.user_id = example_positive1.id
         booking_2.booking_datetime = datetime.datetime(2020,10,5,10,15,0,0)
         booking_2.people_number = 5
         booking_2.table_id = 2
@@ -287,6 +287,24 @@ def fake_data():
         db.session.add(booking_7)
         db.session.commit()
 
+        booking_8 = Booking()
+        booking_8.rest_id = 1
+        booking_8.user_id = example_positive.id
+        booking_8.booking_datetime = datetime.datetime.now()
+        booking_8.people_number = 5
+        booking_8.table_id = 2
+        db.session.add(booking_8)
+        db.session.commit()
+
+        booking_9 = Booking()
+        booking_9.rest_id = 1
+        booking_9.user_id = example_cust.id
+        booking_9.booking_datetime = datetime.datetime.now()
+        booking_9.people_number = 5
+        booking_9.table_id = 1
+        db.session.add(booking_9)
+        db.session.commit()
+
 def init():
     q = db.session.query(User).filter(User.email == 'example@example.com')
     admin = q.first()
@@ -317,6 +335,11 @@ def init():
 def create_app(configuration):
 
     app = Flask(__name__)
+
+    try: 
+        os.mkdir("monolith/db") 
+    except OSError as error: 
+        pass   
     
     configuration = os.getenv("CONFIG", configuration)
     config = get_config(configuration)

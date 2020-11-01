@@ -92,6 +92,57 @@ def _booking_list(restaurant_id):
     return make_response(render_template('form.html', form=form, title="View reservations"),200)
 
 
+
+@reservations.route('/restaurants/<int:restaurant_id>/reservations/today', methods=['GET'])
+@operator_required
+def _today_booking_list(restaurant_id):
+    record = db.session.query(Restaurant).filter_by(id = restaurant_id).first()
+    if record is None:
+        return make_response(render_template('error.html', error='404'),404)
+
+    if current_user.rest_id != restaurant_id:
+        return make_response(render_template('error.html', error='401'), 401)
+    
+    today = datetime.datetime.today().date()
+
+    qry = db.session.query(Booking,User)\
+                    .filter_by(rest_id = current_user.get_rest_id())\
+                    .filter(User.id == Booking.user_id)\
+                    .all()
+
+    res = []
+    for r in qry:
+        if r.Booking.booking_datetime.date() == today:
+            res.append(r)
+
+    return make_response(render_template("reservations.html", reservations=res, title="Today's Reservations"),200)
+
+
+@reservations.route('/reservations/<int:reservation_id>/entrance', methods=['GET', 'POST'])
+@operator_required
+def _register_entrance(reservation_id):
+    
+    qry = db.session.query(Booking).filter_by(id = reservation_id).first()
+    
+    if qry is None:
+        return make_response(render_template('error.html', error='404'),404)
+
+    if qry.rest_id != current_user.get_rest_id():
+        return make_response(render_template('error.html', error='401'),401)
+    
+    if qry.entrance_datetime is None:
+        try:
+            qry.entrance_datetime = datetime.datetime.now()
+            db.session.add(qry)
+            db.session.commit()
+            return redirect(f"/reservations/{reservation_id}")
+        except: # Remove if coverage < 90%
+            flash('An error occured, please try again','error')
+            return redirect(f"/reservations/{reservation_id}")
+    else:
+        flash('The entrance of this reservation has already been registered',"error")
+        return redirect(f"/reservations/{reservation_id}")
+
 @reservations.route('/reservations/<int:reservation_id>', methods=['GET'])
 @operator_required
 def _reservation(reservation_id):

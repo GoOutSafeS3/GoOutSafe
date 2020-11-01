@@ -10,7 +10,11 @@
       <li>
         <h4>{{restaurant.name}}</h4>
         <h5>
-            {{restaurant.cuisine_type}}, {{restaurant.likes}} Likes
+            {{restaurant.cuisine_type}},
+            {% if restaurant.likes is None %}
+                No Likes
+            {% else %} {{restaurant.likes}} Likes
+            {% endif %}
             <br>
         </h5>
       {% if current_user.is_authenticated %}

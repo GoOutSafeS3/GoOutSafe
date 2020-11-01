@@ -4,7 +4,8 @@ from flask_test_with_csrf import FlaskClient
 from flask import url_for
 from flask_login import current_user
 from utils import do_login, do_logout, get_positives_id
-from monolith.utilities.contact_tracing import mark_as_positive, unmark_as_positive
+from monolith.utilities.contact_tracing import mark_as_positive, unmark_as_positive, get_user_contacts
+import datetime
 
 class TestLogin(unittest.TestCase):
     @classmethod
@@ -306,3 +307,22 @@ class TestLogin(unittest.TestCase):
         with self.app.app_context():
             self.assertFalse(mark_as_positive(99999))
             self.assertFalse(unmark_as_positive(99999))
+
+    def test_user_contacts(self):
+        with self.app.app_context():
+            self.assertEquals(len(get_user_contacts(3, datetime.datetime(2020,10,4,10,15,0,0), datetime.datetime(2020,10,6,10,15,0,0))), 1)
+            self.assertEquals(len(get_user_contacts(3, datetime.datetime(2021,10,4,18,30,0,0), datetime.datetime(2021,10,6,18,30,0,0))), 0)
+    
+    def test_contacts_need_ha(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+
+        do_login(client, "customer@example.com", "customer")
+        reply = client.t_get(f"/users/3/contacts")
+        self.assertEqual(reply.status_code, 401)
+        do_logout(client)
+
+        do_login(client, "health@authority.com", "health")
+        reply = client.t_get(f"/users/3/contacts")
+        self.assertEqual(reply.status_code, 200)
+        do_logout(client)

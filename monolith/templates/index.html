@@ -1,7 +1,7 @@
 {% extends 'homepage.html' %}
     {% block content %}
         {% if current_user.is_authenticated %}
-          <h3>Welcome back {{ current_user.firstname }}!<h3>
+          <h3>Welcome back {{ current_user.firstname }}!</h3>
 
           {% if current_user.is_operator %}
             <br>
@@ -11,12 +11,17 @@
                 <h5>
                   <li>
                        <a href="/restaurants/{{ restaurant.id }}"> {{restaurant.name}}  </a>
-                         has {{restaurant.likes}} Likes
+                         {% if restaurant.likes is None %}
+                            has No Likes
+                         {% else %}
+                            has {{restaurant.likes}} Likes
+                         {% endif %}
                   </li>   
                 </h5>
               </div>
                 <br>
-                  <a class="btn btn-outline-secondary btn-sm"  href="/restaurants/{{ restaurant.id }}/reservations"> See Reservations  </a>
+                  <a class="btn btn-outline-secondary btn-sm"  href="/restaurants/{{ restaurant.id }}/reservations/today"> Today's Reservations  </a>
+                  <a class="btn btn-outline-secondary btn-sm"  href="/restaurants/{{ restaurant.id }}/reservations"> Search Reservations  </a>
                   <a class="btn btn-outline-secondary btn-sm"  href="/restaurants/{{ restaurant.id }}/edit"> Edit Restaurant  </a>
             {% endfor %}
           {% endif %}
@@ -30,7 +35,6 @@
                 <li><a href="/create_user">Sign up as Customer</a> </li>
                 <li><a href="/create_operator">Sign up as Restaurant's Operator</a> </li>
             </ul>
-
 
         {% endif %}
     {% endblock %}
