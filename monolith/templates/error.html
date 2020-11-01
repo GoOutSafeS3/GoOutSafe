@@ -1,9 +1,11 @@
 {% extends 'layout.html' %}
 {% block content %}
     {% if error == '404' %}
-        <h3> GoOutSafe - Page not found</h3>
+        <h3> GoOutSafe - Page not found </h3>
     {% elif error == '401' %}
         <h3> GoOutSafe - Permission denied </h3>
+    {% elif error == '500' %}
+        <h3> GoOutSafe - Internal server error </h3>
     {% else %}
         <h3>GoOutSafe - {{error}}</h3>
     {% endif %}
