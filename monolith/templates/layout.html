@@ -42,49 +42,52 @@
             <li class="nav-item"><a class="nav-link" href="/restaurants">Restaurants</a></li>
 
           {% elif current_user.is_operator %}
-             <li class="nav-item"><a class="nav-link" href="/notifications">Notifications</a></li>
+              <li class="nav-item"><a class="nav-link" href="/notifications">Notifications</a></li>
              <li class="nav-item"><a class="nav-link" href="/">Settings</a></li>
 
           {% else %}
-
               <li class="nav-item"><a class="nav-link" href="/restaurants">Restaurants</a></li>
               <li class="nav-item"><a class="nav-link" href="/reservations">Reservations</a></li>
               <li class="nav-item"><a class="nav-link" href="/notifications">Notifications</a></li>
               <li class="nav-item"><a class="nav-link" href="/edit">Settings</a></li>
           {% endif %}
             <li><a class="nav-link" href="/logout"> Logout </a></li>
-         {% endif %}
+
+      {% else %}
+             <li><a class="nav-link" href="/login"> Login </a></li>
+      {% endif %}
 
         </ul>
       </div>
     </div>
   </nav>
-   <!-- Content section -->
+
+  <!-- Content section -->
   <section class="py-5">
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                {% for message, category in messages %}
-                        {% if category == 'success' %}
+                {% for category, message in messages %}
+                   {% if category == 'success' %}
                             <div class="alert alert-success alert-dismissible fade show" role="alert"> {{ message }}
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                             </button></div>
-                        {% elif category == 'error' %}
+                   {% elif category == 'error' %}
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">{{ message }}
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                             </button>
                             </div>
-                        {% elif category == "warning" %}
+                   {% elif category == "warning" %}
                             <div class="alert alert-warning alert-dismissible fade show" role="alert">{{ message }}
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                             </button>
                             </div>
-                        {% endif %}
+                   {% endif %}
                 {% endfor %}
-            {% endif %}
+             {% endif %}
         {% endwith %}
         <h2 style="color: darkred"> {{title}}</h2>
         {% block content %}
@@ -93,7 +96,7 @@
     </div>
   </section>
 
-   <!-- Bootstrap core JavaScript -->
+  <!-- Bootstrap core JavaScript -->
   <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
   <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.js') }}"></script>
 
