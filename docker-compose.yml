@@ -22,6 +22,19 @@ services:
         target: /code/monolith/db
     ports:
       - "5000:5000"
+  monolith-testing:
+    build:
+      context: .
+      dockerfile: Dockerfile-noprod
+    volumes:
+      - type: volume
+        source: db
+        target: /code/monolith/db
+    depends_on:
+      - redis
+      - worker
+    ports:
+      - "5000:5000"
   worker:
     build:
       context: .
