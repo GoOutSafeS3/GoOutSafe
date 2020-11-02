@@ -17,6 +17,50 @@ def positives():
     qry = db.session.query(User).filter_by(is_positive = True).all()
     return render_template("positives.html", positives = qry, title="Positives")
 
+@contact_tracing.route('/positives/contacts', methods=['GET','POST'])
+@health_authority_required
+def _contacts():
+    form = SearchUserForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            qry = db.session.query(User)\
+            .filter_by(is_admin = False)\
+            .filter_by(is_health_authority=False)\
+            .filter_by(rest_id = None)
+
+            try:
+                if request.form["email"] == "" and request.form["telephone"] == "" and request.form["ssn"] == "":
+                    flash("Please fill in a field","warning")
+                    return render_template('form.html', form=form, title="Find Contacts")
+
+                if request.form["email"] != "":
+                    qry = qry.filter_by(email = request.form["email"])
+                if request.form["telephone"] != "":
+                    qry = qry.filter_by(phone = request.form["telephone"])
+                if request.form["ssn"] != "":
+                    qry = qry.filter_by(ssn = request.form["ssn"])
+            except:
+                flash("Bad Form","error")
+                return render_template('form.html', form=form, title="Find Contacts")
+
+
+            qry = qry.all()
+
+            if len(qry) == 0:
+                flash("User not found","error")
+                return render_template('form.html', form=form, title="Find Contacts")
+            elif len(qry) > 1: # remove if coverage <90%
+                flash("More users have been found, please try again","error")
+                return render_template('form.html', form=form, title="Find Contacts")
+            else:
+                qry = qry[0]
+
+            return render_template("users.html",users=get_user_contacts(qry.id, datetime.today() - timedelta(days=14), datetime.today()))
+        
+    return render_template('form.html', form=form, title="Find Contacts")
+
+
+
 
 @contact_tracing.route('/positives/mark', methods=['GET','POST'])
 @health_authority_required

@@ -191,6 +191,7 @@ def fake_data():
         example_positive.lastname = 'Positive'
         example_positive.email = 'positive@example.com'
         example_positive.phone = 5551234565
+        example_positive.ssn = "9876543210"
         example_positive.dateofbirth = datetime.datetime(2020, 10, 5)
         example_positive.is_admin = False
         example_positive.is_positive = True
@@ -204,7 +205,6 @@ def fake_data():
         example_positive1.lastname = 'Positive'
         example_positive1.email = 'a.positive@example.com'
         example_positive1.phone = "0987654321"
-        example_positive1.ssn = "987654321"
         example_positive1.dateofbirth = datetime.datetime(2020, 10, 5)
         example_positive1.is_admin = False
         example_positive1.is_positive = True

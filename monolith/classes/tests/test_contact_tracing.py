@@ -22,7 +22,7 @@ class TestLogin(unittest.TestCase):
 
         users = ["example@example.com","customer@example.com","operator@example.com"]
         passw = ["admin","customer","operator"]
-        endpoints = ["/positives","/positives/mark","/positives/unmark","/positives/1/unmark"]
+        endpoints = ["/positives","/positives/mark","/positives/unmark","/positives/1/unmark", "/positives/contacts"]
 
         for i in range(len(users)):
             do_login(client, users[i], passw[i])
@@ -36,7 +36,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        endpoints = ["/positives","/positives/mark","/positives/unmark"]
+        endpoints = ["/positives","/positives/mark","/positives/unmark", "/positives/contacts"]
 
         do_login(client, "health@authority.com", "health")
         for e in endpoints:
@@ -117,7 +117,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        endpoints = ["/positives/mark","/positives/unmark"]
+        endpoints = ["/positives/mark","/positives/unmark", "/positives/contacts"]
 
         do_login(client, "health@authority.com", "health")
 
@@ -137,7 +137,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        endpoints = ["/positives/mark","/positives/unmark"]
+        endpoints = ["/positives/mark","/positives/unmark", "/positives/contacts"]
 
         do_login(client, "health@authority.com", "health")
 
@@ -158,7 +158,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        endpoints = ["/positives/mark","/positives/unmark"]
+        endpoints = ["/positives/mark","/positives/unmark", "/positives/contacts"]
 
         do_login(client, "health@authority.com", "health")
 
@@ -178,7 +178,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        endpoints = ["/positives/mark","positives/unmark"]
+        endpoints = ["/positives/mark","positives/unmark", "/positives/contacts"]
 
         do_login(client, "health@authority.com", "health")
 
@@ -210,7 +210,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        endpoints = ["/positives/mark","/positives/unmark"]
+        endpoints = ["/positives/mark","/positives/unmark", "/positives/contacts"]
 
         do_login(client, "health@authority.com", "health")
 
@@ -343,4 +343,53 @@ class TestLogin(unittest.TestCase):
         do_login(client, "health@authority.com", "health")
         reply = client.t_get("/positives")
         self.assertNotIn("old.positive@example.com",reply.get_data(as_text=True), msg=reply.get_data(as_text=True)) # A hard coded positive user but with a timestamp 14 days old
+        do_logout(client)
+
+
+    def test_contacts_by_mail(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+
+        do_login(client, "health@authority.com", "health")
+
+        form = {
+            "email":"positive@example.com",
+            "telephone":"",
+            "ssn":""
+            }
+        reply = client.t_post("/positives/contacts",form)
+        self.assertEqual(reply.status_code,200,msg=reply.get_data(as_text=True))    
+        self.assertIn("Customer", reply.get_data(as_text=True),msg=reply.get_data(as_text=True))    
+        do_logout(client)
+
+    def test_contacts_by_telephone(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+
+        do_login(client, "health@authority.com", "health")
+
+        form = {
+            "email":"",
+            "telephone":"5551234565",
+            "ssn":""
+            }
+        reply = client.t_post("/positives/contacts",form)
+        self.assertEqual(reply.status_code,200,msg=reply.get_data(as_text=True))    
+        self.assertIn("Customer", reply.get_data(as_text=True),msg=reply.get_data(as_text=True))    
+        do_logout(client)
+
+    def test_contacts_by_ssn(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+
+        do_login(client, "health@authority.com", "health")
+
+        form = {
+            "email":"",
+            "telephone":"",
+            "ssn":"9876543210"
+            }
+        reply = client.t_post("/positives/contacts",form)
+        self.assertEqual(reply.status_code,200,msg=reply.get_data(as_text=True))    
+        self.assertIn("Customer", reply.get_data(as_text=True),msg=reply.get_data(as_text=True))    
         do_logout(client)
