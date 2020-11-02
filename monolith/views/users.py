@@ -4,7 +4,7 @@ from sqlalchemy.orm import aliased
 import sys
 
 from monolith.auth import admin_required, is_admin, operator_required, health_authority_required
-from monolith.forms import UserForm, OperatorForm, LoginForm
+from monolith.forms import UserForm, OperatorForm, LoginForm, EditUserForm
 from monolith.database import User, db, Restaurant, Booking
 from monolith.utilities.contact_tracing import get_user_contacts
 from datetime import timedelta, datetime
@@ -101,6 +101,13 @@ def create_user():
                 new_user.email = form.email.data
                 new_user.set_password(form.password.data)
                 new_user.phone = form.telephone.data
+                today = datetime.today()
+                b_date = request.form["dateofbirth"]
+                day, month, year = (int(x) for x in b_date.split('/'))
+                birth_date = today.replace(year=year, month=month, day=day)
+                if birth_date > today:
+                    flash('Date Of Birth error', 'error')
+                    return make_response(render_template('form.html', form=form, title="Sign in!"), 400)
                 new_user.dateofbirth = form.dateofbirth.data
                 new_user.ssn = form.ssn.data
                 try:
@@ -152,6 +159,13 @@ def create_operator():
                     new_user.email = form.email.data
                     new_user.set_password(form.password.data)
                     new_user.phone = form.telephone.data
+                    today = datetime.today()
+                    b_date = request.form["dateofbirth"]
+                    day, month, year = (int(x) for x in b_date.split('/'))
+                    birth_date = today.replace(year=year, month=month, day=day)
+                    if birth_date > today:
+                        flash('Date Of Birth error', 'error')
+                        return make_response(render_template('form.html', form=form, title="Sign in!"), 400)
                     new_user.dateofbirth = form.dateofbirth.data
                     try:
                         # pw should be hashed with some salt
@@ -177,6 +191,7 @@ def create_operator():
             return redirect("/")
 
     return render_template('form.html', form=form, title="Sign in!")
+
 
 @users.route('/edit', methods=['GET', 'POST'])
 @login_required
@@ -234,3 +249,4 @@ def edit_user():
             return redirect("/")
 
     return render_template('form.html', form=form, title="Modify your profile!")
+
