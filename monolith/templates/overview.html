@@ -1,18 +1,6 @@
 {% extends 'layout.html' %}
 {% block content %}
   <h2>Reservation overview for day {{current.day}}/{{current.month}}/{{current.year}}</h2>
-  
-  {% for reservation in reservations: %}
-  <div>
-    <ul>
-      <li>Table: {{reservation.table_id}}</li>
-      <li>Number of people: {{reservation.people_number}}</li>
-      <li>Time: {{reservation.booking_datetime.hour}}:{{reservation.booking_datetime.minute}}</li>
-    </ul>
-  </div>
-  {% endfor %}
-
-  <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/restaurants/{{restaurant.id}}">Back to Restaurant</a>
   <nav>
     <ul class="pagination">
       <li class="page-item"><a class="page-link" href="{{base_url}}/restaurants/{{restaurant.id}}/overview/{{prev.year}}/{{prev.month}}/{{prev.day}}">Previous day</a></li>
@@ -21,4 +9,30 @@
       <li class="page-item"><a class="page-link" href="{{base_url}}/restaurants/{{restaurant.id}}/overview/{{next.year}}/{{next.month}}/{{next.day}}">Next day</a></li>
     </ul>
   </nav>
+
+  {% macro print_reservation(reservation) -%}
+  <div>
+    <ul>
+      <li>Table: {{reservation.table_id}}</li>
+      <li>Number of people: {{reservation.people_number}}</li>
+      <li>Time: {{'%02d' % (reservation.booking_datetime.hour)}}:{{'%02d' % (reservation.booking_datetime.minute)}}</li>
+    </ul>
+  </div>
+  {%- endmacro %}
+
+  {% if lunch != []: %}
+  <h3>Lunch</h3>
+  {% for reservation in lunch: %}
+    {{ print_reservation(reservation) }}
+  {% endfor %}
+  {% endif %}
+
+  {% if dinner != []: %}
+  <h3>Dinner</h3>
+  {% for reservation in dinner: %}
+    {{ print_reservation(reservation) }}
+  {% endfor %}
+  {% endif %}
+
+  <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/restaurants/{{restaurant.id}}">Back to Restaurant</a>
 {% endblock %}

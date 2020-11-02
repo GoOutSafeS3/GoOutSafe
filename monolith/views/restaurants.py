@@ -155,19 +155,26 @@ def _edit_restaurant(restaurant_id):
             opening_dinner = form.opening_hour_dinner.data
             closing_lunch = form.closing_hour_lunch.data
             closing_dinner = form.closing_hour_dinner.data
+            
             if opening_dinner is not None and opening_lunch is not None and \
                closing_lunch is not None and closing_dinner is not None:
                 if not validate_hours(opening_lunch, closing_lunch, opening_dinner, closing_dinner):
-                    flash('Closing time cannot be before opening time','error')
+                    flash('Closing time cannot be before opening time (general)','error')
                     return make_response(render_template('edit_restaurant.html', form=form),400)
             else:
-                if opening_lunch is None:
-                    if opening_dinner > closing_dinner:
-                        flash('Closing time cannot be before opening time', 'error')
+                if opening_lunch is None or closing_lunch is None:
+                    if opening_lunch is not None or closing_lunch is not None:
+                        flash('You must specify both lunch hours or none', 'error')
                         return make_response(render_template('edit_restaurant.html', form=form), 400)
-                elif opening_dinner is None:
+                    if opening_dinner > closing_dinner:
+                        flash('Closing time cannot be before opening time (dinner)', 'error')
+                        return make_response(render_template('edit_restaurant.html', form=form), 400)
+                elif opening_dinner is None or closing_dinner is None:
+                    if opening_dinner is not None or closing_dinner is not None:
+                        flash('You must specify both dinner hours or none', 'error')
+                        return make_response(render_template('edit_restaurant.html', form=form), 400)
                     if opening_lunch > closing_lunch:
-                        flash('Closing time cannot be before opening time', 'error')
+                        flash('Closing time cannot be before opening time (lunch)', 'error')
                         return make_response(render_template('edit_restaurant.html', form=form), 400)
             form.populate_obj(record)
             record.closed_days = ''.join(request.form.getlist('closed_days'))
@@ -198,15 +205,43 @@ def restaurant_reservations_overview(restaurant_id, year, month, day):
     if current_user.rest_id != restaurant_id:
         return make_response(render_template('error.html', error="Area reserved for the restaurant operator"), 401)
 
+    restaurant = db.session.query(Restaurant).\
+        filter(Restaurant.id == restaurant_id).\
+        first()
+
+    if restaurant is None:
+        return make_response(render_template('error.html', error='404'), 404)
+
     reservations = db.session.query(Booking).\
         filter(Booking.rest_id == restaurant_id).\
         filter(Booking.booking_datetime >= date_start).\
         filter(Booking.booking_datetime < date_end).\
         all()
 
+    lunch_reservations = []
+    dinner_reservations = []
+
+    if restaurant.opening_hour_lunch is not None:
+        slot_begin = datetime(year, month, day, restaurant.opening_hour_lunch)
+        slot_end = datetime(year, month, day, restaurant.closing_hour_lunch)
+
+        for reserv in reservations:
+            if reserv.booking_datetime >= slot_begin and reserv.booking_datetime < slot_end:
+                lunch_reservations.append(reserv)
+
+    if restaurant.opening_hour_dinner is not None:
+        slot_begin = datetime(year, month, day, restaurant.opening_hour_dinner)
+        slot_end = datetime(year, month, day, restaurant.closing_hour_dinner)
+
+        for reserv in reservations:
+            if reserv.booking_datetime >= slot_begin and reserv.booking_datetime < slot_end:
+                dinner_reservations.append(reserv)
+
+
     return render_template('overview.html',
         restaurant = db.session.query(Restaurant).filter(Restaurant.id == restaurant_id).first(),
-        reservations=reservations,
+        lunch=lunch_reservations,
+        dinner=dinner_reservations,
         current = date_start,
         prev = prev_day,
         next = date_end,

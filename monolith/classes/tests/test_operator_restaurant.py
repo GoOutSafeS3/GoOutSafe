@@ -88,6 +88,52 @@ class TestRegistration(unittest.TestCase):
             else:
                 self.assertTrue(v in reply.get_data(as_text=True), msg=v+"\n"+reply.get_data(as_text=True))
 
+    def test_post_edit_only_dinner(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client,"testerGoodFormOperator@test.me", "42")
+        id = get_my_restaurant_id(client)
+        self.assertIsNotNone(id)
+        form = {
+            "name":"Restaurant at the End of the Universe",
+            "phone":"123456789003",
+            "lat":"43.431489",
+            "lon":"10.242911",
+            "opening_hour_lunch": None,
+            "closing_hour_lunch": None,
+            "opening_hour_dinner": "19",
+            "closing_hour_dinner": "23",
+            "occupation_time": "2",
+            "closed_days": ["1","2"],
+            "cuisine_type": "Pizzoria",
+            "menu": "Napolitano"
+        }
+        reply = edit_restaurant(client, id, form.copy())
+        self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
+
+    def test_post_edit_only_lunch(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client,"testerGoodFormOperator@test.me", "42")
+        id = get_my_restaurant_id(client)
+        self.assertIsNotNone(id)
+        form = {
+            "name":"Restaurant at the End of the Universe",
+            "phone":"123456789003",
+            "lat":"43.431489",
+            "lon":"10.242911",
+            "opening_hour_lunch": "12",
+            "closing_hour_lunch": "15",
+            "opening_hour_dinner": None,
+            "closing_hour_dinner": None,
+            "occupation_time": "2",
+            "closed_days": ["1","2"],
+            "cuisine_type": "Pizzoria",
+            "menu": "Napolitano"
+        }
+        reply = edit_restaurant(client, id, form.copy())
+        self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
+
     def test_post_edit_wrong_user(self):
         client = self.app.test_client()
         client.set_app(self.app)
@@ -111,6 +157,75 @@ class TestRegistration(unittest.TestCase):
         reply = edit_restaurant(client, id-1, form.copy()) #id-1 because id is the restorant of operato2
         self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))
 
+    def test_post_edit_wrong_hours(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client,"testerGoodFormOperator@test.me", "42")
+        id = get_my_restaurant_id(client)
+        self.assertIsNotNone(id)
+        form = {
+            "name": "Restaurant at the End of the Universe",
+            "phone":"123456789005",
+            "lat":"43.431489",
+            "lon":"10.242911",
+            "opening_hour_lunch": "12",
+            "closing_hour_lunch": "15",
+            "opening_hour_dinner": "19",
+            "closing_hour_dinner": "23",
+            "occupation_time": "2",
+            "closed_days": ["1","2"],
+            "cuisine_type": "None",
+            "menu": "None"
+        }
+        possibilities = [
+            {
+                "opening_hour_lunch": "12", 
+                "closing_hour_lunch": "11", #wrong hours at lunch
+                "opening_hour_dinner": "19",
+                "closing_hour_dinner": "23",
+            },
+            {
+                "opening_hour_lunch": "12", 
+                "closing_hour_lunch": "15",
+                "opening_hour_dinner": "19",
+                "closing_hour_dinner": "18",
+            },
+            {
+                "opening_hour_lunch": "12", 
+                "closing_hour_lunch": "15",
+                "opening_hour_dinner": "19",
+                "closing_hour_dinner": "37",
+            },
+            {
+                "opening_hour_lunch": "12", 
+                "closing_hour_lunch": "20",
+                "opening_hour_dinner": "19",
+                "closing_hour_dinner": "22",
+            },
+            {
+                "opening_hour_lunch": "20", 
+                "closing_hour_lunch": "22",
+                "opening_hour_dinner": "12",
+                "closing_hour_dinner": "15",
+            },
+            {
+                "opening_hour_lunch": None, 
+                "closing_hour_lunch": None,
+                "opening_hour_dinner": "23",
+                "closing_hour_dinner": "19",
+            },
+            {
+                "opening_hour_lunch": "15", 
+                "closing_hour_lunch": "12",
+                "opening_hour_dinner": None,
+                "closing_hour_dinner": None,
+            }]
+        for pos in possibilities:
+            dup = form.copy()
+            for k,v in pos.items():
+                dup[k] = v
+            reply = edit_restaurant(client, id, dup)
+            self.assertEqual(reply.status_code, 400, msg=str(pos)+reply.get_data(as_text=True))
 
     def test_post_edit_wrong_data(self):
         client = self.app.test_client()
@@ -119,8 +234,8 @@ class TestRegistration(unittest.TestCase):
         id = get_my_restaurant_id(client)
         self.assertIsNotNone(id)
         form = {
-            "name": None,
-            "phone":"123456789005",
+            "name":"Restaurant at the End of the Universe",
+            "phone":"123456789003",
             "lat":"43.431489",
             "lon":"10.242911",
             "opening_hour_lunch": "13",
@@ -129,8 +244,8 @@ class TestRegistration(unittest.TestCase):
             "closing_hour_dinner": "23",
             "occupation_time": "2",
             "closed_days": ["1","2"],
-            "cuisine_type": "None",
-            "menu": "None"
+            "cuisine_type": "Pizzoria",
+            "menu": "Napolitano"
         }
         for k,v in form.items():
             dup = form.copy()

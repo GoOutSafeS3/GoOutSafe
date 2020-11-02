@@ -22,4 +22,6 @@ def validate_hours(opening_lunch, closing_lunch, opening_dinner, closing_dinner)
         return False
     if opening_dinner > closing_dinner:
         return False
+    if closing_dinner > 24 and closing_dinner-24 > opening_lunch: # restaurant may be open after midnight, check that the opening the day after does not conflict with the closing
+        return False
     return True
