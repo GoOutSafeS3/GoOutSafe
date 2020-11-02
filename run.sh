@@ -11,8 +11,10 @@ elif [[ "$1" == "local-tests" ]]; then
     pytest --cov=monolith --cov-report term-missing --cov-report html --html=report.html
 elif [[ "$1" == "tests" ]]; then 
     docker-compose up --exit-code-from tests tests
-elif [[ "$1" == "monolith" ]]; then 
+elif [[ "$1" == "monolith-test" ]]; then 
     docker-compose up monolith
+elif [[ "$1" == "monolith-prod" ]]; then 
+    docker-compose -f docker-compose.yml up monolith
 else
     echo "Service not recognized"
 fi;

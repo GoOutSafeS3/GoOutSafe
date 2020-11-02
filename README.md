@@ -19,13 +19,13 @@ $ docker-compose up tests
 ### Running in production mode
 
 ```
-$ docker-compose up monolith
+$ docker-compose -f docker-compose.yml up monolith
 ```
 
 ### Running in testing mode (with test data)
 
 ```
-$ docker-compose up monolith-testing
+$ docker-compose up monolith
 ```
 
 ### Only run Redis & Celery workers

@@ -42,23 +42,20 @@ import traceback
 @celery.task
 def check_likes():
     with _APP.app_context():
-        print("hello",flush=True)
         try:
             likes = db.session.query(Like).filter(Like.marked == False).all()
-            print("hello2",flush=True)
             rest_likes = {}
             for like in likes:
                 rest_likes.get(like.restaurant_id, 0) + 1
                 like.restaurant.likes += 1
                 like.marked = True
-            print("hello4",flush=True)
         except:
             traceback.print_exc()
-            print("hello-rollback",flush=True)
+            log("hello-rollback")
             db.session.rollback()
             raise
         else:
-            print("hello-commit",flush=True)
+            log("hello-commit")
             db.session.commit()
 
 @celery.task
