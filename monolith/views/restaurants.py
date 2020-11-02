@@ -198,15 +198,43 @@ def restaurant_reservations_overview(restaurant_id, year, month, day):
     if current_user.rest_id != restaurant_id:
         return make_response(render_template('error.html', error="Area reserved for the restaurant operator"), 401)
 
+    restaurant = db.session.query(Restaurant).\
+        filter(Restaurant.id == restaurant_id).\
+        first()
+
+    if restaurant is None:
+        return make_response(render_template('error.html', error='404'), 404)
+
     reservations = db.session.query(Booking).\
         filter(Booking.rest_id == restaurant_id).\
         filter(Booking.booking_datetime >= date_start).\
         filter(Booking.booking_datetime < date_end).\
         all()
 
+    lunch_reservations = []
+    dinner_reservations = []
+
+    if restaurant.opening_hour_lunch is not None:
+        slot_begin = datetime(year, month, day, restaurant.opening_hour_lunch)
+        slot_end = datetime(year, month, day, restaurant.closing_hour_lunch)
+
+        for reserv in reservations:
+            if reserv.booking_datetime >= slot_begin and reserv.booking_datetime < slot_end:
+                lunch_reservations.append(reserv)
+
+    if restaurant.opening_hour_dinner is not None:
+        slot_begin = datetime(year, month, day, restaurant.opening_hour_dinner)
+        slot_end = datetime(year, month, day, restaurant.closing_hour_dinner)
+
+        for reserv in reservations:
+            if reserv.booking_datetime >= slot_begin and reserv.booking_datetime < slot_end:
+                dinner_reservations.append(reserv)
+
+
     return render_template('overview.html',
         restaurant = db.session.query(Restaurant).filter(Restaurant.id == restaurant_id).first(),
-        reservations=reservations,
+        lunch=lunch_reservations,
+        dinner=dinner_reservations,
         current = date_start,
         prev = prev_day,
         next = date_end,
