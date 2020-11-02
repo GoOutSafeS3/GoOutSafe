@@ -32,7 +32,7 @@ celery = create_celery(app)
 def setup_periodic_tasks(sender, **kwargs):
     #here call only tasks, it does not work with normal functions (at least print does not work)
     # Calls log every 10 seconds.
-    #sender.add_periodic_task(10.0, log.s("Logging Stuff 10"), name="reverse every 10")
+    sender.add_periodic_task(10.0, log.s("Logging Stuff 10"), name="reverse every 10")
 
     # Calls log('Logging Stuff') every 30 seconds
     #sender.add_periodic_task(15.0, test_db.s(), name="Log every 15")
