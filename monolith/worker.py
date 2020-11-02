@@ -1,9 +1,8 @@
-from GoOutSafe.monolith.background import check_likes
 from celery import Celery
 from celery.schedules import crontab
 
 from monolith.app import create_worker_app
-from monolith.background import log, test_db, unmark
+from monolith.background import log, test_db, unmark, check_likes
 
 def create_celery(app):
 
