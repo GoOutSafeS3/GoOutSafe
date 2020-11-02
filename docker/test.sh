@@ -1,6 +1,6 @@
 #!/bin/sh
 rm .coverage -f
 coverage run -m pytest
-RESULT = $?
+RESULT=$?
 cp .coverage /coverage/.coverage
 exit $RESULT
