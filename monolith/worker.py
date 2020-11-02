@@ -37,7 +37,7 @@ def setup_periodic_tasks(sender, **kwargs):
     # Calls log('Logging Stuff') every 30 seconds
     #sender.add_periodic_task(15.0, test_db.s(), name="Log every 15")
 
-    # Executes every Monday morning at 7:30 a.m.
+    # Executes every morning at 7:30 a.m. see https://docs.celeryproject.org/en/stable/userguide/periodic-tasks.html#crontab-schedules
     #sender.add_periodic_task(
-    #    crontab(minute=30, hour=7), log.s("Monday morning log!"),
+    #    crontab(minute=30, hour=7), log.s("Morning log!"),
     #)
