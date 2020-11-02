@@ -2,7 +2,7 @@ from celery import Celery
 from celery.schedules import crontab
 
 from monolith.app import create_worker_app
-from monolith.background import log, test_db, unmark
+from monolith.background import log, test_db, unmark, check_likes
 
 def create_celery(app):
 
@@ -35,7 +35,7 @@ def setup_periodic_tasks(sender, **kwargs):
     # Calls log every 10 seconds.
     sender.add_periodic_task(float(app.config["UNMARK_AFTER"]), unmark.s(), name=f"Unmark positive users | a controll each {app.config['UNMARK_AFTER']} seconds")
     #sender.add_periodic_task(15.0, log.s("Logging Stuff 10"), name="reverse every 10")
-
+    sender.add_periodic_task(float(app.config["UNMARK_AFTER"]), check_likes.s(), name=f"Mark likes and add to respective restaurants | a controll each {app.config['UNMARK_AFTER']} seconds")
     # Calls log('Logging Stuff') every 30 seconds
     #sender.add_periodic_task(15.0, test_db.s(), name="Log every 15")
 

@@ -66,7 +66,7 @@ class Restaurant(db.Model):
     #r = db.relationship('User', backref='Restaurant')
     name = db.Column(db.Text(100))
     
-    likes = db.Column(db.Integer) # will store the number of likes, periodically updated in background
+    likes = db.Column(db.Integer, default=0) # will store the number of likes, periodically updated in background
 
     lat = db.Column(db.Float) # restaurant latitude
     lon = db.Column(db.Float) # restaurant longitude

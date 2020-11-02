@@ -2,7 +2,7 @@ import os
 from flask import Flask
 from flask_googlemaps import GoogleMaps, Map
 
-from monolith.database import db, User, Restaurant, Booking, Table
+from monolith.database import db, User, Restaurant, Booking, Table, Like
 from monolith.views import blueprints
 from monolith.auth import login_manager
 from monolith.background import init_celery
@@ -110,6 +110,12 @@ def fake_data():
         db.session.add(table_5)
         db.session.commit()
 
+        like_1 = Like()
+        like_1.restaurant_id = example.id
+        like_1.liker_id = example_cust.id
+        db.session.add(like_1)
+        db.session.commit()
+
         example_op = User()
         example_op.firstname = 'Operator'
         example_op.lastname = 'Operator'
@@ -191,6 +197,7 @@ def fake_data():
         example_positive.lastname = 'Positive'
         example_positive.email = 'positive@example.com'
         example_positive.phone = 5551234565
+        example_positive.ssn = "9876543210"
         example_positive.dateofbirth = datetime.datetime(2020, 10, 5)
         example_positive.is_admin = False
         example_positive.is_positive = True
@@ -204,7 +211,6 @@ def fake_data():
         example_positive1.lastname = 'Positive'
         example_positive1.email = 'a.positive@example.com'
         example_positive1.phone = "0987654321"
-        example_positive1.ssn = "987654321"
         example_positive1.dateofbirth = datetime.datetime(2020, 10, 5)
         example_positive1.is_admin = False
         example_positive1.is_positive = True

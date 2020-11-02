@@ -46,3 +46,10 @@ def get_positives_id(client):
     reply = client.t_get("/positives")
     matches = re.findall(r"\/positives\/([0-9]+)\/unmark",reply.get_data(as_text=True))
     return [int(match) for match in matches]
+
+def get_restaurant_likes(client, rest_id):
+    reply = client.t_get('/restaurants/'+str(rest_id))
+    matches = re.findall(r"([0-9]+) Likes",reply.get_data(as_text=True))
+    if len(matches) != 1:
+        return None
+    return matches[0]
