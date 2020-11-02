@@ -3,6 +3,7 @@ from celery.schedules import crontab
 from monolith.database import db,User
 from celery.utils.log import get_task_logger
 import datetime
+from monolith.utilities.contact_tracing import unmark_as_positive
 
 logger = get_task_logger(__name__)
 
@@ -26,9 +27,7 @@ def unmark():
     for u in users:
         if u.positive_datetime+datetime.timedelta(days=14) <= now:
             negatives.append(u)
-            u.is_positive = False
-            db.session.add(u)
-            db.session.commit()
+            unmark_as_positive(u.id)
 
     log(negatives)
 

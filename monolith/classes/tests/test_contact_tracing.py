@@ -5,7 +5,10 @@ from flask import url_for
 from flask_login import current_user
 from utils import do_login, do_logout, get_positives_id
 from monolith.utilities.contact_tracing import mark_as_positive, unmark_as_positive, get_user_contacts, get_user_visited_restaurants
+from monolith.background import unmark
+
 import datetime
+
 
 class TestLogin(unittest.TestCase):
     @classmethod
@@ -329,4 +332,15 @@ class TestLogin(unittest.TestCase):
         do_login(client, "health@authority.com", "health")
         reply = client.t_get(f"/users/3/contacts")
         self.assertEqual(reply.status_code, 200)
+        do_logout(client)
+
+    def test_background_process(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+
+        unmark()
+
+        do_login(client, "health@authority.com", "health")
+        reply = client.t_get("/positives")
+        self.assertNotIn("old.positive@example.com",reply.get_data(as_text=True), msg=reply.get_data(as_text=True)) # A hard coded positive user but with a timestamp 14 days old
         do_logout(client)

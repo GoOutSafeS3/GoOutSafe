@@ -360,7 +360,7 @@ def fake_data():
     example_old_positive.dateofbirth = datetime.datetime(2020, 10, 5)
     example_old_positive.is_admin = False
     example_old_positive.is_positive = True
-    example_old_positive.positive_datetime = datetime.datetime.now() - datetime.timedelta(days=14)
+    example_old_positive.positive_datetime = datetime.datetime.now() - datetime.timedelta(days=14, hours=1)
     example_old_positive.set_password('positive')
     db.session.add(example_old_positive)
     db.session.commit()
@@ -374,7 +374,7 @@ def fake_data():
     example_old_positive1.dateofbirth = datetime.datetime(2020, 10, 5)
     example_old_positive1.is_admin = False
     example_old_positive1.is_positive = True
-    example_old_positive1.positive_datetime = datetime.datetime.now() - datetime.timedelta(days=13, hours=23, minutes=58)
+    example_old_positive1.positive_datetime = datetime.datetime.now() - datetime.timedelta(days=14, hours=0, minutes=59)
     example_old_positive1.set_password('positive')
     db.session.add(example_old_positive1)
     db.session.commit()

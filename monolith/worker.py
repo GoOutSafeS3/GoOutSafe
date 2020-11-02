@@ -33,7 +33,7 @@ celery = create_celery(app)
 def setup_periodic_tasks(sender, **kwargs):
     #here call only tasks, it does not work with normal functions (at least print does not work)
     # Calls log every 10 seconds.
-    sender.add_periodic_task(10.0, unmark.s(app.config["UNMARK_AFTER"]), name="Unmark positive users")
+    sender.add_periodic_task(float(app.config["UNMARK_AFTER"]), unmark.s(), name=f"Unmark positive users | a controll each {app.config['UNMARK_AFTER']} seconds")
     #sender.add_periodic_task(15.0, log.s("Logging Stuff 10"), name="reverse every 10")
 
     # Calls log('Logging Stuff') every 30 seconds
