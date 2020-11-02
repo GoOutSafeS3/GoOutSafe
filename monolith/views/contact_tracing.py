@@ -55,8 +55,11 @@ def _contacts():
             else:
                 qry = qry[0]
 
-            return render_template("users.html",users=get_user_contacts(qry.id, datetime.today() - timedelta(days=14), datetime.today()))
-        
+            if qry.is_positive:
+                return redirect(f"/users/{qry.id}/contacts")
+            else:
+                flash("The user is not positive","error")
+                
     return render_template('form.html', form=form, title="Find Contacts")
 
 

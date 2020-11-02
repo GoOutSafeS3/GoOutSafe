@@ -325,12 +325,12 @@ class TestLogin(unittest.TestCase):
         client.set_app(self.app)
 
         do_login(client, "customer@example.com", "customer")
-        reply = client.t_get(f"/users/3/contacts")
+        reply = client.t_get(f"/users/7/contacts")
         self.assertEqual(reply.status_code, 401)
         do_logout(client)
 
         do_login(client, "health@authority.com", "health")
-        reply = client.t_get(f"/users/3/contacts")
+        reply = client.t_get(f"/users/7/contacts")
         self.assertEqual(reply.status_code, 200)
         do_logout(client)
 
@@ -358,8 +358,7 @@ class TestLogin(unittest.TestCase):
             "ssn":""
             }
         reply = client.t_post("/positives/contacts",form)
-        self.assertEqual(reply.status_code,200,msg=reply.get_data(as_text=True))    
-        self.assertIn("Customer", reply.get_data(as_text=True),msg=reply.get_data(as_text=True))    
+        self.assertEqual(reply.status_code,302,msg=reply.get_data(as_text=True))    
         do_logout(client)
 
     def test_contacts_by_telephone(self):
@@ -374,8 +373,7 @@ class TestLogin(unittest.TestCase):
             "ssn":""
             }
         reply = client.t_post("/positives/contacts",form)
-        self.assertEqual(reply.status_code,200,msg=reply.get_data(as_text=True))    
-        self.assertIn("Customer", reply.get_data(as_text=True),msg=reply.get_data(as_text=True))    
+        self.assertEqual(reply.status_code,302,msg=reply.get_data(as_text=True))    
         do_logout(client)
 
     def test_contacts_by_ssn(self):
@@ -390,6 +388,42 @@ class TestLogin(unittest.TestCase):
             "ssn":"9876543210"
             }
         reply = client.t_post("/positives/contacts",form)
-        self.assertEqual(reply.status_code,200,msg=reply.get_data(as_text=True))    
-        self.assertIn("Customer", reply.get_data(as_text=True),msg=reply.get_data(as_text=True))    
+        self.assertEqual(reply.status_code,302,msg=reply.get_data(as_text=True))    
+        do_logout(client)
+
+    def test_contacts_not_positive_user(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+
+        do_login(client, "health@authority.com", "health")
+
+        form = {
+            "email":"customer@example.com",
+            "telephone":"",
+            "ssn":""
+            }
+        reply = client.t_post("/positives/contacts",form)
+        self.assertEqual(reply.status_code,200,msg=reply.get_data(as_text=True))   
+        self.assertIn("The user is not positive",reply.get_data(as_text=True),msg=reply.get_data(as_text=True)) 
+        do_logout(client)
+
+    def test_contacts_not_positive_user_by_id(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+
+        do_login(client, "health@authority.com", "health")
+
+        reply = client.t_get("/users/3/contacts")
+        self.assertEqual(reply.status_code,404,msg=reply.get_data(as_text=True))   
+        do_logout(client)
+
+
+    def test_contacts_by_id_404(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+
+        do_login(client, "health@authority.com", "health")
+
+        reply = client.t_get("/users/99999/contacts")
+        self.assertEqual(reply.status_code,404,msg=reply.get_data(as_text=True))   
         do_logout(client)
