@@ -24,6 +24,18 @@ class UserForm(FlaskForm):
     display = ['email', 'firstname', 'lastname', 'password','password_repeat', 'telephone', 'dateofbirth', 'ssn']
 
 
+class EditUserForm(FlaskForm):
+    firstname = f.StringField('Firstname')
+    lastname = f.StringField('Lastname')
+    new_password = f.PasswordField('Password')
+    old_password = f.PasswordField('Old Password', validators=[DataRequired()])
+    password_repeat = f.PasswordField('Repeat Password')
+    telephone = f.StringField('Telephone')
+    dateofbirth = f.DateField('Date Of Birth', format='%d/%m/%Y')
+    ssn = f.StringField('SSN (if available)', validators=[])
+    submit = f.SubmitField('Confirm')
+
+
 class OperatorForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired(), Email()])
     firstname = f.StringField('Firstname', validators=[DataRequired()])

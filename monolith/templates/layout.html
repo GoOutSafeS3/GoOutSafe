@@ -43,13 +43,13 @@
 
           {% elif current_user.is_operator %}
               <li class="nav-item"><a class="nav-link" href="/notifications">Notifications</a></li>
-             <li class="nav-item"><a class="nav-link" href="/">Settings</a></li>
+             <li class="nav-item"><a class="nav-link" href="/edit_user">Settings</a></li>
 
           {% else %}
               <li class="nav-item"><a class="nav-link" href="/restaurants">Restaurants</a></li>
               <li class="nav-item"><a class="nav-link" href="/reservations">Reservations</a></li>
               <li class="nav-item"><a class="nav-link" href="/notifications">Notifications</a></li>
-              <li class="nav-item"><a class="nav-link" href="/edit">Settings</a></li>
+              <li class="nav-item"><a class="nav-link" href="/edit_user">Settings</a></li>
           {% endif %}
             <li><a class="nav-link" href="/logout"> Logout </a></li>
 
