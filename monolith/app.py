@@ -245,7 +245,7 @@ def fake_data():
         booking_3 = Booking()
         booking_3.rest_id = 1
         booking_3.user_id = example_cust.id
-        booking_3.booking_datetime = datetime.datetime(2020,10,5,11,30,0,0)
+        booking_3.booking_datetime = datetime.datetime(2020,10,5,21,00,0,0)
         booking_3.people_number = 5
         booking_3.table_id = 3
         db.session.add(booking_3)
@@ -254,7 +254,7 @@ def fake_data():
         booking_4 = Booking()
         booking_4.rest_id = 1
         booking_4.user_id = example_positive.id
-        booking_4.booking_datetime = datetime.datetime(2020,10,5,18,30,0,0)
+        booking_4.booking_datetime = datetime.datetime(2020,10,5,15,30,0,0)
         booking_4.people_number = 5
         booking_4.table_id = 5
         db.session.add(booking_4)

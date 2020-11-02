@@ -4,6 +4,7 @@ from flask_test_with_csrf import FlaskClient
 from flask import url_for
 from flask_login import current_user
 from utils import do_login, do_logout
+import datetime
 
 class TestRestaurant(unittest.TestCase):
     @classmethod
@@ -228,3 +229,32 @@ class TestRestaurant(unittest.TestCase):
         do_logout(client)
         reply_data = reply.get_data(as_text = True)
         self.assertEqual(reply.status_code, 404, msg=reply_data)
+
+    def test_overview_needs_operator(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        reply = client.t_get("/restaurants/1/overview")
+        self.assertEqual(reply.status_code, 401)
+        
+        reply = client.t_get("/restaurants/1/overview/2020/10/10")
+        self.assertEqual(reply.status_code, 401)
+
+    def test_overview_slots(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "operator@example.com","operator")
+        reply = client.t_get("/restaurants/1/overview/2020/10/5")
+        reply_data = reply.get_data(as_text = True)
+        self.assertIn("Lunch", reply_data)
+        self.assertIn("Dinner", reply_data)
+
+    def test_overview_wrong_operator(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "operator2@example.com","operator2")
+
+        reply = client.t_get("/restaurants/1/overview")
+        self.assertEqual(reply.status_code, 401)
+        
+        reply = client.t_get("/restaurants/1/overview/2020/10/10")
+        self.assertEqual(reply.status_code, 401)
