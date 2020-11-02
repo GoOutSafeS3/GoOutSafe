@@ -42,7 +42,7 @@ services:
       - "BROKER=redis://redis:6379"
       - "BACKEND=redis://redis:6379"
       - "CONFIG=PRODUCTION"
-    command: celery -A monolith.worker:celery worker -l info # -B -s /tmp/celerybeat-schedule
+    command: celery -A monolith.worker:celery worker -l info -B -s /tmp/celerybeat-schedule
     depends_on:
       - redis
     volumes:
@@ -60,7 +60,7 @@ services:
       - "BROKER=redis://local-redis:6379"
       - "BACKEND=redis://local-redis:6379"
       - "CONFIG=TEST"
-    command: celery -A monolith.worker:celery worker -l info # -B -s /tmp/celerybeat-schedule 
+    command: celery -A monolith.worker:celery worker -l info -B -s /tmp/celerybeat-schedule 
     volumes:
       - ./monolith/db:/code/monolith/db
     depends_on:
