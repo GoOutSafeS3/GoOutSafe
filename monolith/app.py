@@ -2,7 +2,7 @@ import os
 from flask import Flask
 from flask_googlemaps import GoogleMaps, Map
 
-from monolith.database import db, User, Restaurant, Booking, Table
+from monolith.database import db, User, Restaurant, Booking, Table, Like
 from monolith.views import blueprints
 from monolith.auth import login_manager
 from monolith.background import init_celery
@@ -108,6 +108,12 @@ def fake_data():
         table_5.rest_id = example.id
         table_5.capacity = 8
         db.session.add(table_5)
+        db.session.commit()
+
+        like_1 = Like()
+        like_1.restaurant_id = example.id
+        like_1.liker_id = example_cust.id
+        db.session.add(like_1)
         db.session.commit()
 
         example_op = User()

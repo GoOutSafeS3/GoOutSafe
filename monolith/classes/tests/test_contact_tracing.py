@@ -338,7 +338,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        unmark()
+        unmark.apply()
 
         do_login(client, "health@authority.com", "health")
         reply = client.t_get("/positives")
