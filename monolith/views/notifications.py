@@ -22,6 +22,7 @@ def mark_as_read(pos_id):
         notifications = db.session.query(Notification).filter_by(user_notified_id=current_user.id).all()
         if pos_id is None:
             return make_response(render_template("index.html",notifications=notifications),400)
-        delete_notification(pos_id, current_user.id)
+        if not delete_notification(pos_id, current_user.id):
+            return make_response(render_template("index.html",notifications=notifications),404)
     return render_template("index.html", notifications=notifications)
 

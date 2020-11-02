@@ -183,14 +183,20 @@ def _edit_restaurant(restaurant_id):
 @operator_required
 def restaurant_reservations_overview_today(restaurant_id):
     today = datetime.today()
-    return redirect(f'/restaurants/{restaurant_id}/overview/{today.year}/{today.month}/{today.day}', code=302)
+    return restaurant_reservations_overview(restaurant_id,today.year,today.month,today.day)
 
 @restaurants.route('/restaurants/<int:restaurant_id>/overview/<int:year>/<int:month>/<int:day>')
 @operator_required
 def restaurant_reservations_overview(restaurant_id, year, month, day):
-    date_start = datetime(year, month, day)
-    prev_day = date_start - timedelta(days=1)
-    date_end = date_start + timedelta(days=1)
+    try:
+        date_start = datetime(year, month, day)
+        prev_day = date_start - timedelta(days=1)
+        date_end = date_start + timedelta(days=1)
+    except:
+        return make_response(render_template('error.html', error='404'), 404)
+
+    if current_user.rest_id != restaurant_id:
+        return make_response(render_template('error.html', error="Area reserved for the restaurant operator"), 401)
 
     reservations = db.session.query(Booking).\
         filter(Booking.rest_id == restaurant_id).\

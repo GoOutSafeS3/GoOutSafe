@@ -20,7 +20,7 @@ class TestLogin(unittest.TestCase):
             ]
             return app_rules
         for rule in get_url_mappings(self.app):
-            url = re.sub('<[a-z:_]*>',"99999",str(rule))
+            url = re.sub('<int:[a-z_]*>',"99999",str(rule))
             if url != str(rule):
                 client = self.app.test_client()
                 client.set_app(self.app)
