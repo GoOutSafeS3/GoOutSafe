@@ -25,7 +25,9 @@ DEFAULT_CONFIGURATION = {
     "sqlalchemy_track_modifications" : False,
     
     "result_backend" : os.getenv("BACKEND", "redis://localhost:6379"),
-    "broker_url" : os.getenv("BROKER", "redis://localhost:6379")
+    "broker_url" : os.getenv("BROKER", "redis://localhost:6379"),
+
+    "unmark_after": 30 #seconds
 }
 
 def get_config(configuration=None):
@@ -209,6 +211,7 @@ def fake_data():
         example_positive1.positive_datetime = datetime.datetime.now()
         example_positive1.set_password('positive')
         db.session.add(example_positive1)
+        db.session.commit()
 
         example_cust1 = User()
         example_cust1.firstname = 'Another'
@@ -348,6 +351,34 @@ def fake_data():
     db.session.add(booking_11)
     db.session.commit()
 
+    example_old_positive = User()
+    example_old_positive.firstname = 'Old'
+    example_old_positive.lastname = 'Positive'
+    example_old_positive.email = 'old.positive@example.com'
+    example_old_positive.phone = "234678150"
+    example_old_positive.ssn = "234678150"
+    example_old_positive.dateofbirth = datetime.datetime(2020, 10, 5)
+    example_old_positive.is_admin = False
+    example_old_positive.is_positive = True
+    example_old_positive.positive_datetime = datetime.datetime.now() - datetime.timedelta(days=14, hours=1)
+    example_old_positive.set_password('positive')
+    db.session.add(example_old_positive)
+    db.session.commit()
+
+    example_old_positive1 = User()
+    example_old_positive1.firstname = 'Old1'
+    example_old_positive1.lastname = 'Positive'
+    example_old_positive1.email = 'o1.positive@example.com'
+    example_old_positive1.phone = "0912873465"
+    example_old_positive1.ssn = ""
+    example_old_positive1.dateofbirth = datetime.datetime(2020, 10, 5)
+    example_old_positive1.is_admin = False
+    example_old_positive1.is_positive = True
+    example_old_positive1.positive_datetime = datetime.datetime.now() - datetime.timedelta(days=14, hours=0, minutes=59)
+    example_old_positive1.set_password('positive')
+    db.session.add(example_old_positive1)
+    db.session.commit()
+
 def init():
     q = db.session.query(User).filter(User.email == 'example@example.com')
     admin = q.first()
@@ -399,6 +430,7 @@ def create_app(configuration):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config["sqlalchemy_track_modifications"]
     app.config['result_backend'] = config['result_backend']
     app.config['broker_url'] = config['broker_url']
+    app.config["UNMARK_AFTER"] = config['unmark_after']
 
     for bp in blueprints:
         app.register_blueprint(bp)
@@ -426,13 +458,16 @@ def create_app(configuration):
 def create_worker_app():
     configuration = os.getenv("CONFIG", "TEST")
     config = get_config(configuration)
-    app = Flask(__name__)
+    app = Flask(__name__
+    )
     app.config['WTF_CSRF_SECRET_KEY'] = config["wtf_csrf_secret_key"]
     app.config['SECRET_KEY'] = config["secret_key"]
     app.config['SQLALCHEMY_DATABASE_URI'] = config["sqlalchemy_database_uri"]
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config["sqlalchemy_track_modifications"]
     app.config['result_backend'] = config['result_backend']
     app.config['broker_url'] = config['broker_url']
+    app.config["UNMARK_AFTER"] = config['unmark_after']
+    
     db.init_app(app)
     init_celery(app, worker=True)
 

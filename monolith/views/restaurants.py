@@ -155,19 +155,26 @@ def _edit_restaurant(restaurant_id):
             opening_dinner = form.opening_hour_dinner.data
             closing_lunch = form.closing_hour_lunch.data
             closing_dinner = form.closing_hour_dinner.data
+            
             if opening_dinner is not None and opening_lunch is not None and \
                closing_lunch is not None and closing_dinner is not None:
                 if not validate_hours(opening_lunch, closing_lunch, opening_dinner, closing_dinner):
-                    flash('Closing time cannot be before opening time','error')
+                    flash('Closing time cannot be before opening time (general)','error')
                     return make_response(render_template('edit_restaurant.html', form=form),400)
             else:
-                if opening_lunch is None:
-                    if opening_dinner > closing_dinner:
-                        flash('Closing time cannot be before opening time', 'error')
+                if opening_lunch is None or closing_lunch is None:
+                    if opening_lunch is not None or closing_lunch is not None:
+                        flash('You must specify both lunch hours or none', 'error')
                         return make_response(render_template('edit_restaurant.html', form=form), 400)
-                elif opening_dinner is None:
+                    if opening_dinner > closing_dinner:
+                        flash('Closing time cannot be before opening time (dinner)', 'error')
+                        return make_response(render_template('edit_restaurant.html', form=form), 400)
+                elif opening_dinner is None or closing_dinner is None:
+                    if opening_dinner is not None or closing_dinner is not None:
+                        flash('You must specify both dinner hours or none', 'error')
+                        return make_response(render_template('edit_restaurant.html', form=form), 400)
                     if opening_lunch > closing_lunch:
-                        flash('Closing time cannot be before opening time', 'error')
+                        flash('Closing time cannot be before opening time (lunch)', 'error')
                         return make_response(render_template('edit_restaurant.html', form=form), 400)
             form.populate_obj(record)
             record.closed_days = ''.join(request.form.getlist('closed_days'))
