@@ -32,7 +32,7 @@ def _mark_as_positive():
             try:
                 if request.form["email"] == "" and request.form["telephone"] == "" and request.form["ssn"] == "":
                     flash("Please fill in a field","warning")
-                    return render_template('form.html', form=form, title="Mark a User")
+                    return render_template('mark_positives.html', form=form, title="Mark a User")
 
                 if request.form["email"] != "":
                     qry = qry.filter_by(email = request.form["email"])
@@ -42,17 +42,16 @@ def _mark_as_positive():
                     qry = qry.filter_by(ssn = request.form["ssn"])
             except:
                 flash("Bad Form","error")
-                return render_template('form.html', form=form, title="Mark a User")
-
+                return render_template('mark_positives.html', form=form, title="Mark a User")
 
             qry = qry.all()
 
             if len(qry) == 0:
                 flash("User not found","error")
-                return render_template('form.html', form=form, title="Mark a User")
+                return render_template('mark_positives.html', form=form, title="Mark a User")
             elif len(qry) > 1: # remove if coverage <90%
                 flash("More users have been found, please try again","error")
-                return render_template('form.html', form=form, title="Mark a User")
+                return render_template('mark_positives.html', form=form, title="Mark a User")
             else:
                 qry = qry[0]
 
@@ -70,9 +69,9 @@ def _mark_as_positive():
                 return redirect("/positives")
             else: # remove if coverage <90%
                 flash("User not found","error")
-                return render_template('form.html', form=form, title="Mark a User")
+                return render_template('mark_positives.html', form=form, title="Mark a User")
         
-    return render_template('form.html', form=form, title="Mark a User")
+    return render_template('mark_positives.html', form=form, title="Mark a User")
 
 @contact_tracing.route('/positives/unmark', methods=['GET','POST'])
 @health_authority_required

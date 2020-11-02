@@ -1,0 +1,49 @@
+<html>
+    {% extends 'layout.html' %}
+
+    {% block content %}
+        <form action="" method="POST">
+        {{ form.hidden_tag() }}
+            <dl>
+             {% for field in form.display %}
+             <dt>{{ form[field].label }}</dt>
+             <dd>{{ form[field]() }}</dd>
+               {% if form[field].errors %}
+                  {% for e in form[field].errors %}
+                   <p class="help-block">{{ e }}</p>
+                  {% endfor %}
+               {% endif %}
+             {% endfor %}
+            </dl>
+            <p>
+
+            <a class="btn btn-outline-secondary btn-sm" href="" data-toggle="modal" data-target="#MarkModal" title="Mark"> Mark </a>
+
+        <!-- Modal Mark User -->
+        <div style="margin-top: 200px" class="modal fade" id="MarkModal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="staticBackdropLabel"> <b> Do you want to confirm? </b> </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <form action="" method="post" novalidate>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary my-2 my-sm-0" data-dismiss="modal"> Cancel </button>
+                <button type="submit" id="submit" class="btn btn-secondary my-2 my-sm-0"> Confirm </button>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+
+
+        </form>
+        <br>
+    <a class="btn btn-outline-secondary btn-sm" href="/"> Back to Homepage </a>
+    {% endblock %}
+</html>
+
