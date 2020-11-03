@@ -58,10 +58,10 @@ class RestaurantEditForm(FlaskForm):
     phone = f.StringField('Restaurant Phone', validators=[DataRequired()])
     lat = f.FloatField('Restaurant Latitude', validators=[InputRequired()])
     lon = f.FloatField('Restaurant Longitude', validators=[InputRequired()])
-    opening_hour_lunch = f.IntegerField('Opening hour for lunch', validators=[optional()])  # the opening hour for the lunch
-    closing_hour_lunch = f.IntegerField('Closing hour for lunch', validators=[optional()]) # the closing hour for the lunch
-    opening_hour_dinner = f.IntegerField('Opening hour for dinner', validators=[optional()]) # the opening hour for the dinner
-    closing_hour_dinner = f.IntegerField('Closing hour for dinner', validators=[optional()]) # the closing hour for the dinner
+    opening_hour_lunch = f.IntegerField('Opening hour', validators=[optional()])  # the opening hour for the lunch
+    closing_hour_lunch = f.IntegerField('Closing hour', validators=[optional()]) # the closing hour for the lunch
+    opening_hour_dinner = f.IntegerField('Second opening hour (if available)', validators=[optional()]) # the opening hour for the dinner
+    closing_hour_dinner = f.IntegerField('Second closing hour (if available)', validators=[optional()]) # the closing hour for the dinner
     occupation_time = f.IntegerField('Time for a table to be clear again', validators=[InputRequired()])
     closed_days = f.SelectMultipleField('Closed days',  choices=[("1","Monday"), ("2","Tuesday"), ("3","Wednesday"), ("4","Thursday"),("5","Friday"), ("6","Saturday"),("7","Sunday")], validators=[InputRequired()])
     cuisine_type = f.StringField('Cousine type',validators=[DataRequired()])

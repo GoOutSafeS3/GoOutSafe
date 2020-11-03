@@ -90,16 +90,31 @@ class Restaurant(db.Model):
     operators = relationship('User')
 
     def is_open(self, booking_datetime):
-        now = datetime.datetime.now()
-        lunch_opening = now.replace( hour=self.opening_hour_lunch, minute=0, second=0, microsecond=0 )
-        lunch_closing = now.replace( hour=self.closing_hour_lunch, minute=0, second=0, microsecond=0 )
 
-        dinner_opening = now.replace( hour=self.opening_hour_dinner, minute=0, second=0, microsecond=0 )
-        dinner_closing = now.replace( hour=self.closing_hour_dinner, minute=0, second=0, microsecond=0 )
+        if str(booking_datetime.weekday()+1) in self.closed_days:
+            return False
+
+        now = datetime.datetime.now()
 
         booking = now.replace( hour=booking_datetime.hour, minute=booking_datetime.minute, second=0, microsecond=0 )
 
-        return ( not(str(booking_datetime.weekday()+1) in self.closed_days ) ) and ( (lunch_opening <= booking <= lunch_closing) or (dinner_opening <= booking <= dinner_closing) )
+        if self.opening_hour_lunch is not None and self.opening_hour_lunch is not None:
+
+            lunch_opening = now.replace( hour=self.opening_hour_lunch, minute=0, second=0, microsecond=0 )
+            lunch_closing = now.replace( hour=self.closing_hour_lunch, minute=0, second=0, microsecond=0 )
+
+            if lunch_opening <= booking <= lunch_closing:
+                return True
+
+        if self.opening_hour_dinner is not None and self.opening_hour_dinner is not None:
+
+            dinner_opening = now.replace( hour=self.opening_hour_dinner, minute=0, second=0, microsecond=0 )
+            dinner_closing = now.replace( hour=self.closing_hour_dinner, minute=0, second=0, microsecond=0 )
+
+            if dinner_opening <= booking <= dinner_closing:
+                return True
+
+        return False
 
     def get_id(self):
         return self.id
