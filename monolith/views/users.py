@@ -184,7 +184,7 @@ def create_operator():
     return render_template('form.html', form=form, title="Sign in!")
 
 
-@users.route('/edit_user', methods=['GET', 'POST'])
+@users.route('/edit', methods=['GET', 'POST'])
 @login_required
 def edit():
 
