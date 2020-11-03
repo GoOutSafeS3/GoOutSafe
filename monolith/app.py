@@ -191,6 +191,9 @@ def fake_data():
         db.session.add(example_op)
         db.session.commit()
 
+        today = datetime.datetime.today()
+        today_noon = datetime.datetime(today.year, today.month, today.day, 13, 0)
+
         example_positive = User()
         example_positive.firstname = 'Positive'
         example_positive.lastname = 'Positive'
@@ -200,7 +203,7 @@ def fake_data():
         example_positive.dateofbirth = datetime.datetime(2020, 10, 5)
         example_positive.is_admin = False
         example_positive.is_positive = True
-        example_positive.positive_datetime = datetime.datetime.now()
+        example_positive.positive_datetime = today_noon
         example_positive.set_password('positive')
         db.session.add(example_positive)
         db.session.commit()
@@ -213,7 +216,7 @@ def fake_data():
         example_positive1.dateofbirth = datetime.datetime(2020, 10, 5)
         example_positive1.is_admin = False
         example_positive1.is_positive = True
-        example_positive1.positive_datetime = datetime.datetime.now()
+        example_positive1.positive_datetime = today_noon
         example_positive1.set_password('positive')
         db.session.add(example_positive1)
         db.session.commit()
@@ -271,7 +274,7 @@ def fake_data():
         booking_1 = Booking()
         booking_1.rest_id = 1
         booking_1.user_id = example_cust.id
-        booking_1.booking_datetime = datetime.datetime.now() + datetime.timedelta(days=1)
+        booking_1.booking_datetime = today_noon + datetime.timedelta(days=1)
         booking_1.people_number = 5
         booking_1.table_id = 4
         db.session.add(booking_1)
@@ -299,7 +302,7 @@ def fake_data():
         booking_8 = Booking()
         booking_8.rest_id = 1
         booking_8.user_id = example_positive.id
-        booking_8.booking_datetime = datetime.datetime.now()
+        booking_8.booking_datetime = today_noon
         booking_8.people_number = 5
         booking_8.table_id = 2
         db.session.add(booking_8)
@@ -308,7 +311,7 @@ def fake_data():
         booking_9 = Booking()
         booking_9.rest_id = 1
         booking_9.user_id = example_cust.id
-        booking_9.booking_datetime = datetime.datetime.now()
+        booking_9.booking_datetime = today_noon
         booking_9.people_number = 5
         booking_9.table_id = 1
         db.session.add(booking_9)
