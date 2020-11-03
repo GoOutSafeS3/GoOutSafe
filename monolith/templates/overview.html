@@ -10,14 +10,26 @@
     </ul>
   </nav>
 
+  {% macro print_time(t) -%}
+    {{'%02d' % (t.hour)}}:{{'%02d' % (t.minute)}}
+  {%- endmacro %}
+
   {% macro print_reservation(reservation) -%}
   <div>
     <ul>
       <li>Table: {{reservation.table_id}}</li>
       <li>Number of people: {{reservation.people_number}}</li>
-      <li>Time: {{'%02d' % (reservation.booking_datetime.hour)}}:{{'%02d' % (reservation.booking_datetime.minute)}}</li>
+      <li>Time: {{ print_time(reservation.booking_datetime) }}</li>
     </ul>
   </div>
+  {%- endmacro %}
+
+  {% macro range_select(name, k) -%}
+  <select name="{{name}}">
+    {% for i in range(k): %}
+      <option value="{{i}}">{{'%02d' % (i)}}</option>
+    {% endfor %}
+  </select>
   {%- endmacro %}
 
   {% if lunch != []: %}
@@ -33,6 +45,24 @@
     {{ print_reservation(reservation) }}
   {% endfor %}
   {% endif %}
+
+  {% if slot_reservations is not none: %}
+    <h3>Reservations between {{print_time(slot_begin)}} and {{print_time(slot_end)}}</h3>
+    {% for reservation in slot_reservations: %}
+      {{ print_reservation(reservation) }}
+    {% endfor %}
+
+    No. people total: {{ slot_people }}
+  {% endif %}
+
+  <form action="{{base_url}}/restaurants/{{restaurant.id}}/overview/{{current.year}}/{{current.month}}/{{current.day}}">
+    Select a slot:
+    {{ range_select("from_h", 23) }}
+    {{ range_select("from_m", 59) }} - 
+    {{ range_select("to_h", 23) }}
+    {{ range_select("to_m", 59) }}
+    <input type="submit">
+  </form>
 
   <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/restaurants/{{restaurant.id}}">Back to Restaurant</a>
 {% endblock %}

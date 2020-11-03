@@ -189,12 +189,26 @@ def _edit_restaurant(restaurant_id):
 @restaurants.route('/restaurants/<int:restaurant_id>/overview')
 @operator_required
 def restaurant_reservations_overview_today(restaurant_id):
+    """ Alias for today's reservations overview """
+
     today = datetime.today()
     return restaurant_reservations_overview(restaurant_id,today.year,today.month,today.day)
 
 @restaurants.route('/restaurants/<int:restaurant_id>/overview/<int:year>/<int:month>/<int:day>')
 @operator_required
 def restaurant_reservations_overview(restaurant_id, year, month, day):
+    """ Renders an overview of a day's reservations
+    
+    If GET parameters from_h, from_m, to_h, to_m are provided, also renders the
+    list of reservations in the particular time range.
+
+    Error status codes:
+        400 -- The requested time range is invalid
+        401 -- The request has been sent by an unauthenticated user, or the user
+                is not the owner of the restaurant
+        404 -- The restaurant or the requested day do not exist
+    """
+
     try:
         date_start = datetime(year, month, day)
         prev_day = date_start - timedelta(days=1)
@@ -237,6 +251,38 @@ def restaurant_reservations_overview(restaurant_id, year, month, day):
             if reserv.booking_datetime >= slot_begin and reserv.booking_datetime < slot_end:
                 dinner_reservations.append(reserv)
 
+    slot_begin = None
+    slot_end = None
+    slot_reservations = None
+    people_total = None
+
+    if request.args.get('from_h') is not None and \
+        request.args.get('from_m') is not None and \
+        request.args.get('to_h') is not None and \
+        request.args.get('to_m') is not None:
+        try:
+            from_h = int(request.args.get('from_h'))
+            from_m = int(request.args.get('from_m'))
+            to_h = int(request.args.get('to_h'))
+            to_m = int(request.args.get('to_m'))
+
+            slot_begin = datetime(year, month, day, from_h, from_m)
+            slot_end = datetime(year, month, day, to_h, to_m)
+        except:
+            return make_response(render_template('error.html', error='Invalid slot range'), 400)
+
+        if slot_end < slot_begin:
+            return make_response(render_template('error.html', error='Slot start must be before slot end'), 400)
+        
+        slot_reservations = db.session.query(Booking).\
+            filter(Booking.rest_id == restaurant_id).\
+            filter(Booking.booking_datetime >= slot_begin).\
+            filter(Booking.booking_datetime < slot_end).\
+            all()
+
+        people_total = 0
+        for reserv in slot_reservations:
+            people_total = people_total + reserv.people_number
 
     return render_template('overview.html',
         restaurant = db.session.query(Restaurant).filter(Restaurant.id == restaurant_id).first(),
@@ -245,7 +291,11 @@ def restaurant_reservations_overview(restaurant_id, year, month, day):
         current = date_start,
         prev = prev_day,
         next = date_end,
-        today = datetime.today())
+        today = datetime.today(),
+        slot_begin = slot_begin,
+        slot_end = slot_end,
+        slot_reservations = slot_reservations,
+        slot_people = people_total)
 
 @restaurants.route('/tables/add', methods=['GET', 'POST'])
 @operator_required
