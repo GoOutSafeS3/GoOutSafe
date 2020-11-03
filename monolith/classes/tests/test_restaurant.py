@@ -248,6 +248,18 @@ class TestRestaurant(unittest.TestCase):
         self.assertIn("Lunch", reply_data)
         self.assertIn("Dinner", reply_data)
 
+        today = datetime.datetime.today()
+        reply = client.t_get(f"/restaurants/1/overview/{today.year}/{today.month}/{today.day}")
+        reply_data = reply.get_data(as_text = True)
+        self.assertIn("Lunch", reply_data)
+        self.assertNotIn("Dinner", reply_data)
+
+        today = datetime.datetime.today()
+        reply = client.t_get(f"/restaurants/1/overview/2020/10/3")
+        reply_data = reply.get_data(as_text = True)
+        self.assertNotIn("Lunch", reply_data)
+        self.assertIn("Dinner", reply_data)
+
     def test_overview_wrong_operator(self):
         client = self.app.test_client()
         client.set_app(self.app)
