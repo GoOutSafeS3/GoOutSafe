@@ -551,5 +551,41 @@ class TestReservation(unittest.TestCase):
         self.assertIn("The entrance of this reservation has already been registered",reply.get_data(as_text=True),msg=reply.get_data(as_text=True))
         do_logout(client)
 
+    def test_book_one_period_rest(self):
+        with self.app.test_client() as client:
+            client.set_app(self.app)
+            form = {
+                "email": "customer@example.com",
+                "password":"customer"
+            }
+            reply = client.t_post('/login', data=form)
+            self.assertEqual(reply.status_code, 302)
+            form = {
+                "number_of_people": "2",
+                "booking_date": "05/10/2021",
+                "booking_hr": "12",
+                "booking_min": "0"
+            }
+            reply = client.t_post("/restaurants/3/book", data=form)
+            self.assertEqual(reply.status_code, 302)
+
+    def test_bad_book_one_period_rest(self):
+        with self.app.test_client() as client:
+            client.set_app(self.app)
+            form = {
+                "email": "customer@example.com",
+                "password":"customer"
+            }
+            reply = client.t_post('/login', data=form)
+            self.assertEqual(reply.status_code, 302)
+            form = {
+                "number_of_people": "2",
+                "booking_date": "05/10/2021",
+                "booking_hr": "9",
+                "booking_min": "0"
+            }
+            reply = client.t_post("/restaurants/3/book", data=form)
+            self.assertEqual(reply.status_code, 400)
+
 if __name__ == '__main__':
     unittest.main()

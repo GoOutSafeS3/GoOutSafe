@@ -314,6 +314,15 @@ def fake_data():
         db.session.add(booking_9)
         db.session.commit()
 
+        booking_10 = Booking()
+        booking_10.rest_id = 1
+        booking_10.user_id = example_cust.id
+        booking_10.booking_datetime = datetime.datetime(2020,10,3,21,00,0,0)
+        booking_10.people_number = 5
+        booking_10.table_id = 1
+        db.session.add(booking_10)
+        db.session.commit()
+
     user_to_add = User()
     user_to_add.firstname = 'Gianni'
     user_to_add.lastname = 'Verdi'

@@ -248,6 +248,18 @@ class TestRestaurant(unittest.TestCase):
         self.assertIn("Lunch", reply_data)
         self.assertIn("Dinner", reply_data)
 
+        today = datetime.datetime.today()
+        reply = client.t_get(f"/restaurants/1/overview/{today.year}/{today.month}/{today.day}")
+        reply_data = reply.get_data(as_text = True)
+        self.assertIn("Lunch", reply_data)
+        self.assertNotIn("Dinner", reply_data)
+
+        today = datetime.datetime.today()
+        reply = client.t_get(f"/restaurants/1/overview/2020/10/3")
+        reply_data = reply.get_data(as_text = True)
+        self.assertNotIn("Lunch", reply_data)
+        self.assertIn("Dinner", reply_data)
+
     def test_overview_wrong_operator(self):
         client = self.app.test_client()
         client.set_app(self.app)
@@ -258,3 +270,55 @@ class TestRestaurant(unittest.TestCase):
         
         reply = client.t_get("/restaurants/1/overview/2020/10/10")
         self.assertEqual(reply.status_code, 401)
+
+    def test_overview_invalid_range(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "operator@example.com","operator")
+
+        data={
+            "from_h":"foo",
+            "from_m":"foo",
+            "to_h":"foo",
+            "to_m":"foo"
+        }
+        
+        reply = client.t_get("/restaurants/1/overview/2020/10/5", query_string=data)
+        self.assertEqual(reply.status_code, 400)
+
+        data={
+            "from_h":"11",
+            "from_m":"00",
+            "to_h":"10",
+            "to_m":"00"
+        }
+        
+        reply = client.t_get("/restaurants/1/overview/2020/10/5", query_string=data)
+        self.assertEqual(reply.status_code, 400)
+
+        data={
+            "from_h":"27",
+            "from_m":"00",
+            "to_h":"28",
+            "to_m":"00"
+        }
+        
+        reply = client.t_get("/restaurants/1/overview/2020/10/5", query_string=data)
+        self.assertEqual(reply.status_code, 400)
+
+    def test_overview_range(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "operator@example.com","operator")
+
+        data={
+            "from_h":"20",
+            "from_m":"00",
+            "to_h":"22",
+            "to_m":"00"
+        }
+        
+        reply = client.t_get("/restaurants/1/overview/2020/10/5", query_string=data)
+        reply_data = reply.get_data(as_text=True)
+
+        self.assertIn("No. people total: 5", reply_data)
