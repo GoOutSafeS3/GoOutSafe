@@ -9,7 +9,7 @@
                         {% if notification.operator_notification_type == 1 %}
                         <div class="alert alert-danger" role="alert">
                             <strong>
-                                A customer that has been in your restaurant in the last 14 days is positive. <a href="/{{ notification.notification_id }}/mark_as_read" class="alert-link">Mark as read</a>
+                                A customer that has been in your restaurant in the last 14 days is positive. <a href="/notifications/{{ notification.notification_id }}/mark_as_read" class="alert-link">Mark as read</a>
                             </strong>
                         </div>
                          {% else %}
@@ -24,7 +24,7 @@
                                         Was marked Covid-19 positive. Please delete the reservation in date:
                                         <li> Datetime: {{ notification.user_booking_date }}</li>
                                       </ul>
-                                     <a href="/{{ notification.notification_id }}/mark_as_read" class="alert-link">Mark as read</a>
+                                     <a href="/notifications/{{ notification.notification_id }}/mark_as_read" class="alert-link">Mark as read</a>
                                 </strong>
                             </div>
                          {% endif %}
@@ -36,7 +36,7 @@
                 {% for notification in notifications %}
                     {% if notification.already_read == False %}
                     <div class="alert alert-danger" role="alert">
-                        You have had contact with a Covid-19 positive in the last 14 days. <a href="/{{ notification.notification_id }}/mark_as_read" class="alert-link">Mark as read</a>
+                        You have had contact with a Covid-19 positive in the last 14 days. <a href="/notifications/{{ notification.notification_id }}/mark_as_read" class="alert-link">Mark as read</a>
                     </div>
                     {% endif %}
                 {% endfor %}

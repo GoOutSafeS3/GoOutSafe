@@ -17,6 +17,7 @@ def positives():
     qry = db.session.query(User).filter_by(is_positive = True).all()
     return render_template("positives.html", positives = qry, title="Positives")
 
+
 @contact_tracing.route('/positives/contacts', methods=['GET','POST'])
 @health_authority_required
 def _contacts():
@@ -56,11 +57,12 @@ def _contacts():
                 qry = qry[0]
 
             if qry.is_positive:
-                return redirect(f"/positives/{qry.id}/contacts")
+                return redirect("/positives/{qry.id}/contacts")
             else:
                 flash("The user is not positive","error")
                 
     return render_template('form.html', form=form, title="Find Contacts")
+
 
 @contact_tracing.route('/positives/mark', methods=['GET','POST'])
 @health_authority_required
@@ -117,6 +119,7 @@ def _mark_as_positive():
                 return render_template('mark_positives.html', form=form, title="Mark a User")
         
     return render_template('mark_positives.html', form=form, title="Mark a User")
+
 
 @contact_tracing.route('/positives/unmark', methods=['GET','POST'])
 @health_authority_required
@@ -195,10 +198,12 @@ def _mark_as_positive_by_id(pos_id):
         operators_to_be_notified = get_operators_contacts(qry.id, date_start, today)
         for operator in operators_to_be_notified:
             add_notification(qry.id, operator.id)
+        add_bookings_notifications(qry.id)
         return redirect("/positives")
     else: # remove if coverage <90%
         flash("User not found","error")
         return make_response(render_template('error.html', error='404'), 404)
+
 
 @contact_tracing.route('/positives/<int:pos_id>/unmark', methods=['GET'])
 @health_authority_required
@@ -225,6 +230,7 @@ def _unmark_as_positive_by_id(pos_id):
     else: # remove if coverage <90%
         flash("User not found","error")
         return make_response(render_template('error.html', error='404'), 404)
+
 
 @contact_tracing.route('/positives/<int:user_id>/contacts')
 @health_authority_required

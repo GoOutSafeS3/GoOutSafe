@@ -63,7 +63,7 @@ class TestRestaurant(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        reply = client.t_get("/1/mark_as_read")
+        reply = client.t_get("/notifications/1/mark_as_read")
         self.assertEqual(reply.status_code, 401)
 
     def test_mark_as_read_invalid_id(self):
@@ -72,7 +72,7 @@ class TestRestaurant(unittest.TestCase):
 
         do_login(client, "alice@example.com", "alice")
 
-        reply = client.t_get("/9999/mark_as_read")
+        reply = client.t_get("/notifications/9999/mark_as_read")
         self.assertEqual(reply.status_code, 404)
 
     def test_mark_as_read(self):
@@ -92,6 +92,6 @@ class TestRestaurant(unittest.TestCase):
         do_logout(client)
 
         do_login(client, "alice@example.com", "alice")
-        reply = client.t_get("/1/mark_as_read")
+        reply = client.t_get("/notifications/1/mark_as_read")
         self.assertEqual(reply.status_code, 200)
 

@@ -15,7 +15,7 @@ def list_notifications():
     return render_template("notifications.html", notifications=notifications, title="Notifications")
 
 
-@notifications_page.route('/<int:notification_id>/mark_as_read', methods=['GET','POST'])
+@notifications_page.route('/notifications/<int:notification_id>/mark_as_read', methods=['GET','POST'])
 @login_required
 def mark_as_read(notification_id):
     if current_user is not None and hasattr(current_user, 'id'):
