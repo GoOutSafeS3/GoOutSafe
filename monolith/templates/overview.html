@@ -57,10 +57,10 @@
 
   <form action="{{base_url}}/restaurants/{{restaurant.id}}/overview/{{current.year}}/{{current.month}}/{{current.day}}">
     Select a slot:
-    {{ range_select("from_h", 23) }}
-    {{ range_select("from_m", 59) }} - 
-    {{ range_select("to_h", 23) }}
-    {{ range_select("to_m", 59) }}
+    {{ range_select("from_h", 24) }}
+    {{ range_select("from_m", 60) }} - 
+    {{ range_select("to_h", 24) }}
+    {{ range_select("to_m", 60) }}
     <input type="submit">
   </form>
 
