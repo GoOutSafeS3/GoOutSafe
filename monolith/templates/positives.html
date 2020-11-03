@@ -17,7 +17,7 @@
           {% if positive.is_positive %}
             <li>Positive since: {{positive.positive_datetime.strftime("%d %b %Y, %H:%M")}}</li>
             <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/positives/{{positive.id}}/unmark"> Unmark </a>
-            <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/users/{{positive.id}}/contacts"> View contacts </a>
+            <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/positives/{{positive.id}}/contacts"> View contacts </a>
           {% else %}
             <li>Negative</li>
             <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/positives/{{positive.id}}/mark"> Mark </a>
