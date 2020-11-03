@@ -1,13 +1,11 @@
+from datetime import timedelta, datetime
 from flask import Blueprint, redirect, render_template, request, flash, make_response
 from flask_login import login_required, logout_user, current_user, login_user
-from sqlalchemy.orm import aliased
-import sys
-
-from monolith.auth import admin_required, is_admin, operator_required, health_authority_required
-from monolith.forms import UserForm, OperatorForm, LoginForm, EditUserForm
-from monolith.database import User, db, Restaurant, Booking
 from monolith.utilities.contact_tracing import get_user_contacts
-from datetime import timedelta, datetime
+from werkzeug.security import check_password_hash
+from monolith.auth import is_admin, health_authority_required
+from monolith.database import User, db, Restaurant, Booking
+from monolith.forms import UserForm, OperatorForm, LoginForm, EditUserForm
 
 users = Blueprint('users', __name__)
 
@@ -208,60 +206,76 @@ def create_operator():
     return render_template('form.html', form=form, title="Sign in!")
 
 
-@users.route('/edit', methods=['GET', 'POST'])
+@users.route('/edit_user', methods=['GET', 'POST'])
 @login_required
-def edit_user():
+def edit():
 
     if current_user.is_admin or current_user.is_health_authority:
         return make_response(render_template('error.html', error='401'),401)
 
-    user = db.session.query(User).filter_by(id = current_user.id).first()
-
-    if user is None: #remove if coverage <90%
-        return make_response(render_template('error.html', error='404'), 404)
-
-    user.telephone = user.phone
-    form = UserForm(obj=user)
+    user = User.query.filter_by(id = current_user.id).first()
+    form = EditUserForm()
 
     if request.method == 'POST':
+        new_password = form.new_password.data
+        password_repeat = form.password_repeat.data
+        firstname = form.firstname.data
+        lastname = form.lastname.data
+        telephone = form.telephone.data
+        dateofbirth = form.dateofbirth.data
+        ssn = form.ssn.data
+        password = form.old_password.data
 
-        if form.validate_on_submit():
-            password = request.form['password']
-            password_repeat = request.form['password_repeat']
-            if password != password_repeat:
+        if password == '':
+            flash('Insert password to modify the account','error')
+            return make_response(render_template('edit_profile.html', form=form, user=user, title="Modify your profile!"), 400)
+
+        checked = check_password_hash(current_user.password, password)
+        if checked:
+            if new_password != password_repeat:
                 flash('Passwords do not match', 'warning')
-                return make_response(render_template('form.html', form=form, title="Modify your profile!"),200)
+                return make_response(render_template('edit_profile.html', form=form, user=user, title="Modify your profile!"), 400)
 
-            userGetMail = User.query.filter(User.id != current_user.id).filter_by(email=form.email.data).first()
-            userGetPhone = User.query.filter(User.id != current_user.id).filter_by(phone=form.telephone.data).first()
+            userGetPhone = User.query.filter(User.id != current_user.id).filter_by(phone=telephone).first()
             userGetSSN = None
 
-            if form.ssn.data is not None and form.ssn.data != "":
+            if ssn is not None and ssn != "":
                 userGetSSN = User.query.filter(User.id != current_user.id).filter_by(ssn=form.ssn.data).first()
             else:
                 form.ssn.data = None
 
-            if userGetMail is None and userGetPhone is None and userGetSSN is None:
-                user.firstname = form.firstname.data
-                user.lastname = form.lastname.data
-                user.email = form.email.data
-                user.set_password(form.password.data)
-                user.phone = form.telephone.data
-                user.dateofbirth = form.dateofbirth.data
-                user.ssn = form.ssn.data
-                try:
-                    user.set_password(form.password.data)  # pw should be hashed with some salt
-                    db.session.add(user)
-                    db.session.commit()
-                except: # Remove if coverage < 90%
-                    flash('An error occured, please try again','error')
-                    return make_response(render_template('form.html', form=form, title="Modify your profile!"),500)
+            if userGetPhone is None and userGetSSN is None:
+
+                if new_password != "" and password_repeat == new_password:
+                    current_user.set_password(new_password)
+                if firstname != "":
+                    current_user.firstname = firstname
+                if lastname != "":
+                    current_user.lastname = lastname
+                if telephone != "":
+                    current_user.phone = telephone
+                if dateofbirth is not None and dateofbirth != "":
+                    today = datetime.today()
+                    b_date = request.form["dateofbirth"]
+                    day, month, year = (int(x) for x in b_date.split('/'))
+                    birth_date = today.replace(year=year, month=month, day=day)
+                    if birth_date > today:
+                        flash('Date Of Birth error', 'error')
+                        return make_response(render_template('edit_profile.html', user=user, form=form, title="Modify your profile!"),400)
+                    current_user.dateofbirth = dateofbirth
+                if ssn != "":
+                    current_user.ssn = ssn
+                db.session.commit()
+
+                flash('Profile modified', 'success')
+                return redirect("/")
+
             else:
                 flash('A user already exists with this data', 'error')
-                return make_response(render_template('form.html', form=form, title="Modify your profile!"),400)
+                return make_response(render_template('edit_profile.html', user=user, form=form, title="Modify your profile!"), 400)
 
-            flash('The data has been changed!', 'success')
-            return redirect("/")
+        else:
+            flash('Uncorrect password', 'error')
+            return make_response(render_template('edit_profile.html', form=form, user=user, title="Modify your profile!"), 400)
 
-    return render_template('form.html', form=form, title="Modify your profile!")
-
+    return render_template('edit_profile.html', form=form, user=user, title="Modify your profile!")

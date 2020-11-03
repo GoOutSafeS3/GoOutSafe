@@ -1,10 +1,10 @@
 import unittest
-from flask import request, jsonify
 from monolith.app import create_app
 from flask_test_with_csrf import FlaskClient
 from monolith.classes.tests.utils import do_login, do_logout
 
-class TestRegistration(unittest.TestCase):
+
+class TestEdit(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.app = create_app("TEST")
@@ -17,230 +17,123 @@ class TestRegistration(unittest.TestCase):
         tested_app.set_app(self.app)
         return tested_app
 
-    def test_edit_without_login(self):
+    def test_error401(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        reply = client.t_get('/edit')
+        reply = client.t_get('/edit_user')
+        self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))
+        do_login(client, "example@example.com", "admin")
+        reply = client.t_get('/edit_user')
+        self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))
+        do_logout(client)
+        do_login(client, "health@authority.com", "health")
+        reply = client.t_get('/edit_user')
         self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))
 
-    def test_edit_log_as_admin(self):
+    def test_get_customer200(self):
         client = self.app.test_client()
-        client.set_app(self.app)       
-        do_login(client, "example@example.com","admin")
+        client.set_app(self.app)
+        do_login(client, "customer@example.com", "customer")
+        reply = client.t_get('/edit_user')
+        self.assertEqual(reply.status_code, 200)
 
-        reply = client.t_get('/edit')
-        self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))
-
-    def test_edit_log_as_health_authority(self):
+    def test_get_operator200(self):
         client = self.app.test_client()
-        client.set_app(self.app)        
-        do_login(client, "health@authority.com","health")
-        
-        reply = client.t_get('/edit')
-        self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))
+        client.set_app(self.app)
+        do_login(client, "operator@example.com", "operator")
+        reply = client.t_get('/edit_user')
+        self.assertEqual(reply.status_code, 200)
 
-    def test_get_edit(self):
+    def test_password400(self):
         client = self.app.test_client()
-        client.set_app(self.app)         
-        do_login(client, "operator@example.com","operator")
-
-        reply = client.t_get('/edit')
-        self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
-        
-        do_logout(client)
-
-        do_login(client, "customer@example.com","customer")
-
-        reply = client.t_get('/edit')
-        self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
-        
-        do_logout(client)
-
-    def test_get_edit_no_change_form(self):
-        client = self.app.test_client()
-        client.set_app(self.app)         
-        do_login(client, "operator@example.com","operator")
-
-        form =  {
-            "email":"operator@example.com",
-            "firstname":"Operator",
-            "lastname":"Operator",
-            "dateofbirth":"05/10/2020",
-            "telephone":"5551234563",
-            "ssn":"",
-            "password":"operator",
-            "password_repeat":"operator"
+        client.set_app(self.app)
+        do_login(client, "customer@example.com", "customer")
+        reply = client.t_get('/edit_user')
+        self.assertEqual(reply.status_code, 200)
+        form = {
+            "firstname": "Anna",
+            "old_password": "errata"
         }
-
-        reply = client.t_post('/edit',data=form)
-        self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
-        
-        do_logout(client)
-
-
-    def test_get_edit_bad_form(self):
-        client = self.app.test_client()
-        client.set_app(self.app)         
-        do_login(client, "operator@example.com","operator")
-
-        form =  {
-            "email":"",
-            "firstname":"Operator",
-            "lastname":"Operator",
-            "dateofbirth":"05/10/2020",
-            "telephone":"123",
-            "ssn":"",
-            "password":"operator",
-            "password_repeat":"operator"
-        }
-
-        reply = client.t_post('/edit',data=form)
-        self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
-        self.assertIn("This field is required.", reply.get_data(as_text=True), msg=reply.get_data(as_text=True))
-
-    def test_get_edit_wrong_passw_form(self):
-        client = self.app.test_client()
-        client.set_app(self.app)         
-        do_login(client, "operator@example.com","operator")
-
-        form =  {
-            "email":"operator@example.com",
-            "firstname":"Operator",
-            "lastname":"Operator",
-            "dateofbirth":"05/10/2020",
-            "telephone":"123",
-            "ssn":"",
-            "password":"the_operator",
-            "password_repeat":"_operator"
-        }
-
-        reply = client.t_post('/edit',data=form)
-        self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
-        self.assertIn("Passwords do not match", reply.get_data(as_text=True), msg=reply.get_data(as_text=True))
-        
-        do_logout(client)
-
-    def test_get_existing_mail_form(self):
-        client = self.app.test_client()
-        client.set_app(self.app)         
-        do_login(client, "operator@example.com","operator")
-
-        form =  {
-            "email":"example@example.com",
-            "firstname":"Operator",
-            "lastname":"Operator",
-            "dateofbirth":"05/10/2020",
-            "telephone":"123",
-            "ssn":"",
-            "password":"operator",
-            "password_repeat":"operator"
-        }
-
-        reply = client.t_post('/edit',data=form)
+        reply = client.t_post('/edit_user', data=form)
         self.assertEqual(reply.status_code, 400, msg=reply.get_data(as_text=True))
-        
-        do_logout(client)
 
-    def test_get_existing_telephone_form(self):
+    def test_dateerror400(self):
         client = self.app.test_client()
-        client.set_app(self.app)         
-        do_login(client, "operator@example.com","operator")
-
-        form =  {
-            "email":"exampleee@example.com",
-            "firstname":"Operator",
-            "lastname":"Operator",
-            "dateofbirth":"05/10/2020",
-            "telephone":"1234567890",
-            "ssn":"",
-            "password":"operator",
-            "password_repeat":"operator"
+        client.set_app(self.app)
+        do_login(client, "customer@example.com", "customer")
+        reply = client.t_get('/edit_user')
+        self.assertEqual(reply.status_code, 200)
+        form = {
+            "dateofbirth":"11/11/2030",
+            "old_password": "customer"
         }
-
-        reply = client.t_post('/edit',data=form)
+        reply = client.t_post('/edit_user', data=form)
         self.assertEqual(reply.status_code, 400, msg=reply.get_data(as_text=True))
-        
-        do_logout(client)
 
-    def test_get_existing_ssn_form(self):
+    def test_telephone_exist400(self):
         client = self.app.test_client()
-        client.set_app(self.app)         
-        do_login(client, "operator@example.com","operator")
-
-        form =  {
-            "email":"exampleee@example.com",
-            "firstname":"Operator",
-            "lastname":"Operator",
-            "dateofbirth":"05/10/2020",
-            "telephone":"12345678900000",
-            "ssn":"1234567890",
-            "password":"operator",
-            "password_repeat":"operator"
+        client.set_app(self.app)
+        do_login(client, "customer@example.com", "customer")
+        reply = client.t_get('/edit_user')
+        self.assertEqual(reply.status_code, 200)
+        form = {
+            "telephone": "2354673561",
+            "old_password": "customer"
         }
-
-        reply = client.t_post('/edit',data=form)
+        reply = client.t_post('/edit_user', data=form)
         self.assertEqual(reply.status_code, 400, msg=reply.get_data(as_text=True))
-        
-        do_logout(client)
 
-
-    def test_get_edit_change_all_form_operator(self):
-        client = self.setup_app()     
-        do_login(client, "operator@example.com","operator")
-
-        form =  {
-            "email":"the_operator@example.com",
-            "firstname":"Agent",
-            "lastname":"Agent",
-            "dateofbirth":"10/05/2002",
-            "telephone":"555123456342",
-            "ssn":"567",
-            "password":"the_operator",
-            "password_repeat":"the_operator"
+    def test_password_repeat400(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "customer@example.com", "customer")
+        reply = client.t_get('/edit_user')
+        self.assertEqual(reply.status_code, 200)
+        form = {
+            "new_password":"ciao",
+            "password_repeat":"ciao421",
+            "old_password": "customer"
         }
+        reply = client.t_post('/edit_user', data=form)
+        self.assertEqual(reply.status_code, 400, msg=reply.get_data(as_text=True))
 
-        reply = client.t_post('/edit',data=form)
-        self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
-        
-        do_logout(client)
-
-        reply = do_login(client, "operator@example.com","operator")
-        self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))
-        reply = do_login(client, "the_operator@example.com","the_operator")
-        reply_data = reply.get_data(as_text=True)
-        self.assertEqual(reply.status_code, 302, msg=reply_data)
-        reply = client.t_get('/')
-        reply_data = reply.get_data(as_text=True)
-        self.assertIn("Agent", reply_data, msg=reply_data)
-
-    def test_get_edit_change_all_form_user(self):
-        client = self.setup_app()       
-        do_login(client, "customer@example.com","customer")
-
-        form =  {
-            "email":"the_customer@example.com",
-            "firstname":"Agent",
-            "lastname":"Agent",
-            "dateofbirth":"10/05/2002",
-            "telephone":"5551234563421",
-            "ssn":"123",
-            "password":"the_customer",
-            "password_repeat":"the_customer"
+    def test_insert_old_password400(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "customer@example.com", "customer")
+        reply = client.t_get('/edit_user')
+        self.assertEqual(reply.status_code, 200)
+        form = {
+            "old_password": ""
         }
+        reply = client.t_post('/edit_user', data=form)
+        self.assertEqual(reply.status_code, 400, msg=reply.get_data(as_text=True))
 
-        reply = client.t_post('/edit',data=form)
+    def test_correct_edit(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "alice@example.com", "alice")
+        reply = client.t_get('/edit_user')
+        self.assertEqual(reply.status_code, 200)
+        form = {
+            "old_password": "alice",
+            "firstname":"Alice Beatrice",
+            "new_password":"pass12",
+            "password_repeat":"pass12"
+        }
+        reply = client.t_post('/edit_user', data=form)
         self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
-        
-        do_logout(client)
 
-        reply = do_login(client, "customer@example.com","customer")
-        self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))
-        reply = do_login(client, "the_customer@example.com","the_customer")
-        reply_data = reply.get_data(as_text=True)
-        self.assertEqual(reply.status_code, 302, msg=reply_data)
-        reply = client.t_get('/')
-        reply_data = reply.get_data(as_text=True)
-        self.assertIn("Agent", reply_data, msg=reply_data)
+    def test_existing_ssn400(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "operator@example.com", "operator")
+        form = {
+            "firstname": "Operator",
+            "lastname": "Operator",
+            "ssn": "1234567890",
+            "password": "operator",
+        }
+        reply = client.t_post('/edit_user', data=form)
+        self.assertEqual(reply.status_code, 400, msg=reply.get_data(as_text=True))
 
-if __name__ == '__main__':
-    unittest.main()
