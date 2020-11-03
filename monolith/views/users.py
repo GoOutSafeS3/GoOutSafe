@@ -15,28 +15,6 @@ def _users():
         users = db.session.query(User)
         return render_template("users.html", users=users)
 
-@users.route('/users/<int:user_id>/contacts')
-@health_authority_required
-def user_contacts(user_id):
-    qry = db.session.query(User)\
-        .filter_by(id = user_id)\
-        .filter_by(is_admin = False)\
-        .filter_by(is_health_authority=False)\
-        .filter_by(rest_id = None)\
-        .first()
-
-    if qry is None:
-        flash("User not found","error")
-        return make_response(render_template('error.html', error='404'), 404)
-
-    if not qry.is_positive:
-        flash("The user is not positive","warning")
-        return make_response(render_template('error.html', error='404'), 404)
-        
-    return render_template("users.html",
-        users=get_user_contacts(user_id, datetime.today() - timedelta(days=14), datetime.today()))
-
-
 @users.route('/reservations', methods=['GET', 'POST'])
 @login_required
 def user_bookings():

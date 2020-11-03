@@ -325,12 +325,12 @@ class TestLogin(unittest.TestCase):
         client.set_app(self.app)
 
         do_login(client, "customer@example.com", "customer")
-        reply = client.t_get(f"/users/7/contacts")
+        reply = client.t_get(f"/positives/7/contacts")
         self.assertEqual(reply.status_code, 401)
         do_logout(client)
 
         do_login(client, "health@authority.com", "health")
-        reply = client.t_get(f"/users/7/contacts")
+        reply = client.t_get(f"/positives/7/contacts")
         self.assertEqual(reply.status_code, 200)
         do_logout(client)
 
@@ -413,7 +413,7 @@ class TestLogin(unittest.TestCase):
 
         do_login(client, "health@authority.com", "health")
 
-        reply = client.t_get("/users/3/contacts")
+        reply = client.t_get("/positives/3/contacts")
         self.assertEqual(reply.status_code,404,msg=reply.get_data(as_text=True))   
         do_logout(client)
 
@@ -424,6 +424,6 @@ class TestLogin(unittest.TestCase):
 
         do_login(client, "health@authority.com", "health")
 
-        reply = client.t_get("/users/99999/contacts")
+        reply = client.t_get("/positives/99999/contacts")
         self.assertEqual(reply.status_code,404,msg=reply.get_data(as_text=True))   
         do_logout(client)
