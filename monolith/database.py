@@ -143,9 +143,13 @@ class Like(db.Model):
 class Notification(db.Model):
     __tablename__ = 'notification'
 
-    notification_id = db.Column(db.Integer, autoincrement=True)
-    user_positive_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key = True)
-    user_notified_id= db.Column(db.Integer, db.ForeignKey('user.id'), primary_key = True)
+    notification_id = db.Column(db.Integer, autoincrement=True, primary_key = True)
+    user_positive_id = db.Column(db.Integer, db.ForeignKey('user.id') )
+    user_positive_email = db.Column(db.String)
+    user_positive_name = db.Column(db.String)
+    user_booking_date = db.Column(db.DateTime, default = None)
+    user_notified_id= db.Column(db.Integer, db.ForeignKey('user.id'))
     already_read = db.Column(db.Boolean, default=False)
     datetime = db.Column(db.DateTime, default = None)
+    operator_notification_type = db.Column(db.Integer, default=0)
 

@@ -1,7 +1,6 @@
 import os
 from flask import Flask
 from flask_googlemaps import GoogleMaps, Map
-
 from monolith.database import db, User, Restaurant, Booking, Table, Like
 from monolith.views import blueprints
 from monolith.auth import login_manager
@@ -357,6 +356,15 @@ def fake_data():
     db.session.add(booking_11)
     db.session.commit()
 
+    booking_12 = Booking()
+    booking_12.rest_id = 1
+    booking_12.user_id = user_to_add.id
+    booking_12.booking_datetime = datetime.datetime.now() + datetime.timedelta(days=3)
+    booking_12.people_number = 3
+    booking_12.table_id = 5
+    db.session.add(booking_12)
+    db.session.commit()
+
     example_old_positive = User()
     example_old_positive.firstname = 'Old'
     example_old_positive.lastname = 'Positive'
@@ -464,8 +472,7 @@ def create_app(configuration):
 def create_worker_app():
     configuration = os.getenv("CONFIG", "TEST")
     config = get_config(configuration)
-    app = Flask(__name__
-    )
+    app = Flask(__name__)
     app.config['WTF_CSRF_SECRET_KEY'] = config["wtf_csrf_secret_key"]
     app.config['SECRET_KEY'] = config["secret_key"]
     app.config['SQLALCHEMY_DATABASE_URI'] = config["sqlalchemy_database_uri"]

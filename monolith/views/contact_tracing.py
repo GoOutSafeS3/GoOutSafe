@@ -6,7 +6,7 @@ from monolith.database import User, db, Restaurant, Notification
 from monolith.utilities.contact_tracing import mark_as_positive, unmark_as_positive, get_user_contacts, get_operators_contacts
 import datetime
 from datetime import timedelta, datetime
-from monolith.utilities.notification import add_notification
+from monolith.utilities.notification import add_notification, add_bookings_notifications
 
 contact_tracing = Blueprint('contact_tracing', __name__)
 
@@ -110,9 +110,10 @@ def _mark_as_positive():
                 users_to_be_notified = get_user_contacts(qry.id, date_start, today)
                 operators_to_be_notified = get_operators_contacts(qry.id, date_start, today)
                 for user in users_to_be_notified:
-                    add_notification(qry.id, user.id)
+                    add_notification(qry.id, user.id, None)
                 for operator in operators_to_be_notified:
-                    add_notification(qry.id, operator.id)
+                    add_notification(qry.id, operator.id, 1)
+                add_bookings_notifications(qry.id)
                 return redirect("/positives")
             else: # remove if coverage <90%
                 flash("User not found","error")

@@ -1,5 +1,6 @@
-from monolith.database import User, db, Restaurant, Booking
+from monolith.database import User, db, Restaurant, Booking, Notification
 from datetime import datetime, timedelta
+
 
 def mark_as_positive(user_id):
     qry = db.session.query(User).filter_by(id = user_id).first()
@@ -10,6 +11,7 @@ def mark_as_positive(user_id):
         qry.positive_datetime = datetime.now()
         db.session.commit()
         return True
+
 
 def unmark_as_positive(user_id):
     qry = db.session.query(User).filter_by(id = user_id).first()
@@ -55,6 +57,7 @@ def get_user_visited_restaurants(user_id, date_begin, date_end):
         all()
     return restaurants
 
+
 def get_operators_contacts(user_id, date_begin, date_end):
     restaurants = get_user_visited_restaurants(user_id,date_begin,date_end)
     operators_ids = set()
@@ -62,3 +65,5 @@ def get_operators_contacts(user_id, date_begin, date_end):
         operator = User.query.filter_by(rest_id=restaurant.id).first()
         operators_ids.add(operator.id)
     return db.session.query(User).filter(User.id.in_(list(operators_ids))).all()
+
+

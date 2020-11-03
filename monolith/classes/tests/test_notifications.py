@@ -92,6 +92,6 @@ class TestRestaurant(unittest.TestCase):
         do_logout(client)
 
         do_login(client, "alice@example.com", "alice")
-        reply = client.t_get("/10/mark_as_read")
+        reply = client.t_get("/1/mark_as_read")
         self.assertEqual(reply.status_code, 200)
 
