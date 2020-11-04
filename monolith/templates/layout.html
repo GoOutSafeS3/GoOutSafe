@@ -33,29 +33,46 @@
         {% if current_user.is_authenticated %}
 
           {% if current_user.is_health_authority %}
-            <li class="nav-item"> <a class="nav-link" href="/positives">Positives</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="/positives/mark">Mark</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="/positives/unmark">Unmark</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="/positives/contacts">Contact Tracing</a> </li>
+            <li class="nav-item"> <a class="btn btn-dark" href="/positives">Positives</a> </li>
+            <li class="nav-item"> <a class="btn btn-dark" href="/positives/mark">Mark</a> </li>
+            <li class="nav-item"> <a class="btn btn-dark" href="/positives/unmark">Unmark</a> </li>
+            <li class="nav-item"> <a class="btn btn-dark" href="/positives/contacts">Contact Tracing</a> </li>
 
           {% elif current_user.is_admin %}
-            <li class="nav-item"><a class="nav-link" href="/users">Users</a></li>
-            <li class="nav-item"><a class="nav-link" href="/restaurants">Restaurants</a></li>
+            <li class="nav-item"><a class="btn btn-dark" href="/users">Users</a></li>
+            <li class="nav-item"><a class="btn btn-dark" href="/restaurants">Restaurants</a></li>
 
           {% elif current_user.is_operator %}
-              <li class="nav-item"><a class="nav-link" href="/notifications">Notifications</a></li>
-             <li class="nav-item"><a class="nav-link" href="/edit">Settings</a></li>
+              <li class="nav-item"><a class="btn btn-dark" href="/notifications">Notifications</a></li>
+               <div class="dropdown">
+                  <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Settings
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="/edit"> Modify account </a>
+                    <a class="dropdown-item" href="/delete">Delete account</a>
+                  </div>
+              </div>
 
           {% else %}
-              <li class="nav-item"><a class="nav-link" href="/restaurants">Restaurants</a></li>
-              <li class="nav-item"><a class="nav-link" href="/reservations">Reservations</a></li>
-              <li class="nav-item"><a class="nav-link" href="/notifications">Notifications</a></li>
-              <li class="nav-item"><a class="nav-link" href="/edit">Settings</a></li>
+              <li class="nav-item"><a class="btn btn-dark" href="/restaurants">Restaurants</a></li>
+              <li class="nav-item"><a class="btn btn-dark" href="/reservations">Reservations</a></li>
+              <li class="nav-item"><a class="btn btn-dark" href="/notifications">Notifications</a></li>
+              <li class="nav-item"><a class="btn btn-dark" href="/restaurants_map">Map</a></li>
+              <div class="dropdown">
+                  <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Settings
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="/edit"> Modify account </a>
+                    <a class="dropdown-item" href="/delete">Delete account</a>
+                  </div>
+              </div>
           {% endif %}
-            <li><a class="nav-link" href="/logout"> Logout </a></li>
+            <li class="nav-item"><a class="btn btn-dark" href="/logout"> Logout </a></li>
 
       {% else %}
-             <li><a class="nav-link" href="/login"> Login </a></li>
+             <li class="nav-item"><a class="btn btn-dark" href="/login"> Login </a></li>
       {% endif %}
 
         </ul>
