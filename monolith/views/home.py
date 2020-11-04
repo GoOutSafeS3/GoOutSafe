@@ -37,3 +37,13 @@ def permission_denied_page(error):
     :rtype: template
     """
     return make_response(render_template('error.html', error='401'),401)
+
+
+@home.app_errorhandler(500)
+def not_found_page(error):
+    """
+    404 Page error
+    :return: template *error.html*
+    :rtype: template
+    """
+    return make_response(render_template('error.html', error='500'), 500)

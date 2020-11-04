@@ -9,7 +9,7 @@ notifications_page = Blueprint('notifications_page', __name__)
 
 @notifications_page.route('/notifications', methods=['GET'])
 @login_required
-def list_notifications():
+def list_notifications(): # pragma: no cover
     if current_user is not None and hasattr(current_user, 'id'):
         notifications = db.session.query(Notification).filter_by(user_notified_id=current_user.id).all()
     return render_template("notifications.html", notifications=notifications, title="Notifications")
@@ -17,7 +17,7 @@ def list_notifications():
 
 @notifications_page.route('/notifications/<int:notification_id>/mark_as_read', methods=['GET','POST'])
 @login_required
-def mark_as_read(notification_id):
+def mark_as_read(notification_id): # pragma: no cover
     if current_user is not None and hasattr(current_user, 'id'):
         restaurants = db.session.query(Restaurant).filter_by(id=current_user.rest_id)
         notifications = Notification.query.filter_by(user_notified_id=current_user.id).all()

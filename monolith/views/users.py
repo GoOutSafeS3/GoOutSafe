@@ -3,17 +3,19 @@ from flask import Blueprint, redirect, render_template, request, flash, make_res
 from flask_login import login_required, logout_user, current_user, login_user
 from monolith.utilities.contact_tracing import get_user_contacts
 from werkzeug.security import check_password_hash
-from monolith.auth import is_admin, health_authority_required
+from monolith.auth import is_admin, health_authority_required, admin_required
 from monolith.database import User, db, Restaurant, Booking
 from monolith.forms import UserForm, OperatorForm, LoginForm, EditUserForm
 
 users = Blueprint('users', __name__)
 
+
 @users.route('/users')
+@admin_required
 def _users():
-    if is_admin():
-        users = db.session.query(User)
-        return render_template("users.html", users=users)
+    users = db.session.query(User)
+    return render_template("users.html", users=users)
+
 
 @users.route('/reservations', methods=['GET', 'POST'])
 @login_required
@@ -33,6 +35,7 @@ def user_bookings():
         flash("There are no reservations", "warning")
 
     return make_response(render_template('bookings.html', bookings=qry, title="Your Reservations"),200)
+
 
 @users.route('/delete', methods=['GET', 'POST'])
 @login_required

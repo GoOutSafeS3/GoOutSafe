@@ -41,7 +41,7 @@ def recompute_ratings():
                 rest = db.session.query(Restaurant).filter(Restaurant.id == rest_id).first()
                 rest.rating_val = sum/num
                 rest.rating_num = num
-        except:
+        except: # pragma: no cover
             traceback.print_exc()
             logger.info("hello-rollback")
             db.session.rollback()
