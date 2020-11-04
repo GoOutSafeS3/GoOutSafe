@@ -18,10 +18,12 @@ def _book(restaurant_id):
         return make_response(render_template('error.html', error='404'), 404)
 
     if current_user.is_admin or current_user.is_operator or current_user.is_health_authority:
-        return make_response(render_template('error.html', error="Please log as customer to book a table"), 401)
+        flash("Please log as customer to book a table","erro")
+        return make_response(render_template('error.html', error="401"), 401)
 
     if current_user.is_positive:
-        return make_response(render_template('error.html', error="You cannot book as long as you are positive"), 401)
+        flash("You cannot book as long as you are positive","error")
+        return make_response(render_template('error.html', error="401"), 401)
 
     form = BookingForm()
     if request.method == 'POST':

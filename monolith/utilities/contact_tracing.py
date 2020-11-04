@@ -14,6 +14,7 @@ def mark_as_positive(user_id):
             return True
     except:
             db.session.rollback()
+            return False
 
 
 def unmark_as_positive(user_id):
@@ -28,6 +29,7 @@ def unmark_as_positive(user_id):
             return True
     except:
             db.session.rollback()
+            return False
 
 
 def get_user_contacts(user_id, date_begin, date_end):
