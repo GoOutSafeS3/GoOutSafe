@@ -28,16 +28,12 @@ def create_celery(app):
 app = create_worker_app()
 celery = create_celery(app)
 
-#commented scheduled task work
+
 @celery.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
-    #here call only tasks, it does not work with normal functions (at least print does not work)
-    # Calls log every 10 seconds.
+    
     sender.add_periodic_task(float(app.config["UNMARK_AFTER"]), unmark.s(), name=f"Unmark positive users | a controll each {app.config['UNMARK_AFTER']} seconds")
-    #sender.add_periodic_task(15.0, log.s("Logging Stuff 10"), name="reverse every 10")
     sender.add_periodic_task(float(app.config["UNMARK_AFTER"]), check_ratings.s(), name=f"Mark likes and add to respective restaurants | a controll each {app.config['UNMARK_AFTER']} seconds")
-    # Calls log('Logging Stuff') every 30 seconds
-    #sender.add_periodic_task(15.0, test_db.s(), name="Log every 15")
 
     # Executes every monday morning at 4:30 a.m. see https://docs.celeryproject.org/en/stable/userguide/periodic-tasks.html#crontab-schedules
     sender.add_periodic_task(

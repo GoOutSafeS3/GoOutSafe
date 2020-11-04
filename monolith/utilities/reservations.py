@@ -50,8 +50,11 @@ def try_to_book(restaurant_id, number_of_people, booking_datetime):
     if record.is_open(booking_datetime):
         table = get_table(record, number_of_people, booking_datetime)
         if table is not None:
-            book_a_table(record, number_of_people, booking_datetime, table)
-            return True
+            try:
+                book_a_table(record, number_of_people, booking_datetime, table)
+                return True
+            except:
+                db.session.rollback()
     return False
 
 
@@ -62,6 +65,9 @@ def try_to_update(record, number_of_people, booking_datetime):
     if rest.is_open(booking_datetime):
         table = get_table(rest, number_of_people, booking_datetime)
         if table is not None:
-            update_a_reservation(record, number_of_people, booking_datetime, table)
-            return True
+            try:
+                update_a_reservation(record, number_of_people, booking_datetime, table)
+                return True
+            except:
+                db.session.rollback()
     return False
