@@ -3,25 +3,31 @@ from datetime import datetime, timedelta
 
 
 def mark_as_positive(user_id):
-    qry = db.session.query(User).filter_by(id = user_id).first()
-    if qry is None:
-        return False
-    else:
-        qry.is_positive = True
-        qry.positive_datetime = datetime.now()
-        db.session.commit()
-        return True
+    try:
+        qry = db.session.query(User).filter_by(id = user_id).first()
+        if qry is None:
+            return False
+        else:
+            qry.is_positive = True
+            qry.positive_datetime = datetime.now()
+            db.session.commit()
+            return True
+    except:
+            db.session.rollback()
 
 
 def unmark_as_positive(user_id):
-    qry = db.session.query(User).filter_by(id = user_id).first()
-    if qry is None:
-        return False
-    else:
-        qry.is_positive = False
-        qry.positive_datetime = None
-        db.session.commit()
-        return True
+    try:
+        qry = db.session.query(User).filter_by(id = user_id).first()
+        if qry is None:
+            return False
+        else:
+            qry.is_positive = False
+            qry.positive_datetime = None
+            db.session.commit()
+            return True
+    except:
+            db.session.rollback()
 
 
 def get_user_contacts(user_id, date_begin, date_end):
