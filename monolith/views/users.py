@@ -14,6 +14,13 @@ users = Blueprint('users', __name__)
 @users.route('/users')
 @admin_required
 def _users():
+    """ Returns the list of registered users
+
+    You must be logged in as admin
+
+    Error status codes:
+        401 -- If a user other than admin tries to view it
+    """
     users = db.session.query(User)
     return render_template("users.html", users=users)
 
@@ -21,6 +28,13 @@ def _users():
 @users.route('/reservations', methods=['GET', 'POST'])
 @login_required
 def user_bookings():
+    """ Displays the current user's future bookings list.
+
+    You must be logged in as a customer
+
+    Error status codes:
+        404 -- If the current user is not a customer
+    """
     if current_user.is_admin or current_user.is_health_authority or current_user.rest_id is not None:
         return make_response(render_template('error.html', error='404'),404)
 
@@ -41,6 +55,25 @@ def user_bookings():
 @users.route('/delete', methods=['GET', 'POST'])
 @login_required
 def delete_user():
+    """ Delete the current user profile and log out
+    
+    The user must confirm the request by entering email and password.
+
+    The request is approved only if the user is not positive.
+
+    If the user is an operator, the restaurant is also deleted. 
+    In that case, a notification is sent to all users who had active bookings.
+
+    The functionality is not active for the health authority or for the admin.
+
+    Error status codes:
+        400 -- The request is not valid, the form is filled out incorrectly or a generic error has occurred
+        401 -- The current user is not a customer or operator
+
+    Success codes:
+        200 -- The form is sent
+        302 -- The elimination was carried out
+    """
     if current_user.is_admin or current_user.is_health_authority:
         return make_response(render_template('error.html', error='401'),401)
     form = LoginForm()
@@ -62,7 +95,7 @@ def delete_user():
                     db.session.delete(user)
                     if rest is not None:
                         bookings = Booking.query.filter_by(rest_id=rest.id).all()
-                        for b in bookings:
+                        for b in bookings: # send the notifications 
                             if b.booking_datetime >= datetime.today():
                                 add_notification_restaurant_closed(rest, b.user_id, b.booking_datetime)
                                 db.session.delete(b)
@@ -85,6 +118,15 @@ def delete_user():
 
 @users.route('/create_user', methods=['GET', 'POST'])
 def create_user():
+    """ Create a customer account and login
+    
+    Error status codes:
+        400 -- The request is not valid, the form is filled out incorrectly, a user with the same identifiers already exists or a generic error has occurred
+        500 -- A db error
+    Success codes:
+        200 -- The form is sent
+        302 -- The creation was carried out
+    """
     form = UserForm()
     if request.method == 'POST':
 
@@ -124,7 +166,7 @@ def create_user():
                     new_user.set_password(form.password.data)  # pw should be hashed with some salt
                     db.session.add(new_user)
                     db.session.commit()
-                except: # Remove if coverage < 90%
+                except:
                     flash('User not inserted','error')
                     return make_response(render_template('form.html', form=form, title="Sign in!"),500)
             else:
@@ -141,6 +183,15 @@ def create_user():
 
 @users.route('/create_operator', methods=['GET', 'POST'])
 def create_operator():
+    """ Create an operator account and login
+    
+    Error status codes:
+        400 -- The request is not valid, the form is filled out incorrectly, a user with the same identifiers already exists or a generic error has occurred
+        500 -- A db error
+    Success codes:
+        200 -- The form is sent
+        302 -- The creation was carried out
+    """
     form = OperatorForm()
     if request.method == 'POST':
 
@@ -178,14 +229,13 @@ def create_operator():
                         return make_response(render_template('form.html', form=form, title="Sign in!"), 400)
                     new_user.dateofbirth = form.dateofbirth.data
                     try:
-                        # pw should be hashed with some salt
                         db.session.add(new_rest)
                         db.session.commit()
                         new_user.rest_id = new_rest.id
                         db.session.add(new_user)
                         db.session.commit()
 
-                    except: # Remove if coverage < 90%
+                    except:
                         flash('New operator and Restaurant not inserted','error')
                         return make_response(render_template('form.html', form=form, title="Sign in!"),500)
                 else:
@@ -206,6 +256,20 @@ def create_operator():
 @users.route('/edit', methods=['GET', 'POST'])
 @login_required
 def edit():
+    """ Edit the current user profile
+    
+    The user must confirm the request by entering the password.
+
+    The functionality is not active for the health authority or for the admin.
+
+    Error status codes:
+        400 -- the data entered is incorrect or a user with the same identifiers already exists
+        401 -- The current user is not a customer or operator
+
+    Success codes:
+        200 -- The form is sent
+        302 -- The update was carried out
+    """
 
     if current_user.is_admin or current_user.is_health_authority:
         return make_response(render_template('error.html', error='401'),401)

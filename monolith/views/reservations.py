@@ -12,13 +12,20 @@ reservations = Blueprint('reservations', __name__)
 @reservations.route('/restaurants/<int:restaurant_id>/book', methods=['GET', 'POST'])
 @login_required
 def _book(restaurant_id):
+    """ It allows you to book in a specific restaurant
+
+    Error status code:
+        400 -- The form is filled in incorrectly or it is not possible to make a reservation with that data
+        401 -- The user cannot make the reservation (it is positive, he is not a customer, he is not logged in)
+        404 -- The restaurant does not exist
+    """
     record = db.session.query(Restaurant).filter_by(id = restaurant_id).first()
 
     if record is None:
         return make_response(render_template('error.html', error='404'), 404)
 
     if current_user.is_admin or current_user.is_operator or current_user.is_health_authority:
-        flash("Please log as customer to book a table","erro")
+        flash("Please log as customer to book a table","error")
         return make_response(render_template('error.html', error="401"), 401)
 
     if current_user.is_positive:
@@ -54,6 +61,13 @@ def _book(restaurant_id):
 @reservations.route('/restaurants/<int:restaurant_id>/reservations', methods=['GET', 'POST'])
 @operator_required
 def _booking_list(restaurant_id):
+    """ It allows the current operator to view all bookings in a given period of time
+
+    Error status code:
+        400 -- The form is filled in incorrectly
+        401 -- The user is not the restaurant operator
+        404 -- The restaurant does not exist
+    """
     record = db.session.query(Restaurant).filter_by(id = restaurant_id).first()
     if record is None:
         return make_response(render_template('error.html', error='404'),404)
@@ -98,6 +112,12 @@ def _booking_list(restaurant_id):
 @reservations.route('/restaurants/<int:restaurant_id>/reservations/today', methods=['GET'])
 @operator_required
 def _today_booking_list(restaurant_id):
+    """ It allows the current operator to view all bookings of today
+
+    Error status code:
+        401 -- The user is not the restaurant operator
+        404 -- The restaurant does not exist
+    """
     record = db.session.query(Restaurant).filter_by(id = restaurant_id).first()
     if record is None:
         return make_response(render_template('error.html', error='404'),404)
@@ -123,6 +143,12 @@ def _today_booking_list(restaurant_id):
 @reservations.route('/reservations/<int:reservation_id>/entrance', methods=['GET', 'POST'])
 @operator_required
 def _register_entrance(reservation_id):
+    """ It allows the operator ro register the entrance of the users into the restaurant (Given a reservation)
+
+    Error status code:
+        401 -- The user is not the restaurant operator
+        404 -- The reservation does not exist
+    """
     
     qry = db.session.query(Booking).filter_by(id = reservation_id).first()
     
@@ -138,7 +164,7 @@ def _register_entrance(reservation_id):
             db.session.add(qry)
             db.session.commit()
             return redirect(f"/reservations/{reservation_id}")
-        except: # Remove if coverage < 90%
+        except:
             flash('An error occured, please try again','error')
             return redirect(f"/reservations/{reservation_id}")
     else:
@@ -148,6 +174,12 @@ def _register_entrance(reservation_id):
 @reservations.route('/reservations/<int:reservation_id>', methods=['GET'])
 @operator_required
 def _reservation(reservation_id):
+    """ It allows the restaurant operator to view the details of a reservation
+
+    Error status code:
+        401 -- The user is not the restaurant operator
+        404 -- The reservation does not exist
+    """
 
     qry = db.session.query(Booking,User).filter(Booking.id == reservation_id).filter(User.id == Booking.user_id).first()
     
@@ -163,6 +195,12 @@ def _reservation(reservation_id):
 @reservations.route('/reservations/<int:reservation_id>/delete', methods=['GET', 'DELETE', 'POST'])
 @login_required
 def _reservation_delete(reservation_id):
+    """ It allows the restaurant operator or the user that made the reservation to delete the reservation
+
+    Error status code:
+        401 -- The user is not the restaurant operator or the user that made the reservation
+        404 -- The reservation does not exist
+    """
 
     qry = db.session.query(Booking).filter_by(id = reservation_id).first()
     
@@ -180,6 +218,12 @@ def _reservation_delete(reservation_id):
 @reservations.route('/reservations/<int:reservation_id>/edit', methods=['GET', 'POST'])
 @login_required
 def _reservation_edit(reservation_id):
+    """ It allows the restaurant operator or the user that made the reservation to edit the reservation
+
+    Error status code:
+        401 -- The user is not the restaurant operator or the user that made the reservation
+        404 -- The reservation does not exist
+    """
 
     qry = db.session.query(Booking).filter_by(id = reservation_id).first()
     

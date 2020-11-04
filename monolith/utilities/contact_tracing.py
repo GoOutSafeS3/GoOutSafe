@@ -3,6 +3,12 @@ from datetime import datetime, timedelta
 
 
 def mark_as_positive(user_id):
+    """ Given an id it marks that user as positive also assigning the timestamp of the current time 
+        
+        Return:
+        True -> The procedure was successful
+        False -> otherwise
+    """
     try:
         qry = db.session.query(User).filter_by(id = user_id).first()
         if qry is None:
@@ -18,6 +24,12 @@ def mark_as_positive(user_id):
 
 
 def unmark_as_positive(user_id):
+    """ Given an id it marks that user as negative also deleting the timestamp 
+        
+        Return:
+        True -> The procedure was successful
+        False -> otherwise
+    """
     try:
         qry = db.session.query(User).filter_by(id = user_id).first()
         if qry is None:
