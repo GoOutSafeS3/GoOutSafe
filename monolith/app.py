@@ -1,7 +1,7 @@
 import os
 from flask import Flask
 from flask_googlemaps import GoogleMaps, Map
-from monolith.database import db, User, Restaurant, Booking, Table, Like
+from monolith.database import db, User, Restaurant, Booking, Table, Rating
 from monolith.views import blueprints
 from monolith.auth import login_manager
 from monolith.background import init_celery
@@ -64,7 +64,8 @@ def fake_data():
     if restaurant is None:
         example = Restaurant()
         example.name = 'Trial Restaurant'
-        example.likes = 42
+        example.rating_val = 3
+        example.rating_num = 1
         example.phone = 555123456
         example.lat = 43.720586
         example.lon = 10.408347
@@ -109,10 +110,11 @@ def fake_data():
         db.session.add(table_5)
         db.session.commit()
 
-        like_1 = Like()
-        like_1.restaurant_id = example.id
-        like_1.liker_id = example_cust.id
-        db.session.add(like_1)
+        rating_1 = Rating()
+        rating_1.restaurant_id = example.id
+        rating_1.rater_id = example_cust.id
+        rating_1.rating = 5
+        db.session.add(rating_1)
         db.session.commit()
 
         example_op = User()
@@ -132,7 +134,8 @@ def fake_data():
     if restaurant is None:
         example = Restaurant()
         example.name = 'Osteria dei Santi'
-        example.likes = 102
+        example.rating_num = 2
+        example.rating_val = 3
         example.phone = 555127156
         example.lat = 43.7191589
         example.lon = 10.3973009
@@ -164,7 +167,8 @@ def fake_data():
     if restaurant is None:
         example = Restaurant()
         example.name = 'Le Bandierine'
-        example.likes = 140
+        example.rating_num = 2
+        example.rating_val = 1
         example.phone = 555427156
         example.lat = 43.7177699
         example.lon = 10.4038814
@@ -304,7 +308,7 @@ def fake_data():
         booking_8.user_id = example_positive.id
         booking_8.booking_datetime = today_noon
         booking_8.people_number = 5
-        booking_8.table_id = 2
+        booking_8.table_id = 4
         db.session.add(booking_8)
         db.session.commit()
 

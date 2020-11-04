@@ -1,7 +1,8 @@
 {% extends 'layout.html' %}
+{% import 'rating.html' as rating %}
 {% block content %}
     <h1 style="color: darkred">{{name}}</h1>
-    <h4>{{likes}} Likes</h4>
+    <h4>{{rating_val}}/5 Stars, {{rating_num}} voted | {{ rating.rating(id,form) }}</h4>
     <h4>Phone: {{phone}}</h4>
     <div class="cuisine_type">
     <h4>Cuisine type: {{cuisine_type}}</h4>

@@ -1,10 +1,10 @@
 from flask import Blueprint, redirect, render_template, request, make_response, flash
 from flask_googlemaps import Map
 from monolith.utilities.restaurant import validate_hours
-from monolith.database import db, Restaurant, Like, Booking, User, Table
+from monolith.database import db, Restaurant, Rating, Booking, User, Table
 from monolith.auth import admin_required, current_user, is_admin, operator_required
 from flask_login import current_user, login_user, logout_user, login_required
-from monolith.forms import UserForm, BookingForm, BookingList, RestaurantEditForm, TableAddForm, SearchRestaurantForm
+from monolith.forms import UserForm, BookingForm, BookingList, RestaurantEditForm, TableAddForm, SearchRestaurantForm, RatingAddForm
 from monolith.utilities.restaurant import is_busy_table
 from datetime import datetime, timedelta
 
@@ -99,10 +99,11 @@ def restaurant_sheet(restaurant_id):
     closed_days = []
     for day in record.closed_days:
         closed_days.append(days[int(day) - 1])
-
+    form = RatingAddForm()
     return render_template("restaurantsheet.html",
                            name=record.name,
-                           likes=record.likes,
+                           rating_val=record.rating_val,
+                           rating_num=record.rating_num,
                            lat=record.lat,
                            lon=record.lon,
                            phone=record.phone,
@@ -114,27 +115,33 @@ def restaurant_sheet(restaurant_id):
                            dinner_closing=record.closing_hour_dinner,
                            cuisine_type=record.cuisine_type,
                            menu=record.menu,
-                           tables=record.tables)
+                           tables=record.tables,
+                           form=form)
 
 
-@restaurants.route('/restaurants/<int:restaurant_id>/like')
+@restaurants.route('/restaurants/<int:restaurant_id>/rate', methods=['GET', "POST"])
 @login_required
-def _like(restaurant_id):
+def _rate(restaurant_id):
     record = db.session.query(Restaurant).filter_by(id=restaurant_id).first()
     if record is None:
         return make_response(render_template('error.html', error='404'), 404)
-
-    q = Like.query.filter_by(liker_id=current_user.id, restaurant_id=restaurant_id)
-    if q.first() == None:
-        new_like = Like()
-        new_like.liker_id = current_user.id
-        new_like.restaurant_id = restaurant_id
-        db.session.add(new_like)
-        db.session.commit()
-        message = ''
-    else:
-        message = 'You\'ve already liked this place!'
-    return _restaurants(message)
+    form = RatingAddForm()
+    if form.validate_on_submit():
+        q = Rating.query.filter_by(rater_id=current_user.id, restaurant_id=restaurant_id)
+        if q.first() == None:
+            new_rating = Rating()
+            new_rating.rater_id = current_user.id
+            new_rating.rating = form.rating.data
+            new_rating.restaurant_id = restaurant_id
+            db.session.add(new_rating)
+            db.session.commit()
+            flash('Rating submitted', "success")
+            return restaurant_sheet(record.id)
+        else:
+            flash('You\'ve already rated this place!', "error")
+            return make_response(restaurant_sheet(record.id), 400)
+    flash("Bad form", "error")
+    return make_response(restaurant_sheet(record.id), 400)
 
 
 @restaurants.route('/restaurants/<int:restaurant_id>/edit', methods=['GET', 'POST'])

@@ -1,0 +1,36 @@
+{% macro rating(id, form) -%}
+ 
+<a class="btn btn-outline-secondary btn-sm" href="" data-toggle="modal" data-target="#RateRestaurantModal" title="Modifica"> Rate </a>
+
+<!-- Modal MODIFICA UTENTE -->
+<div style="margin-top: 200px" class="modal fade" id="RateRestaurantModal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel"> <b> Rate the restaurant </b> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="/restaurants/{{ id }}/rate" method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="modal-body">
+            <h5> Insert the rating from 0-5 Stars</h5>
+            <div style="text-align: center; width: 400px" class="input-group m-3">
+                <input id="rating" aria-labelledby="basic-addon2" type="text" class="form-control" name="rating" placeholder="5">
+                {% if form["rating"].errors %}
+                    {% for e in form["rating"].errors %}
+                    <p class="help-block">{{ e }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary my-2 my-sm-0" data-dismiss="modal"> Cancel </button>
+            <button type="submit" id="submit" class="btn btn-secondary my-2 my-sm-0"> Confirm </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{%- endmacro %}

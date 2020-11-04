@@ -74,6 +74,9 @@ class TableAddForm(FlaskForm):
     capacity = f.IntegerField('Table capacity', validators=[InputRequired()])
     display = ['capacity']
 
+class RatingAddForm(FlaskForm):
+    rating = f.IntegerField('Restaurant rating', validators=[InputRequired()])
+    display = ['rating']
 
 class BookingForm(FlaskForm):
     number_of_people = f.IntegerField("Number of people", validators=[InputRequired(), NumberRange(min=1)])

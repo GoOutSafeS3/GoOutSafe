@@ -94,19 +94,6 @@ class TestRestaurant(unittest.TestCase):
             self.assertIn("Pasta Bolognese", reply_data)
             self.assertIn("Breadsticks", reply_data)
 
-    def test_can_like_once(self):
-        with self.app.test_client() as client:
-            client.set_app(self.app)
-            reply = do_login(client, "example@example.com", "admin")
-            
-            reply = client.t_get("/restaurants/1/like")
-            reply_data = reply.get_data(as_text = True)
-            self.assertFalse("already liked" in reply_data)
-            
-            reply = client.t_get("/restaurants/1/like")
-            reply_data = reply.get_data(as_text = True)
-            self.assertIn("already liked",reply_data)
-
     def test_bad_form_search(self):
         client = self.app.test_client()
         client.set_app(self.app)

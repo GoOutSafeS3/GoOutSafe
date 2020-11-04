@@ -1,4 +1,4 @@
-from monolith.database import db, Restaurant, Like, Booking, User, Table
+from monolith.database import db, Restaurant, Booking, User, Table
 from monolith.auth import current_user
 from datetime import timedelta
 

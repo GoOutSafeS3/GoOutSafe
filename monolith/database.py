@@ -66,7 +66,8 @@ class Restaurant(db.Model):
     #r = db.relationship('User', backref='Restaurant')
     name = db.Column(db.Text(100))
     
-    likes = db.Column(db.Integer, default=0) # will store the number of likes, periodically updated in background
+    rating_val = db.Column(db.Float, default=0) # will store the mean value of the rating
+    rating_num = db.Column(db.Integer, default=0) # will store the number of ratings 
 
     lat = db.Column(db.Float) # restaurant latitude
     lon = db.Column(db.Float) # restaurant longitude
@@ -143,16 +144,18 @@ class Booking(db.Model):
 
 
 
-class Like(db.Model):
-    __tablename__ = 'like'
+class Rating(db.Model):
+    __tablename__ = 'Rating'
     
-    liker_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    liker = relationship('User', foreign_keys='Like.liker_id')
+    rater_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    rater = relationship('User', foreign_keys='Rating.rater_id')
 
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), primary_key=True)
-    restaurant = relationship('Restaurant', foreign_keys='Like.restaurant_id')
+    restaurant = relationship('Restaurant', foreign_keys='Rating.restaurant_id')
 
-    marked = db.Column(db.Boolean, default = False) # True iff it has been counted in Restaurant.likes
+    rating = db.Column(db.Integer)
+
+    marked = db.Column(db.Boolean, default = False) # True iff it has been counted in Restaurant.rating
 
 
 class Notification(db.Model):

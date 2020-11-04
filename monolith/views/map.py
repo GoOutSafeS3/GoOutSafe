@@ -1,5 +1,5 @@
 from flask import Blueprint, redirect, render_template, request, make_response, flash
-from monolith.database import db, Restaurant, Like, Booking, User, Table
+from monolith.database import db, Restaurant, Booking, User, Table
 from flask_login import current_user, login_required
 from flask_googlemaps import GoogleMaps, Map
 

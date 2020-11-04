@@ -2,7 +2,7 @@ from celery import Celery
 from celery.schedules import crontab
 
 from monolith.app import create_worker_app
-from monolith.background import log, test_db, unmark, check_likes
+from monolith.background import log, unmark, check_ratings, recompute_ratings
 
 def create_celery(app):
 
@@ -35,11 +35,11 @@ def setup_periodic_tasks(sender, **kwargs):
     # Calls log every 10 seconds.
     sender.add_periodic_task(float(app.config["UNMARK_AFTER"]), unmark.s(), name=f"Unmark positive users | a controll each {app.config['UNMARK_AFTER']} seconds")
     #sender.add_periodic_task(15.0, log.s("Logging Stuff 10"), name="reverse every 10")
-    sender.add_periodic_task(float(app.config["UNMARK_AFTER"]), check_likes.s(), name=f"Mark likes and add to respective restaurants | a controll each {app.config['UNMARK_AFTER']} seconds")
+    sender.add_periodic_task(float(app.config["UNMARK_AFTER"]), check_ratings.s(), name=f"Mark likes and add to respective restaurants | a controll each {app.config['UNMARK_AFTER']} seconds")
     # Calls log('Logging Stuff') every 30 seconds
     #sender.add_periodic_task(15.0, test_db.s(), name="Log every 15")
 
-    # Executes every morning at 7:30 a.m. see https://docs.celeryproject.org/en/stable/userguide/periodic-tasks.html#crontab-schedules
-    #sender.add_periodic_task(
-    #    crontab(minute=30, hour=7), log.s("Morning log!"),
-    #)
+    # Executes every monday morning at 4:30 a.m. see https://docs.celeryproject.org/en/stable/userguide/periodic-tasks.html#crontab-schedules
+    sender.add_periodic_task(
+        crontab(minute=30, hour=4, day_of_week=1), recompute_ratings.s(),
+    )

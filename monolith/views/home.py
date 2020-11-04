@@ -1,15 +1,14 @@
 from flask import Blueprint, render_template, make_response
-from monolith.database import db, Restaurant, Like, Notification
+from monolith.database import db, Restaurant, Notification
 from monolith.auth import current_user
-from monolith.background import log,add_together,test_db
+from monolith.background import log
 
 home = Blueprint('home', __name__)
 
 
 @home.route('/')
 def index():
-    log.s("Logging Stuff")
-    result = test_db.delay()
+    result = log.delay("Logging Stuff")
     print(result.wait())
     notifications = None
     if current_user is not None and hasattr(current_user, 'id'):
