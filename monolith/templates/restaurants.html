@@ -11,10 +11,7 @@
         <h4>{{restaurant.name}}</h4>
         <h5>
             {{restaurant.cuisine_type}},
-            {% if restaurant.likes is none %}
-                No Likes
-            {% else %} {{restaurant.likes}} Likes
-            {% endif %}
+            {{ restaurant.rating_val | round( 1, 'ceil') }}/5 Stars
             <br>
         </h5>
       {% if current_user.is_authenticated %}

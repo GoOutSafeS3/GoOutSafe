@@ -2,7 +2,7 @@
 {% import 'rating.html' as rating %}
 {% block content %}
     <h1 style="color: darkred">{{name}}</h1>
-    <h4>{{rating_val}}/5 Stars, {{rating_num}} voted | {{ rating.rating(id,form) }}</h4>
+    <h4>{{ rating_val | round( 1, 'ceil') }}/5 Stars with {{rating_num}} ratings | {{ rating.rating(id,form) }}</h4>
     <h4>Phone: {{phone}}</h4>
     <div class="cuisine_type">
     <h4>Cuisine type: {{cuisine_type}}</h4>
@@ -22,18 +22,17 @@
     <br>
     <div class="opening_hours">
       <h4>Opening hours</h4>
-        <p> Lunch:
-        {% if lunch_opening == None %}
+        <p> First Opening:
+        {% if lunch_opening is none %}
              closed
         {% else %}  {{lunch_opening}}:00 -  {{lunch_closing}}:00
         {% endif %}
         </p>
-      <p>Dinner:
-        {% if dinner_opening == None %}
-             closed
-        {% else %}  {{dinner_opening}}:00 -  {{dinner_closing}}:00
-        {% endif %}
+      {% if dinner_opening is not none %}
+      <p>Second Opening:
+        {{dinner_opening}}:00 -  {{dinner_closing}}:00
         </p>
+        {% endif %}
     </div>
 
     <div class="closed_days">

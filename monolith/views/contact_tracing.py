@@ -194,10 +194,10 @@ def _mark_as_positive_by_id(pos_id):
         date_start = today - two_weeks
         users_to_be_notificated = get_user_contacts(qry.id, date_start, today)
         for user in users_to_be_notificated:
-            add_notification(qry.id, user.id)
+            add_notification(qry.id, user.id, 0)
         operators_to_be_notified = get_operators_contacts(qry.id, date_start, today)
         for operator in operators_to_be_notified:
-            add_notification(qry.id, operator.id)
+            add_notification(qry.id, operator.id, 1)
         add_bookings_notifications(qry.id)
         return redirect("/positives")
     else: # remove if coverage <90%

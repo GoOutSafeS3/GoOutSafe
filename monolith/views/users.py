@@ -197,7 +197,7 @@ def create_operator():
 
             if new_user is not None and new_user.authenticate(password):
                 login_user(new_user)
-            flash('Restaurant registered succesfully', 'success')
+            flash('Restaurant registered succesfully! Click Settings->Edit Restaurant to add your restaurant information!', 'success')
             return redirect("/")
 
     return render_template('form.html', form=form, title="Sign in!")
