@@ -48,7 +48,11 @@ class TestUnregistration(unittest.TestCase):
         reply = client.t_get('/delete')
         self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
 
-        reply = self.do_delete(client, "operator@example.com","operator")
+        form = {
+            'email': "operator@example.com",
+            'password': "operator"
+        }
+        reply = client.t_post('/delete', data=form)
         self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
 
         do_login(client, "example@example.com", "admin")
@@ -72,7 +76,11 @@ class TestUnregistration(unittest.TestCase):
         reply = client.t_get('/delete')
         self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
 
-        reply = self.do_delete(client, "customer@example.com","customer")
+        form = {
+            "email": "customer@example.com",
+            "password": "customer"
+        }
+        reply = client.t_post('/delete', data=form)
         self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
         reply = client.t_get('/')
         self.assertIn("success",reply.get_data(as_text=True),  msg=reply.get_data(as_text=True))
@@ -84,7 +92,6 @@ class TestUnregistration(unittest.TestCase):
 
         reply = do_login(client, "customer@example.com","customer")
         self.assertEqual(reply.status_code, 401)
-
 
 
     def test_delete_log_as_positive_customer(self):

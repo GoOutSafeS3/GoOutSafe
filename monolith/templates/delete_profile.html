@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+
+    {% block content %}
+    {% if current_user.is_authenticated %}
+         <form action="" method="post" novalidate>
+            {{ form.hidden_tag() }}
+                <div style="text-align: center; width: 400px" class="input-group m-3">
+                    <div class="input-group-prepend">
+                        <span style="color: grey" class="input-group-text" id="basic-addon1"> Email
+                        </span>
+                     </div>
+                    <input id="email" aria-describedby="basic-addon1" type="text" class="form-control" name="email">
+                </div>
+
+             <a class="btn btn-outline-secondary btn-sm" href="" data-toggle="modal" data-target="#DeleteUserModal" title="Delete"> Delete account </a>
+
+        <!-- Modal Delete UTENTE -->
+        <div style="margin-top: 200px" class="modal fade" id="DeleteUserModal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="staticBackdropLabel"> <b> Delete account </b> </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <form action="" method="post" novalidate>
+              <div class="modal-body">
+                <h5> Insert password to confirm </h5>
+                <div style="text-align: center; width: 400px" class="input-group m-3">
+                    <input id="password" aria-labelledby="basic-addon2" type="password" class="form-control" name="password" placeholder="Password">
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary my-2 my-sm-0" data-dismiss="modal"> Cancel </button>
+                <button type="submit" id="submit" class="btn btn-secondary my-2 my-sm-0"> Confirm </button>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+   </form>
+
+  {% endif %}
+  {% endblock %}

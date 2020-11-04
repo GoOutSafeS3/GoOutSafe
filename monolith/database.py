@@ -163,11 +163,13 @@ class Notification(db.Model):
 
     notification_id = db.Column(db.Integer, autoincrement=True, primary_key = True)
     user_positive_id = db.Column(db.Integer, db.ForeignKey('user.id') )
-    user_positive_email = db.Column(db.String)
-    user_positive_name = db.Column(db.String)
-    user_booking_date = db.Column(db.DateTime, default = None)
+    rest_closed_name = db.Column(db.String, default=None)
+    user_positive_email = db.Column(db.String, default=None)
+    user_positive_name = db.Column(db.String, default=None)
+    user_booking_date = db.Column(db.DateTime, default=None)
     user_notified_id= db.Column(db.Integer, db.ForeignKey('user.id'))
     already_read = db.Column(db.Boolean, default=False)
     datetime = db.Column(db.DateTime, default = None)
     operator_notification_type = db.Column(db.Integer, default=0)
+    customer_notification_type = db.Column(db.Integer, default=0)
 

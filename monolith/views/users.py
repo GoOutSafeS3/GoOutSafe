@@ -6,6 +6,7 @@ from werkzeug.security import check_password_hash
 from monolith.auth import is_admin, health_authority_required, admin_required
 from monolith.database import User, db, Restaurant, Booking
 from monolith.forms import UserForm, OperatorForm, LoginForm, EditUserForm
+from monolith.utilities.notification import add_notification_restaurant_closed
 
 users = Blueprint('users', __name__)
 
@@ -46,26 +47,41 @@ def delete_user():
     if request.method == 'POST':
         if form.validate_on_submit():
             email, password = form.data['email'], form.data['password']
-            q = db.session.query(User).filter(User.email == email)
-            user = q.first()
-            if user is not None and user.authenticate(password) and current_user.id == user.id:
+            if current_user.email != email:
+                flash('Wrong email', 'error')
+                return make_response(render_template('delete_profile.html', form=form, title="Unregister"), 400)
+            user = db.session.query(User).filter(current_user.email == User.email).first()
+            checked = check_password_hash(current_user.password, password)
+            if user is not None and checked:
                 if current_user.is_positive:
                     flash('You cannot delete your data as long as you are positive','error')
+                    return redirect('/', code=302)
                 else:
-                    q_r = db.session.query(Restaurant).filter_by(id = user.rest_id)	
-                    rest = q_r.first()
+                    rest = Restaurant.query.filter_by(id=current_user.rest_id).first()
                     logout_user()
                     db.session.delete(user)
-                    if rest is not None:	
+                    if rest is not None:
+                        bookings = Booking.query.filter_by(rest_id=rest.id).all()
+                        for b in bookings:
+                            if b.booking_datetime >= datetime.today():
+                                add_notification_restaurant_closed(rest, b.user_id, b.booking_datetime)
+                                db.session.delete(b)
                         db.session.delete(rest)
-                    db.session.commit()
-                    flash('Your account has been deleted','success')
-                return redirect('/', code=302)
-            flash('Wrong email or password','error')
-            return make_response(render_template('form.html', form=form, title="Unregister"),400)
+                    try:
+                        db.session.commit()
+                        flash('Your account has been deleted', 'success')
+                        return redirect('/', code=302)
+                    except:
+                        db.session.rollback()
+                        flash('There was a problem, please try again', 'error')
+                        return make_response(render_template('delete_profile.html', form=form, title="Unregister"), 400)
+            else:
+                flash('Wrong email or password','error')
+                return make_response(render_template('delete_profile.html', form=form, title="Unregister"),400)
         flash('Bad form','error')
-        return make_response(render_template('form.html', form=form, title="Unregister"),400)
-    return make_response(render_template('form.html', form=form, title="Unregister"),200)
+        return make_response(render_template('delete_profile.html', form=form, title="Unregister"),400)
+    return make_response(render_template('delete_profile.html', form=form, title="Unregister"),200)
+
 
 @users.route('/create_user', methods=['GET', 'POST'])
 def create_user():

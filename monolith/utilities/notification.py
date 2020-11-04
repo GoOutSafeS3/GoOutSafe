@@ -1,6 +1,6 @@
 import datetime
 from datetime import timedelta, datetime
-from monolith.database import Notification, db, Booking, User
+from monolith.database import Notification, db, Booking, User, Restaurant
 
 
 def add_notification(user_positive_id, user_notified_id, type):
@@ -15,6 +15,19 @@ def add_notification(user_positive_id, user_notified_id, type):
         db.session.commit()
         return True
     return False
+
+
+def add_notification_restaurant_closed(rest, user_notified_id, booking_datetime):
+    today = datetime.today()
+    notification = Notification()
+    notification.datetime = today
+    notification.user_booking_date = booking_datetime
+    notification.already_read = False
+    notification.user_notified_id = user_notified_id
+    notification.rest_closed_name = rest.name
+    notification.customer_notification_type = 1
+    db.session.add(notification)
+    db.session.commit()
 
 
 def delete_notification(notification_id):
@@ -52,4 +65,3 @@ def add_bookings_notifications(user_id):
                 if search_notification is None:
                     db.session.add(notification)
                     db.session.commit()
-

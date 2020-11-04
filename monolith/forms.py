@@ -20,7 +20,7 @@ class UserForm(FlaskForm):
     telephone = f.StringField('Telephone', validators=[DataRequired()]) 
     dateofbirth = f.DateField('Date Of Birth', format='%d/%m/%Y')
     ssn = f.StringField('SSN (if available)', validators=[])
-
+    submit = f.SubmitField('Confirm')
     display = ['email', 'firstname', 'lastname', 'password','password_repeat', 'telephone', 'dateofbirth', 'ssn']
 
 
