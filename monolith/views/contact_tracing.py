@@ -57,7 +57,7 @@ def _contacts():
                 qry = qry[0]
 
             if qry.is_positive:
-                return redirect("/positives/{qry.id}/contacts")
+                return redirect(f"/positives/{qry.id}/contacts")
             else:
                 flash("The user is not positive","error")
                 
