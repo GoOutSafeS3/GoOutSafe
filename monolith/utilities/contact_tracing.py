@@ -31,6 +31,18 @@ def unmark_as_positive(user_id):
 
 
 def get_user_contacts(user_id, date_begin, date_end):
+    """ Returns a list of users to which a specified user has come in contact with
+
+    This function returns the list of users that the user specified by user_id
+    has come into contact in the period from date_begin to date_end.
+
+    A user is considered to have come in contact with another user if they both
+    share a booking at the same restaurant in an overlapping time slice.
+
+    user_id -- The id of the user whose contacts should be returned
+    date_begin, date_end -- The time interval in which the contacts have happened
+    """
+
     user_bookings = db.session.query(Booking).\
         filter(Booking.user_id == user_id).\
         filter(Booking.booking_datetime is not None).\
@@ -54,6 +66,15 @@ def get_user_contacts(user_id, date_begin, date_end):
 
 
 def get_user_visited_restaurants(user_id, date_begin, date_end):
+    """ Returns the list of restaurants visited by a user in a certain timespan
+
+    A restaurant is considered visited by a user if said user has at least one
+    booking for that restaurant in the specified timespan.
+
+    user_id -- The id of the user whose visited restaurants should be returned
+    date_begin, date_end -- The timespan in which the restaurants have been visited
+    """
+
     restaurants = db.session.query(Restaurant).\
         join(Booking, Booking.rest_id == Restaurant.id).\
         filter(Booking.user_id == user_id).\
