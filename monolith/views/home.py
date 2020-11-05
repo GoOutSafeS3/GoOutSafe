@@ -7,7 +7,7 @@ home = Blueprint('home', __name__)
 
 
 @home.route('/')
-def index():
+def index(): 
     """
     returns The Homepage
     """
@@ -23,7 +23,7 @@ def index():
 
 
 @home.app_errorhandler(404)
-def not_found_page(error):
+def not_found_page(error):  # pragma: no cover
     """
     404 Page error
     :return: template *error.html*
@@ -33,7 +33,7 @@ def not_found_page(error):
 
 
 @home.app_errorhandler(401)
-def permission_denied_page(error):
+def permission_denied_page(error):  # pragma: no cover
     """
     401 Page error
     :return: template *error.html*
@@ -43,7 +43,7 @@ def permission_denied_page(error):
 
 
 @home.app_errorhandler(500)
-def not_found_page(error):
+def not_found_page(error):  # pragma: no cover
     """
     404 Page error
     :return: template *error.html*
