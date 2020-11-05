@@ -30,6 +30,14 @@ class TestRestaurant(unittest.TestCase):
         do_logout(client)
         self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text = True))
 
+    def test_restaurants_map_notcustomer(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "example@example.com", "admin")
+        reply = client.t_get("/restaurants_map")
+        self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text = True))
+        do_logout(client)
+
     def test_profile_has_name(self):
         client = self.app.test_client()
         client.set_app(self.app)
