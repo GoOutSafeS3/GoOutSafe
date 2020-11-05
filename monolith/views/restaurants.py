@@ -98,6 +98,13 @@ def search_res():
 
 @restaurants.route('/restaurants/<int:restaurant_id>')
 def restaurant_sheet(restaurant_id):
+    """ Shows the profile page of a restaurant, which includes its name,
+    ratings, position on the map, opening hours etc.
+
+    Error status code:
+        404 -- No restaurant with id restaurant_id was found
+    """
+
     record = db.session.query(Restaurant).filter_by(id=restaurant_id).first()
     if record is None:
         return make_response(render_template('error.html', error='404'), 404)
@@ -129,6 +136,15 @@ def restaurant_sheet(restaurant_id):
 @restaurants.route('/restaurants/<int:restaurant_id>/rate', methods=['GET', "POST"])
 @login_required
 def _rate(restaurant_id):
+    """ Submits a rating to a restaurant, in a range from 1 to 5
+
+    Error status code:
+        400 -- The currently logged-in user has already rated this restaurant, or
+               the request is malformed
+        401 -- The user is not logged-in
+        404 -- No restaurant with id restaurant_id was found
+    """
+
     record = db.session.query(Restaurant).filter_by(id=restaurant_id).first()
     if record is None:
         return make_response(render_template('error.html', error='404'), 404)
