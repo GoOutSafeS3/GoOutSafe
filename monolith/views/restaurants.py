@@ -170,6 +170,17 @@ def _rate(restaurant_id):
 @restaurants.route('/restaurants/<int:restaurant_id>/edit', methods=['GET', 'POST'])
 @operator_required
 def _edit_restaurant(restaurant_id):
+    """ Show the page for editing the restaurant with GET, the form can be submitted with POST
+
+    Error status codes:
+        400 -- The request is not valid, the form is filled out incorrectly or a generic error has occurred
+        401 -- The current user is not an operator or the operator of this restaurant
+        404 -- The restaurant does not exists
+
+    Success codes:
+        200 -- The form is sent to the user
+        302 -- The modification was accepted
+    """
     record = db.session.query(Restaurant).filter_by(id=restaurant_id).first()
 
     if record is None:
@@ -336,6 +347,10 @@ def _add_tables():
         400 -- The requested table capacity is invalid, or the request is malformed
         401 -- The request has been sent by an unauthenticated user, or the user
                 is not the owner of a restaurant
+
+    Success codes:
+        200 -- The form is sent to the user
+        302 -- The addition is accepted
     """
 
     form = TableAddForm()
@@ -365,6 +380,10 @@ def _edit_tables(table_id):
         401 -- The request has been sent by an unauthenticated user, or
                the user is not the owner of the table's restaurant
         404 -- A table with id table_id has not been found
+
+    Success codes:
+        200 -- The form is sent to the user
+        302 -- The edit is accepted
     """
     
     table = db.session.query(Table).filter(Table.id == table_id).first()
@@ -402,6 +421,9 @@ def delete_table(table_id):
                the user is not the owner of the table's restaurant
         404 -- A table with id table_id has not been found
         412 -- The table has pending reservations, those must be deleted first
+
+    Success codes:
+        302 -- The deletion is accepted
     """
 
     table = db.session.query(Table).filter(Table.id == table_id).first()
