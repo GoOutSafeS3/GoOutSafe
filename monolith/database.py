@@ -8,6 +8,7 @@ import datetime
 
 db = SQLAlchemy()
 
+
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -18,7 +19,6 @@ class User(db.Model):
     dateofbirth = db.Column(db.DateTime)
     phone = db.Column(db.Unicode(128), unique=True)
     ssn = db.Column(db.Unicode(128), unique=True, default=None)
-    
     rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), default=None)
     is_active = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)
@@ -63,30 +63,20 @@ class Restaurant(db.Model):
 
     __tablename__ = 'restaurant'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    #r = db.relationship('User', backref='Restaurant')
     name = db.Column(db.Text(100))
-    
     rating_val = db.Column(db.Float, default=0) # will store the mean value of the rating
-    rating_num = db.Column(db.Integer, default=0) # will store the number of ratings 
-
+    rating_num = db.Column(db.Integer, default=0) # will store the number of ratings
     lat = db.Column(db.Float) # restaurant latitude
     lon = db.Column(db.Float) # restaurant longitude
-
     opening_hour_lunch = db.Column(db.Integer) # the opening hour for the lunch
-    closing_hour_lunch = db.Column(db.Integer) # the closing hour for the lunch 
-
+    closing_hour_lunch = db.Column(db.Integer) # the closing hour for the lunch
     opening_hour_dinner = db.Column(db.Integer) # the opening hour for the dinner
-    closing_hour_dinner = db.Column(db.Integer) # the closing hour for the dinner 
-
+    closing_hour_dinner = db.Column(db.Integer) # the closing hour for the dinner
     occupation_time = db.Column(db.Integer) # in hours the time of occupation of a table
-
     closed_days = db.Column(db.Text(7), default="") # one number for every closing day (1-7 i.e. monday-sunday)
-
     phone = db.Column(db.Integer)
-
     cuisine_type = db.Column(db.Text(1000))
     menu = db.Column(db.Text(1000))
-
     tables = relationship('Table')
     operators = relationship('User')
 
@@ -122,6 +112,7 @@ class Restaurant(db.Model):
     def get_id(self):
         return self.id
 
+
 class Table(db.Model):
     __tablename__ = 'table'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -129,6 +120,7 @@ class Table(db.Model):
     capacity = db.Column(db.Integer)
     restaurant = relationship('Restaurant')
     bookings = relationship('Booking')
+
 
 class Booking(db.Model):
     __tablename__ = 'booking'
@@ -139,24 +131,18 @@ class Booking(db.Model):
     booking_datetime = db.Column(db.DateTime) # the time of  booking
     entrance_datetime = db.Column(db.DateTime, default = None) # the time of entry
     table_id = db.Column(db.Integer, db.ForeignKey('table.id'))
-
     user = relationship('User')
     restaurant = relationship('Restaurant')
     table = relationship('Table')
 
 
-
 class Rating(db.Model):
     __tablename__ = 'Rating'
-    
     rater_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     rater = relationship('User', foreign_keys='Rating.rater_id')
-
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), primary_key=True)
     restaurant = relationship('Restaurant', foreign_keys='Rating.restaurant_id')
-
     rating = db.Column(db.Integer)
-
     marked = db.Column(db.Boolean, default = False) # True iff it has been counted in Restaurant.rating
 
 
@@ -164,38 +150,38 @@ class Notification(db.Model):
     """
     Table containing GoOutSafe notifications
 
-    fields of the table:
+    Fields of the table:
 
-    - notification_id: number representing the notification
+    - notification_id: (Integer) number representing the notification
 
-    - user_positive_id: useful in the event of a notification for a positive user
+    - user_positive_id: (Integer) useful in the event of a notification for a positive user
      addressed to an operator or customer.
 
-    - rest_closed_name:  this field indicates a restaurant that has been deleted
+    - rest_closed_name: (String) this field indicates a restaurant that has been deleted
     from the system. it is useful to communicate this to customers who had an
     active reservation in that restaurant.
 
-    - user_positive_email: customer email that has been marked as positive.
+    - user_positive_email: (String) customer email that has been marked as positive.
      Useful to communicate the customer email to the operator,
      who will have to cancel the customer reservation.
 
-    - user_positive_name: customer name (firstname + lastname) that has been
+    - user_positive_name: (String) customer name (firstname + lastname) that has been
      marked as positive. Useful to communicate the customer name to the
      operator, who will have to cancel the customer reservation.
 
-    - user_booking_date: customer booking date that has been
+    - user_booking_date: (DateTime) customer booking date that has been
      marked as positive. Useful to communicate the booking to delete.
 
-    - user_notified_id: id of the user who will receive the notification.
+    - user_notified_id: (Integer) id of the user who will receive the notification.
 
-    - already_read: boolean representing whether the notification has been read.
+    - already_read: (Boolean) representing whether the notification has been read.
 
-    - datetime: day on which the notification was generated.
+    - datetime: (DateTime) day on which the notification was generated.
 
-    - operator_notification_type: type of operator notification,
+    - operator_notification_type: (Integer) type of operator notification,
       depending on the type, a certain message will be shown on the page.
 
-    - customer_notification_type: type of customer notification,
+    - customer_notification_type: (Integer) type of customer notification,
       depending on the type, a certain message will be shown on the page.
 
     """
