@@ -3,7 +3,7 @@ from flask import Blueprint, redirect, render_template, request, flash, make_res
 from flask_login import login_required, logout_user, current_user, login_user
 from monolith.utilities.contact_tracing import get_user_contacts
 from werkzeug.security import check_password_hash
-from monolith.auth import is_admin, health_authority_required, admin_required
+from monolith.auth import health_authority_required, admin_required
 from monolith.database import User, db, Restaurant, Booking
 from monolith.forms import UserForm, OperatorForm, LoginForm, EditUserForm
 from monolith.utilities.notification import add_notification_restaurant_closed

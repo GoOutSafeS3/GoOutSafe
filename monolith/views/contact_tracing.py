@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request, flash, make_response, current_app
 from flask_login import login_required
-from monolith.auth import admin_required, is_admin, health_authority_required
+from monolith.auth import admin_required, health_authority_required
 from monolith.forms import UserForm, OperatorForm, SearchUserForm
 from monolith.database import User, db, Restaurant, Notification
 from monolith.utilities.contact_tracing import mark_as_positive, unmark_as_positive, get_user_contacts, get_operators_contacts

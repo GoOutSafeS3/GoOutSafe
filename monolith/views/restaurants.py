@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, render_template, request, make_response, 
 from flask_googlemaps import Map
 from monolith.utilities.restaurant import validate_hours
 from monolith.database import db, Restaurant, Rating, Booking, User, Table
-from monolith.auth import admin_required, current_user, is_admin, operator_required
+from monolith.auth import admin_required, current_user,operator_required
 from flask_login import current_user, login_user, logout_user, login_required
 from monolith.forms import UserForm, BookingForm, BookingList, RestaurantEditForm, TableAddForm, SearchRestaurantForm, RatingAddForm
 from monolith.utilities.restaurant import is_busy_table
