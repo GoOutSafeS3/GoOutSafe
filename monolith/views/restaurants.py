@@ -330,6 +330,14 @@ def restaurant_reservations_overview(restaurant_id, year, month, day):
 @restaurants.route('/tables/add', methods=['GET', 'POST'])
 @operator_required
 def _add_tables():
+    """ Adds a new table to the current user's restaurant
+
+    Error status codes:
+        400 -- The requested table capacity is invalid, or the request is malformed
+        401 -- The request has been sent by an unauthenticated user, or the user
+                is not the owner of a restaurant
+    """
+
     form = TableAddForm()
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -350,6 +358,15 @@ def _add_tables():
 @restaurants.route('/tables/<int:table_id>/edit', methods=['GET', 'POST'])
 @operator_required
 def _edit_tables(table_id):
+    """ Edits the info of a table
+
+    Error status codes:
+        400 -- The requested table capacity is invalid, or the request is malformed
+        401 -- The request has been sent by an unauthenticated user, or
+               the user is not the owner of the table's restaurant
+        404 -- A table with id table_id has not been found
+    """
+    
     table = db.session.query(Table).filter(Table.id == table_id).first()
 
     if table is None:
@@ -378,6 +395,15 @@ def _edit_tables(table_id):
 @restaurants.route('/tables/<int:table_id>/delete')
 @operator_required
 def delete_table(table_id):
+    """ Deletes a table
+
+    Error status codes:
+        401 -- The request has been sent by an unauthenticated user, or
+               the user is not the owner of the table's restaurant
+        404 -- A table with id table_id has not been found
+        412 -- The table has pending reservations, those must be deleted first
+    """
+
     table = db.session.query(Table).filter(Table.id == table_id).first()
 
     if table is None:
