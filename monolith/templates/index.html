@@ -66,11 +66,7 @@
                 <h5>
                   <li>
                        <a href="/restaurants/{{ restaurant.id }}"> {{restaurant.name}}  </a>
-                         {% if restaurant.likes is none %}
-                            has No Likes
-                         {% else %}
-                            has {{restaurant.likes}} Likes
-                         {% endif %}
+                       {{ restaurant.rating_val | round( 1, 'ceil') }}/5 Stars with {{restaurant.rating_num}} ratings
                   </li>   
                 </h5>
               </div>

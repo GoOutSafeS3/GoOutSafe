@@ -3,6 +3,7 @@ from monolith.auth import current_user
 from datetime import timedelta
 
 def book_a_table(restaurant, number_of_people, booking_datetime, table):
+    """ Add the reservation record in the database """
     new_booking = Booking()
     new_booking.user_id = current_user.id
     new_booking.rest_id = restaurant.id
@@ -14,6 +15,7 @@ def book_a_table(restaurant, number_of_people, booking_datetime, table):
 
 
 def update_a_reservation(record, number_of_people, booking_datetime, table):
+    """ Edit the reservation record in the database """
     record.people_number = number_of_people
     record.booking_datetime = booking_datetime
     record.table_id = table
@@ -21,6 +23,12 @@ def update_a_reservation(record, number_of_people, booking_datetime, table):
     db.session.commit()
 
 def get_table(restaurant, number_of_people, booking_datetime):
+    """ Given a reservation, check if there is a table available
+
+    Return:
+        The Table record -> if a table is available
+        False -> otherwise
+    """
     delta = restaurant.occupation_time
     starting_period = booking_datetime - timedelta(hours=delta)
     ending_period = booking_datetime + timedelta(hours=delta)
@@ -44,6 +52,12 @@ def get_table(restaurant, number_of_people, booking_datetime):
 
 
 def try_to_book(restaurant_id, number_of_people, booking_datetime):
+    """ Given a reservation, check if there is a table available and if possible assign the table to the reservation
+
+    Return:
+        True -> The procedure was successful
+        False -> otherwise
+    """
     record = db.session.query(Restaurant).filter_by(id = restaurant_id).first()
     if record is None:
         return False
@@ -59,6 +73,14 @@ def try_to_book(restaurant_id, number_of_people, booking_datetime):
 
 
 def try_to_update(record, number_of_people, booking_datetime):
+    """ Given an existing reservation, 
+    and one or more fields of the reservation required to be changed
+    check if there is a new table available and if possible assign the table to the reservation
+
+    Return:
+        True -> The procedure was successful
+        False -> otherwise
+    """
     rest = db.session.query(Restaurant).filter_by(id = record.rest_id).first()
     if rest is None:
         return False

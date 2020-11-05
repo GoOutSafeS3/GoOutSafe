@@ -35,7 +35,7 @@
                                 {% endif %}
                         {% endif %}
                     {% endfor %}
-
+                    <hr>                  
                      <h5>Already read </h5>
 
                     {% for notification in notifications | sort(attribute='datetime')%}
@@ -83,7 +83,7 @@
                             {% endif %}
                         {% endif %}
                     {% endfor %}
-
+                    <hr>               
                     <h5>Already read </h5>
                     {% for notification in notifications | sort(attribute='datetime') %}
                         {% if notification.already_read %}

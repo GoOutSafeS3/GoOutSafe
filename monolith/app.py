@@ -12,11 +12,16 @@ import datetime
 import configparser
 
 
-DEFAULT_CONFIGURATION = {
+DEFAULT_CONFIGURATION = { 
+    """
+    The default app configuration: 
+    in case a configuration is not found or 
+    some data is missing
+    """
 
-    "fake_data" : False,
-    "remove_db" : False,
-    "db_dropall" : False,
+    "fake_data" : False, # insert some default data in the database (for tests)
+    "remove_db" : False, # remove database file when the app starts
+    "db_dropall" : False, # remove the record in the database when the app starts
 
     "wtf_csrf_secret_key" : 'A SECRET KEY',
     "secret_key" : 'ANOTHER ONE',
@@ -26,21 +31,36 @@ DEFAULT_CONFIGURATION = {
     "result_backend" : os.getenv("BACKEND", "redis://localhost:6379"),
     "broker_url" : os.getenv("BROKER", "redis://localhost:6379"),
 
-    "unmark_after": 30 #seconds
+    "unmark_after": 30 # every how many seconds the background task is started to check if there are positive users to demark
+    
 }
 
 def get_config(configuration=None):
+    """
+    returns a json file containing the configuration to use in the app
+
+    The configuration to be used can be passed as a parameter, 
+    otherwise the one indicated by default in config.ini is chosen
+
+    ------------------------------------
+    [CONFIG]
+    CONFIG = The_default_configuration
+    ------------------------------------
+
+    Params:
+        - configuration: if it is a string it indicates the configuration to choose in config.ini
+    """
     parser = configparser.ConfigParser()
     if parser.read('config.ini') != []:
         
-        if type(configuration) != str:
+        if type(configuration) != str: # if it's not a string, take the default one
             configuration = parser["CONFIG"]["CONFIG"]
 
         print("- GoOutSafe CONFIGURATION:",configuration)
-        configuration = parser._sections[configuration]
+        configuration = parser._sections[configuration] # get the configuration data
 
         for k,v in DEFAULT_CONFIGURATION.items():
-            if not k in configuration:
+            if not k in configuration: # if some data are missing enter the default ones
                 configuration[k] = v
 
         return configuration
@@ -48,6 +68,11 @@ def get_config(configuration=None):
         return DEFAULT_CONFIGURATION
 
 def fake_data():
+    """
+    Records to be inserted in the database 
+    when the application is started 
+    in case of testing (manual or unit)
+    """
     example_cust = User()
     example_cust.firstname = 'Customer'
     example_cust.lastname = 'Customer'
@@ -410,6 +435,9 @@ def fake_data():
     db.session.commit()
 
 def init():
+    """
+    Enter the information about the admin and the health authority when starting the app
+    """
     q = db.session.query(User).filter(User.email == 'example@example.com')
     admin = q.first()
     if admin is None:
@@ -437,6 +465,15 @@ def init():
         db.session.commit()
 
 def create_app(configuration):
+
+    """
+    Create the app
+
+    Can receive a string that specifies the configuration to use
+
+    Params:
+        -  configuration: if it is a string it indicates the configuration to use, otherwise it is ignored
+    """
 
     app = Flask(__name__)
 

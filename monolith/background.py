@@ -13,6 +13,11 @@ _APP = None
 
 @celery.task
 def unmark():
+    """
+    Search all positive users and 
+    for those who have been positive for more than 14 days 
+    marks them as negative
+    """
     with _APP.app_context():
         now = datetime.datetime.now()
         users = db.session.query(User)\

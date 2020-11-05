@@ -91,7 +91,9 @@ class Restaurant(db.Model):
     operators = relationship('User')
 
     def is_open(self, booking_datetime):
-
+        """
+        Given a datetime, check that the restaurant is open on that date
+        """
         if str(booking_datetime.weekday()+1) in self.closed_days:
             return False
 
@@ -134,8 +136,8 @@ class Booking(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
     people_number = db.Column(db.Integer)
-    booking_datetime = db.Column(db.DateTime)
-    entrance_datetime = db.Column(db.DateTime, default = None)
+    booking_datetime = db.Column(db.DateTime) # the time of  booking
+    entrance_datetime = db.Column(db.DateTime, default = None) # the time of entry
     table_id = db.Column(db.Integer, db.ForeignKey('table.id'))
 
     user = relationship('User')

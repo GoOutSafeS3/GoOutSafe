@@ -38,6 +38,13 @@ def _restaurants(message=''):
 
 @restaurants.route('/restaurants/search', methods=["GET", "POST"])
 def search_res():
+    """
+    It allows you to filter the search for restaurants based on the desired characteristics
+
+    Error status code:
+        400 -- The form is filled out incorrectly
+        404 -- No restaurant with those characteristics was found
+    """
     form = SearchRestaurantForm()
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -73,7 +80,7 @@ def search_res():
                 flash("No restaurant found", "error")
                 return make_response(render_template('form.html', form=form, title="Find a restaurant!"), 404)
 
-            sndmap = Map(
+            sndmap = Map( # make the maps of restaurants
                 identifier="sndmap",
                 lat=43.72,
                 lng=10.40,
