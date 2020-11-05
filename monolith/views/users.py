@@ -105,7 +105,7 @@ def delete_user():
                         db.session.commit()
                         flash('Your account has been deleted', 'success')
                         return redirect('/', code=302)
-                    except:
+                    except: # pragma: no cover
                         db.session.rollback()
                         flash('There was a problem, please try again', 'error')
                         return make_response(render_template('delete_profile.html', form=form, title="Unregister"), 400)

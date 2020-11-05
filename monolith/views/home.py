@@ -7,7 +7,7 @@ home = Blueprint('home', __name__)
 
 
 @home.route('/')
-def index(): 
+def index():
     """
     returns The Homepage
     """

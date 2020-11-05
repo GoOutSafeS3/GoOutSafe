@@ -18,7 +18,7 @@ def mark_as_positive(user_id):
             qry.positive_datetime = datetime.now()
             db.session.commit()
             return True
-    except:
+    except: # pragma: no cover
             db.session.rollback()
             return False
 
@@ -39,7 +39,7 @@ def unmark_as_positive(user_id):
             qry.positive_datetime = None
             db.session.commit()
             return True
-    except:
+    except: # pragma: no cover
             db.session.rollback()
             return False
 
