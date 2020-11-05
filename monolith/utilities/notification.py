@@ -4,6 +4,7 @@ from monolith.database import Notification, db, Booking, User, Restaurant
 
 
 def add_notification(user_positive_id, user_notified_id, type):
+    """ Add the notification in the database """
     if Notification.query.filter_by(user_positive_id=user_positive_id, user_notified_id=user_notified_id).first() is None:
         new_notification = Notification()
         new_notification.user_positive_id = user_positive_id
@@ -18,6 +19,7 @@ def add_notification(user_positive_id, user_notified_id, type):
 
 
 def add_notification_restaurant_closed(rest, user_notified_id, booking_datetime):
+    """ Add the notification closed restaurant in the database """
     today = datetime.today()
     notification = Notification()
     notification.datetime = today
@@ -31,6 +33,7 @@ def add_notification_restaurant_closed(rest, user_notified_id, booking_datetime)
 
 
 def delete_notification(notification_id):
+    """ Delete the notification from the database """
     notification = Notification.query.filter_by(notification_id=notification_id).first()
     if notification is not None:
         notification.already_read = True
@@ -40,6 +43,7 @@ def delete_notification(notification_id):
 
 
 def add_bookings_notifications(user_id):
+    """ Add the notifications about future booking by positive users """
     today = datetime.today()
     user_bookings = db.session.query(Booking). \
         filter(Booking.user_id == user_id). \

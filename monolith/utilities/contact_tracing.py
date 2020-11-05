@@ -100,6 +100,15 @@ def get_user_visited_restaurants(user_id, date_begin, date_end):
 
 
 def get_operators_contacts(user_id, date_begin, date_end):
+    """
+    Returns the list of operators owning the restaurants that a specific (positive) user has visited
+
+    A restaurant is considered visited by a user if said user has at least one
+    booking for that restaurant in the specified timespan.
+
+    user_id -- The id of the user whose visited restaurants should be returned
+    date_begin, date_end -- The timespan in which the restaurants have been visited
+    """
     restaurants = get_user_visited_restaurants(user_id,date_begin,date_end)
     operators_ids = set()
     for restaurant in restaurants:

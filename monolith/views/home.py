@@ -8,6 +8,9 @@ home = Blueprint('home', __name__)
 
 @home.route('/')
 def index():
+    """
+    returns The Homepage
+    """
     result = log.delay("Logging Stuff")
     print(result.wait())
     notifications = None

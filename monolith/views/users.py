@@ -62,7 +62,8 @@ def delete_user():
     The request is approved only if the user is not positive.
 
     If the user is an operator, the restaurant is also deleted. 
-    In that case, a notification is sent to all users who had active bookings.
+    In that case, a notification is sent to all users who had active bookings,
+    and bookings are canceled.
 
     The functionality is not active for the health authority or for the admin.
 
