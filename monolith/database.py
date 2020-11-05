@@ -161,6 +161,44 @@ class Rating(db.Model):
 
 
 class Notification(db.Model):
+    """
+    Table containing GoOutSafe notifications
+
+    fields of the table:
+
+    - notification_id: number representing the notification
+
+    - user_positive_id: useful in the event of a notification for a positive user
+     addressed to an operator or customer.
+
+    - rest_closed_name:  this field indicates a restaurant that has been deleted
+    from the system. it is useful to communicate this to customers who had an
+    active reservation in that restaurant.
+
+    - user_positive_email: customer email that has been marked as positive.
+     Useful to communicate the customer email to the operator,
+     who will have to cancel the customer reservation.
+
+    - user_positive_name: customer name (firstname + lastname) that has been
+     marked as positive. Useful to communicate the customer name to the
+     operator, who will have to cancel the customer reservation.
+
+    - user_booking_date: customer booking date that has been
+     marked as positive. Useful to communicate the booking to delete.
+
+    - user_notified_id: id of the user who will receive the notification.
+
+    - already_read: boolean representing whether the notification has been read.
+
+    - datetime: day on which the notification was generated.
+
+    - operator_notification_type: type of operator notification,
+      depending on the type, a certain message will be shown on the page.
+
+    - customer_notification_type: type of customer notification,
+      depending on the type, a certain message will be shown on the page.
+
+    """
     __tablename__ = 'notification'
 
     notification_id = db.Column(db.Integer, autoincrement=True, primary_key = True)
