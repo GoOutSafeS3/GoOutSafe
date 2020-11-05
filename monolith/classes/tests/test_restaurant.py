@@ -30,6 +30,14 @@ class TestRestaurant(unittest.TestCase):
         do_logout(client)
         self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text = True))
 
+    def test_restaurants_map_notcustomer(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "example@example.com", "admin")
+        reply = client.t_get("/restaurants_map")
+        self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text = True))
+        do_logout(client)
+
     def test_profile_has_name(self):
         client = self.app.test_client()
         client.set_app(self.app)
@@ -232,20 +240,20 @@ class TestRestaurant(unittest.TestCase):
         do_login(client, "operator@example.com","operator")
         reply = client.t_get("/restaurants/1/overview/2020/10/5")
         reply_data = reply.get_data(as_text = True)
-        self.assertIn("Lunch", reply_data)
-        self.assertIn("Dinner", reply_data)
+        self.assertIn("First opening:", reply_data)
+        self.assertIn("Second opening:", reply_data)
 
         today = datetime.datetime.today()
         reply = client.t_get(f"/restaurants/1/overview/{today.year}/{today.month}/{today.day}")
         reply_data = reply.get_data(as_text = True)
-        self.assertIn("Lunch", reply_data)
-        self.assertNotIn("Dinner", reply_data)
+        self.assertIn("First opening:", reply_data)
+        self.assertNotIn("Second opening:", reply_data)
 
         today = datetime.datetime.today()
         reply = client.t_get(f"/restaurants/1/overview/2020/10/3")
         reply_data = reply.get_data(as_text = True)
-        self.assertNotIn("Lunch", reply_data)
-        self.assertIn("Dinner", reply_data)
+        self.assertNotIn("First opening:", reply_data)
+        self.assertIn("Second opening:", reply_data)
 
     def test_overview_wrong_operator(self):
         client = self.app.test_client()

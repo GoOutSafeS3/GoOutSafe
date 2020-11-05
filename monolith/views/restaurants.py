@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, render_template, request, make_response, 
 from flask_googlemaps import Map
 from monolith.utilities.restaurant import validate_hours
 from monolith.database import db, Restaurant, Rating, Booking, User, Table
-from monolith.auth import admin_required, current_user, is_admin, operator_required
+from monolith.auth import admin_required, current_user,operator_required
 from flask_login import current_user, login_user, logout_user, login_required
 from monolith.forms import UserForm, BookingForm, BookingList, RestaurantEditForm, TableAddForm, SearchRestaurantForm, RatingAddForm
 from monolith.utilities.restaurant import is_busy_table
@@ -98,6 +98,13 @@ def search_res():
 
 @restaurants.route('/restaurants/<int:restaurant_id>')
 def restaurant_sheet(restaurant_id):
+    """ Shows the profile page of a restaurant, which includes its name,
+    ratings, position on the map, opening hours etc.
+
+    Error status code:
+        404 -- No restaurant with id restaurant_id was found
+    """
+
     record = db.session.query(Restaurant).filter_by(id=restaurant_id).first()
     if record is None:
         return make_response(render_template('error.html', error='404'), 404)
@@ -129,6 +136,15 @@ def restaurant_sheet(restaurant_id):
 @restaurants.route('/restaurants/<int:restaurant_id>/rate', methods=['GET', "POST"])
 @login_required
 def _rate(restaurant_id):
+    """ Submits a rating to a restaurant, in a range from 1 to 5
+
+    Error status code:
+        400 -- The currently logged-in user has already rated this restaurant, or
+               the request is malformed
+        401 -- The user is not logged-in
+        404 -- No restaurant with id restaurant_id was found
+    """
+
     record = db.session.query(Restaurant).filter_by(id=restaurant_id).first()
     if record is None:
         return make_response(render_template('error.html', error='404'), 404)
@@ -154,6 +170,17 @@ def _rate(restaurant_id):
 @restaurants.route('/restaurants/<int:restaurant_id>/edit', methods=['GET', 'POST'])
 @operator_required
 def _edit_restaurant(restaurant_id):
+    """ Show the page for editing the restaurant with GET, the form can be submitted with POST
+
+    Error status codes:
+        400 -- The request is not valid, the form is filled out incorrectly or a generic error has occurred
+        401 -- The current user is not an operator or the operator of this restaurant
+        404 -- The restaurant does not exists
+
+    Success codes:
+        200 -- The form is sent to the user
+        302 -- The modification was accepted
+    """
     record = db.session.query(Restaurant).filter_by(id=restaurant_id).first()
 
     if record is None:
@@ -314,6 +341,18 @@ def restaurant_reservations_overview(restaurant_id, year, month, day):
 @restaurants.route('/tables/add', methods=['GET', 'POST'])
 @operator_required
 def _add_tables():
+    """ Adds a new table to the current user's restaurant
+
+    Error status codes:
+        400 -- The requested table capacity is invalid, or the request is malformed
+        401 -- The request has been sent by an unauthenticated user, or the user
+                is not the owner of a restaurant
+
+    Success codes:
+        200 -- The form is sent to the user
+        302 -- The addition is accepted
+    """
+
     form = TableAddForm()
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -334,6 +373,19 @@ def _add_tables():
 @restaurants.route('/tables/<int:table_id>/edit', methods=['GET', 'POST'])
 @operator_required
 def _edit_tables(table_id):
+    """ Edits the info of a table
+
+    Error status codes:
+        400 -- The requested table capacity is invalid, or the request is malformed
+        401 -- The request has been sent by an unauthenticated user, or
+               the user is not the owner of the table's restaurant
+        404 -- A table with id table_id has not been found
+
+    Success codes:
+        200 -- The form is sent to the user
+        302 -- The edit is accepted
+    """
+    
     table = db.session.query(Table).filter(Table.id == table_id).first()
 
     if table is None:
@@ -362,6 +414,18 @@ def _edit_tables(table_id):
 @restaurants.route('/tables/<int:table_id>/delete')
 @operator_required
 def delete_table(table_id):
+    """ Deletes a table
+
+    Error status codes:
+        401 -- The request has been sent by an unauthenticated user, or
+               the user is not the owner of the table's restaurant
+        404 -- A table with id table_id has not been found
+        412 -- The table has pending reservations, those must be deleted first
+
+    Success codes:
+        302 -- The deletion is accepted
+    """
+
     table = db.session.query(Table).filter(Table.id == table_id).first()
 
     if table is None:

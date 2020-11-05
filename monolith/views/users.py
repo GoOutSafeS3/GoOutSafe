@@ -3,7 +3,7 @@ from flask import Blueprint, redirect, render_template, request, flash, make_res
 from flask_login import login_required, logout_user, current_user, login_user
 from monolith.utilities.contact_tracing import get_user_contacts
 from werkzeug.security import check_password_hash
-from monolith.auth import is_admin, health_authority_required, admin_required
+from monolith.auth import health_authority_required, admin_required
 from monolith.database import User, db, Restaurant, Booking
 from monolith.forms import UserForm, OperatorForm, LoginForm, EditUserForm
 from monolith.utilities.notification import add_notification_restaurant_closed
@@ -62,7 +62,8 @@ def delete_user():
     The request is approved only if the user is not positive.
 
     If the user is an operator, the restaurant is also deleted. 
-    In that case, a notification is sent to all users who had active bookings.
+    In that case, a notification is sent to all users who had active bookings,
+    and bookings are canceled.
 
     The functionality is not active for the health authority or for the admin.
 
@@ -104,7 +105,7 @@ def delete_user():
                         db.session.commit()
                         flash('Your account has been deleted', 'success')
                         return redirect('/', code=302)
-                    except:
+                    except: # pragma: no cover
                         db.session.rollback()
                         flash('There was a problem, please try again', 'error')
                         return make_response(render_template('delete_profile.html', form=form, title="Unregister"), 400)

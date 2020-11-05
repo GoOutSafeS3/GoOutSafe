@@ -6,7 +6,7 @@ from flask_login import current_user
 from utils import do_login, do_logout
 import datetime
 
-class TestRestaurant(unittest.TestCase):
+class TestNotifications(unittest.TestCase):
     @classmethod
     def setUp(self):
         self.app = create_app("TEST")
@@ -18,6 +18,20 @@ class TestRestaurant(unittest.TestCase):
 
         reply = client.t_get("/notifications")
         self.assertEqual(reply.status_code, 401)
+
+    def test_notifications_need_CO_login(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+
+        do_login(client, "example@example.com", "admin")
+        reply = client.t_get("/notifications")
+        self.assertEqual(reply.status_code, 404)
+        do_logout(client)
+
+        do_login(client, "health@authority.com", "health")
+        reply = client.t_get("/notifications")
+        self.assertEqual(reply.status_code, 404)
+        do_logout(client)
 
     def test_user_notifications(self):
         client = self.app.test_client()
@@ -87,11 +101,20 @@ class TestRestaurant(unittest.TestCase):
             "ssn":""
             }
 
-        reply = client.t_post("/positives/mark", form)
+        client.t_post("/positives/mark", form)
+        do_logout(client)
 
+        do_login(client, "customer@example.com", "customer")
+        reply = client.t_get("/notifications/1/mark_as_read")
+        self.assertEqual(reply.status_code, 401)
         do_logout(client)
 
         do_login(client, "alice@example.com", "alice")
         reply = client.t_get("/notifications/1/mark_as_read")
         self.assertEqual(reply.status_code, 200)
+        do_logout(client)
+
+
+
+
 

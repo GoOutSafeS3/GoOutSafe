@@ -9,6 +9,17 @@ map = Blueprint('map', __name__)
 @map.route('/restaurants_map', methods=['GET'])
 @login_required
 def map_page():
+    """ returns a map of all restaurants in GoOutSafe
+
+        You must logged as customer
+
+        Error status codes:
+            401 -- If a user other than customer tries to view it
+    """
+    if current_user.is_admin or current_user.is_health_authority or current_user.rest_id is not None:
+        return make_response(render_template('error.html', error='401'), 401)
+
+
     restaurants = Restaurant.query.all()
     markers_to_add = []
     for restaurant in restaurants:

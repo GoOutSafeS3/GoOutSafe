@@ -1,5 +1,4 @@
 import os
-from flask import Flask
 from flask_googlemaps import GoogleMaps, Map
 from monolith.database import db, User, Restaurant, Booking, Table, Rating
 from monolith.views import blueprints
@@ -7,6 +6,7 @@ from monolith.auth import login_manager
 from monolith.background import init_celery
 from celery import Celery
 import sys
+from flask import Flask
 import os
 import datetime
 import configparser

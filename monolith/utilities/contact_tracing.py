@@ -18,7 +18,7 @@ def mark_as_positive(user_id):
             qry.positive_datetime = datetime.now()
             db.session.commit()
             return True
-    except:
+    except: # pragma: no cover
             db.session.rollback()
             return False
 
@@ -39,7 +39,7 @@ def unmark_as_positive(user_id):
             qry.positive_datetime = None
             db.session.commit()
             return True
-    except:
+    except: # pragma: no cover
             db.session.rollback()
             return False
 
@@ -100,6 +100,16 @@ def get_user_visited_restaurants(user_id, date_begin, date_end):
 
 
 def get_operators_contacts(user_id, date_begin, date_end):
+
+    """ Returns the list of operators whose restaurant has been visited by
+    specific user in a certain timespan
+
+    See `get_user_visited_restaurants` for details on when a restaurant is
+    considered visited by a user.
+
+    user_id -- The id of the user whose visits should be considered
+    date_begin, date_end -- The timespan in which the restaurants have been visited
+    """
     restaurants = get_user_visited_restaurants(user_id,date_begin,date_end)
     operators_ids = set()
     for restaurant in restaurants:
