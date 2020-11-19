@@ -1,67 +1,8 @@
 from datetime import datetime
-
+from monolith.utilities.request_timeout import get, post, put, delete
 import datetime
-import requests
 
 BOOKINGS_SERVICE = "http://172.19.0.1:8080/"
-TIMEOUT = 1
-
-def _get(url):
-    """ Makes a get request with a timeout.
-
-    Returns the json object if with the status code (or None, None in case of timeout).
-    """
-    try:
-        r = requests.get(url, timeout=TIMEOUT)
-        try:
-            return r.json() ,r.status_code
-        except:
-            return None, r.status_code  
-    except:
-        return None,None
-
-def _post(url,json):
-    """ Makes a post request with a timeout.
-
-    Returns the json object if with the status code (or None, None in case of timeout).
-    """
-    try:
-        r = requests.post(url, json=json, timeout=TIMEOUT)
-        try:
-            return r.json() ,r.status_code
-        except:
-            return None, r.status_code  
-    except:
-        return None,None
-
-def _put(url,json):
-    """ Makes a put request with a timeout.
-
-    Returns the json object if with the status code (or None, None in case of timeout).
-    """
-    try:
-        r = requests.put(url, json=json, timeout=TIMEOUT)
-        try:
-            return r.json() ,r.status_code
-        except:
-            return None, r.status_code  
-    except:
-        return None,None
-
-def _delete(url):
-    """ Makes a delete request with a timeout.
-
-    Returns the json object if with the status code (or None, None in case of connection error).
-    """
-    try:
-        r = requests.delete(url, timeout=TIMEOUT)
-        try:
-            return r.json() ,r.status_code
-        except:
-            return None, r.status_code   
-    except:
-        return None,None
-
 
 def get_bookings(user=None, rest=None, table=None, begin=None, end=None):
     url = BOOKINGS_SERVICE+"bookings?"
@@ -81,10 +22,10 @@ def get_bookings(user=None, rest=None, table=None, begin=None, end=None):
     if end is not None:
         url += "end="+str(end)+"&"
 
-    return _get(url)
+    return get(url)
 
 def get_a_booking(id):
-    return _get(BOOKINGS_SERVICE+"bookings/"+str(id))
+    return get(BOOKINGS_SERVICE+"bookings/"+str(id))
 
 def new_booking(user_id, rest_id, number_of_people, booking_datetime):
     booking = {
@@ -94,7 +35,7 @@ def new_booking(user_id, rest_id, number_of_people, booking_datetime):
         "booking_datetime":booking_datetime,
     }
 
-    return _post(BOOKINGS_SERVICE+"bookings",booking)
+    return post(BOOKINGS_SERVICE+"bookings",booking)
 
 def edit_booking(booking_id, number_of_people=None, booking_datetime=None):
     booking = {
@@ -106,10 +47,10 @@ def edit_booking(booking_id, number_of_people=None, booking_datetime=None):
     if booking_datetime is not None:
         booking["booking_datetime"] = booking_datetime
 
-    return _put(BOOKINGS_SERVICE+"bookings/"+str(booking_id),booking)
+    return put(BOOKINGS_SERVICE+"bookings/"+str(booking_id),booking)
 
 def delete_booking(id):
-    return _delete(BOOKINGS_SERVICE+"bookings/"+str(id))
+    return delete(BOOKINGS_SERVICE+"bookings/"+str(id))
 
 if __name__ == "__main__":
     print(new_booking(1,3,1,(datetime.datetime.now()+datetime.timedelta(days=2)).isoformat()),"\n")
