@@ -4,6 +4,7 @@ from monolith.auth import admin_required, current_user, operator_required
 from flask_login import current_user, login_user, logout_user, login_required
 from monolith.forms import UserForm, BookingForm, BookingList
 from monolith.utilities.reservations import try_to_book, try_to_update
+from monolith.utilities.booking_client import get_bookings, get_a_booking, new_booking, edit_booking, delete_booking
 import datetime
 
 reservations = Blueprint('reservations', __name__)
@@ -96,12 +97,27 @@ def _booking_list(restaurant_id):
                 flash("Invalid time interval","error")
                 return make_response(render_template('form.html', form=form, title="View reservations"),400)
 
+
+            qry,status_code = get_bookings(rest=int(current_user.get_rest_id()), begin=from_datetime.isoformat(), end=to_datetime.isoformat())
+            
+            if status_code is None or status_code == 500:
+                flash("Sorry, an error occured. Please, try again.","error")
+                qry = []
+            elif qry is None:
+                qry = []
+                flash("No reservations were found","warning")
+
+            flash(qry,"success")
+            flash(status_code,"success")
+
+            """
             qry = db.session.query(Booking,User)\
                             .filter_by(rest_id = current_user.get_rest_id())\
                             .filter(User.id == Booking.user_id)\
                             .filter(from_datetime <= Booking.booking_datetime)\
                             .filter(Booking.booking_datetime <= to_datetime )\
                             .all()
+            """
 
             return make_response(render_template("reservations.html", reservations=qry, title="View reservations"),200)
 

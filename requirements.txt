@@ -7,3 +7,4 @@ flask-sqlalchemy
 pip-tools
 email-validator
 flask-googlemaps
+requests

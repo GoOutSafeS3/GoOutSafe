@@ -12,12 +12,12 @@ import datetime
 import configparser
 
 
-DEFAULT_CONFIGURATION = { 
-    """
+"""
     The default app configuration: 
     in case a configuration is not found or 
     some data is missing
-    """
+"""
+DEFAULT_CONFIGURATION = { 
 
     "fake_data" : False, # insert some default data in the database (for tests)
     "remove_db" : False, # remove database file when the app starts
@@ -31,8 +31,7 @@ DEFAULT_CONFIGURATION = {
     "result_backend" : os.getenv("BACKEND", "redis://localhost:6379"),
     "broker_url" : os.getenv("BROKER", "redis://localhost:6379"),
 
-    "unmark_after": 30 # every how many seconds the background task is started to check if there are positive users to demark
-    
+    "unmark_after": 30, # every how many seconds the background task is started to check if there are positive users to demark
 }
 
 def get_config(configuration=None):
