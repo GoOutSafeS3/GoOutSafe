@@ -3,8 +3,6 @@ from flask_googlemaps import GoogleMaps, Map
 from monolith.database import db, User, Restaurant, Booking, Table, Rating
 from monolith.views import blueprints
 from monolith.auth import login_manager
-from monolith.background import init_celery
-from celery import Celery
 import sys
 from flask import Flask
 import os
@@ -518,23 +516,6 @@ def create_app(configuration):
         init()
         if config["fake_data"]:
             fake_data()
-
-    return app
-
-def create_worker_app():
-    configuration = os.getenv("CONFIG", "TEST")
-    config = get_config(configuration)
-    app = Flask(__name__)
-    app.config['WTF_CSRF_SECRET_KEY'] = config["wtf_csrf_secret_key"]
-    app.config['SECRET_KEY'] = config["secret_key"]
-    app.config['SQLALCHEMY_DATABASE_URI'] = config["sqlalchemy_database_uri"]
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config["sqlalchemy_track_modifications"]
-    app.config['result_backend'] = config['result_backend']
-    app.config['broker_url'] = config['broker_url']
-    app.config["UNMARK_AFTER"] = config['unmark_after']
-    
-    db.init_app(app)
-    init_celery(app, worker=True)
 
     return app
 

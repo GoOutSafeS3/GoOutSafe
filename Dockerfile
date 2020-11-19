@@ -6,8 +6,6 @@ ADD . /code
 WORKDIR /code
 
 ENV FLASK_APP=monolith.app:create_app
-ENV BROKER=redis://redis:6379
-ENV BACKEND=redis://redis:6379
 ENV CONFIG=PRODUCTION
 
 RUN cp /code/docker/* /code/
