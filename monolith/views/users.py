@@ -4,7 +4,7 @@ from flask_login import login_required, logout_user, current_user, login_user
 from monolith.utilities.contact_tracing import get_user_contacts
 from werkzeug.security import check_password_hash
 from monolith.auth import health_authority_required, admin_required
-from monolith.database import User, db, Restaurant, Booking
+from monolith.app import gateway
 from monolith.forms import UserForm, OperatorForm, LoginForm, EditUserForm
 from monolith.utilities.notification import add_notification_restaurant_closed
 
@@ -21,7 +21,10 @@ def _users():
     Error status codes:
         401 -- If a user other than admin tries to view it
     """
-    users = db.session.query(User)
+    users, status = gateway.get_users()
+    if users is None or status != 200:
+        return render_template("error.html", error=500), 500
+    
     return render_template("users.html", users=users)
 
 
@@ -35,21 +38,15 @@ def user_bookings():
     Error status codes:
         404 -- If the current user is not a customer
     """
-    if current_user.is_admin or current_user.is_health_authority or current_user.rest_id is not None:
+    if current_user['is_admin'] or current_user['is_health_authority'] or current_user['rest_id'] is not None:
         return make_response(render_template('error.html', error='404'),404)
-
-    now = datetime.now()
-
-    qry = db.session.query(Booking,Restaurant)\
-                    .filter(Booking.rest_id == Restaurant.id)\
-                    .filter(Booking.user_id == current_user.id)\
-                    .filter(Booking.booking_datetime >= now)\
-                    .order_by(Booking.booking_datetime).all()
     
-    if qry == []:
+    reservations, status = gateway.get_user_future_reservations(current_user['id'])
+
+    if reservations == []:
         flash("There are no reservations", "warning")
 
-    return make_response(render_template('bookings.html', bookings=qry, title="Your Reservations"),200)
+    return make_response(render_template('bookings.html', bookings=reservations, title="Your Reservations"),200)
 
 
 @users.route('/delete', methods=['GET', 'POST'])

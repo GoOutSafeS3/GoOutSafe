@@ -1,22 +1,18 @@
 from flask import Blueprint, render_template, make_response
-from monolith.database import db, Restaurant, Notification
+from monolith.app import gateway
 from monolith.auth import current_user
-from monolith.background import log
 
 home = Blueprint('home', __name__)
-
 
 @home.route('/')
 def index():
     """
     returns The Homepage
     """
-    result = log.delay("Logging Stuff")
-    print(result.wait())
     notifications = None
     if current_user is not None and hasattr(current_user, 'id'):
-        restaurants = db.session.query(Restaurant).filter_by(id=current_user.rest_id)
-        notifications = db.session.query(Notification).filter_by(user_notified_id=current_user.id).all()
+        restaurants, status_rest = gateway.get_restaurant(current_user['rest_id'])
+        notifications, status_noti = gateway.get_notifications(current_user['id'])
     else:
         restaurants = None
     return render_template("index.html", restaurants=restaurants, notifications=notifications)

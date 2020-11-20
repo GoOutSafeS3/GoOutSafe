@@ -1,10 +1,8 @@
 import functools
 from flask_login import current_user, LoginManager
-from monolith.database import User
-
+from monolith.app import gateway
 
 login_manager = LoginManager()
-
 
 def admin_required(func):
     @functools.wraps(func)
@@ -40,7 +38,9 @@ def operator_required(func):
 
 @login_manager.user_loader
 def load_user(user_id):
-    user = User.query.get(user_id)
-    if user is not None:
+    user, status = gateway.get_user(user_id)
+    if status == 200:
         user._authenticated = True
-    return user
+        return user
+    else:
+        return None

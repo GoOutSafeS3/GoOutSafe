@@ -1,5 +1,5 @@
 from flask import Blueprint, redirect, render_template, request, make_response, flash
-from monolith.database import db, Restaurant, Booking, User, Table
+from monolith.app import gateway
 from flask_login import current_user, login_required
 from flask_googlemaps import GoogleMaps, Map
 
@@ -20,14 +20,14 @@ def map_page():
         return make_response(render_template('error.html', error='401'), 401)
 
 
-    restaurants = Restaurant.query.all()
+    restaurants, status = gateway.get_restaurants()
     markers_to_add = []
     for restaurant in restaurants:
         rest = {
             'icon': 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-            'lat': restaurant.lat,
-            'lng': restaurant.lon,
-            'infobox': restaurant.name
+            'lat': restaurant['lat'],
+            'lng': restaurant['lon'],
+            'infobox': restaurant['name']
         }
         markers_to_add.append(rest)
     sndmap = Map(
