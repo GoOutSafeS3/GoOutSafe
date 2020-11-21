@@ -10,7 +10,7 @@ def login():
     form = LoginForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            user, status = gateway.create_user(form.data)
+            user, status = gateway.login_user(request.form)
             if status == 200 and user is not None:
                 login_user(user)
                 return redirect('/')

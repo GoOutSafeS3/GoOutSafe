@@ -32,9 +32,14 @@ class GatewayInterface(ABC):
         pass
 
     @classmethod
-    def create_user(self, userdata: Dict):
+    def create_user(self, userdata: Dict) -> Tuple[Dict, int]:
         userdata['password'] = generate_password_hash(userdata['password'])
         return self._create_user(userdata)
+
+    @classmethod
+    @abstractmethod
+    def login_user(self, userdata: Dict) -> Tuple[Dict, int]:
+        pass
 
     @classmethod
     def check_authenticate(self, user_id: int, password: str):
