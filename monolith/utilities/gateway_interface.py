@@ -31,6 +31,19 @@ class GatewayInterface(ABC):
     def _create_user(self, userdata: Dict) -> Tuple[Dict, int]:
         pass
 
+    @classmethod
+    def create_user(self, userdata: Dict):
+        userdata['password'] = generate_password_hash(userdata['password'])
+        return self._create_user(userdata)
+
+    @classmethod
+    def check_authenticate(self, user_id: int, password: str):
+        user, status = self.get_user(user_id)
+        if status != 200:
+            return False
+        else:
+            return check_password_hash(user['password'], password)
+
     #### CONTACT TRACING ####
 
     @classmethod
@@ -52,19 +65,6 @@ class GatewayInterface(ABC):
     @abstractmethod
     def unmark_user(self, user_id: int) -> Tuple[Dict, int]:
         pass
-
-    @classmethod
-    def create_user(self, userdata: Dict):
-        userdata['password'] = generate_password_hash(userdata['password'])
-        return self._create_user(userdata)
-
-    @classmethod
-    def check_authenticate(self, user_id: int, password: str):
-        user, status = self.get_user(user_id)
-        if status != 200:
-            return False
-        else:
-            return check_password_hash(user['password'], password)
 
     #### NOTIFICATIONS ####
     @classmethod
