@@ -4,8 +4,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    depends_on:
-      - local
     volumes:
       - .:/coverage
       - ./monolith/db:/code/monolith/db
@@ -20,9 +18,6 @@ services:
       - type: volume
         source: db-testing
         target: /code/monolith/db
-    depends_on:
-      - redis
-      - worker
     ports:
       - "5000:5000"
     environment:
