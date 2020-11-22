@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, make_response
-from monolith.gateway import gateway
+from monolith.gateway import get_getaway
 from monolith.auth import current_user
 
 home = Blueprint('home', __name__)
@@ -11,8 +11,8 @@ def index():
     """
     notifications = None
     if current_user is not None and hasattr(current_user, 'id'):
-        restaurants, status_rest = gateway.get_restaurant(current_user['rest_id'])
-        notifications, status_noti = gateway.get_notifications(current_user['id'])
+        restaurants, status_rest = get_getaway().get_restaurant(current_user['rest_id'])
+        notifications, status_noti = get_getaway().get_notifications(current_user['id'])
     else:
         restaurants = None
     return render_template("index.html", restaurants=restaurants, notifications=notifications)

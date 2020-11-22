@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, request, flash, make_response
 from flask_login import login_user, logout_user
-from monolith.gateway import gateway
+from monolith.gateway import get_getaway
 from monolith.forms import LoginForm
 
 auth = Blueprint('auth', __name__)
@@ -10,7 +10,7 @@ def login():
     form = LoginForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            user, status = gateway.login_user(request.form)
+            user, status = get_getaway().login_user(request.form)
             if status == 200 and user is not None:
                 login_user(user)
                 return redirect('/')

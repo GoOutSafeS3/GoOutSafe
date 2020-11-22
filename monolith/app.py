@@ -4,7 +4,6 @@ from monolith.views import blueprints
 from monolith.auth import login_manager
 from monolith.utilities.gateway_interface import GatewayInterface
 from monolith.database import db, User, Restaurant, Booking, Table, Rating
-from monolith.gateway import RealGateway, set_gateway
 import sys
 from flask import Flask
 import os
@@ -515,5 +514,4 @@ if __name__ == '__main__':
         c = sys.argv[1]
 
     app = create_app(c)
-    set_gateway(RealGateway("https://gateway.local:8080"))
     app.run()

@@ -3,7 +3,7 @@ from monolith.auth import health_authority_required
 from monolith.forms import SearchUserForm
 import datetime
 from datetime import timedelta, datetime
-from monolith.gateway import gateway
+from monolith.gateway import get_getaway
 
 contact_tracing = Blueprint('contact_tracing', __name__)
 
@@ -17,7 +17,7 @@ Error status codes:
 @health_authority_required
 def positives():
     """ Allows you to view the list of currently positive users """
-    positives, status = gateway.get_positive_users()
+    positives, status = get_getaway().get_positive_users()
     if positives is None or status != 200:
         return make_response(render_template("error.html", error = status), status)
     return render_template("positives.html", positives = positives, title="Positives")
@@ -34,7 +34,7 @@ def _contacts():
                     flash("Please fill in a field","warning")
                     return render_template('form.html', form=form, title="Find Contacts")
 
-                users, status = gateway.search_users(request.form)
+                users, status = get_getaway().search_users(request.form)
             except:
                 flash("Bad Form","error")
                 return render_template('form.html', form=form, title="Find Contacts")
@@ -75,7 +75,7 @@ def _mark_as_positive():
                     flash("Please fill in a field","warning")
                     return render_template('mark_positives.html', form=form, title="Mark a User")
 
-                users, status = gateway.search_users(request.form)
+                users, status = get_getaway().search_users(request.form)
             except:
                 flash("Bad Form","error")
                 return render_template('mark_positives.html', form=form, title="Mark a User")
@@ -92,7 +92,7 @@ def _mark_as_positive():
             else:
                 user = users[0]
 
-            result, status = gateway.mark_user(user['id'])
+            result, status = get_getaway().mark_user(user['id'])
 
             if result is not None and status == 200:
                 flash("The user was marked","success")
@@ -116,7 +116,7 @@ def _unmark_as_positive():
                     flash("Please fill in a field","warning")
                     return render_template('form.html', form=form, title="Unmark a User")
 
-                users, status = gateway.search_users(request.form)
+                users, status = get_getaway().search_users(request.form)
             except:
                 flash("Bad Form","error")
                 return render_template('mark_positives.html', form=form, title="Mark a User")
@@ -137,7 +137,7 @@ def _unmark_as_positive():
                 flash("The user is not positive","warning")
                 return render_template('form.html', form=form, title="Unmark a User")
 
-            result, status = gateway.unmark_user(user['id'])
+            result, status = get_getaway().unmark_user(user['id'])
 
             if result is not None and status == 200:
                 flash("The user was unmarked","success")
@@ -162,7 +162,7 @@ def _mark_as_positive_by_id(pos_id):
     Error status codes:
         404 -- User not found
     """
-    user, status = gateway.mark_user(pos_id)
+    user, status = get_getaway().mark_user(pos_id)
 
     if status == 404:
         flash("User not found","error")
@@ -181,7 +181,7 @@ def _unmark_as_positive_by_id(pos_id):
     Error status codes:
         404 -- User not found or user not positive
     """
-    user, status = gateway.unmark_user(pos_id)
+    user, status = get_getaway().unmark_user(pos_id)
 
     if status == 404:
         flash("User not found","error")
@@ -199,7 +199,7 @@ def user_contacts(user_id):
     Error status codes:
         404 -- User not found or user not positive
     """
-    users, status = gateway.get_user_contacts(user_id,
+    users, status = get_getaway().get_user_contacts(user_id,
         datetime.today() - timedelta(days = 14),
         datetime.today())
 

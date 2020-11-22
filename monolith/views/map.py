@@ -1,5 +1,5 @@
 from flask import Blueprint, redirect, render_template, request, make_response, flash
-from monolith.gateway import gateway
+from monolith.gateway import get_getaway
 from flask_login import current_user, login_required
 from flask_googlemaps import GoogleMaps, Map
 
@@ -20,7 +20,7 @@ def map_page():
         return make_response(render_template('error.html', error='401'), 401)
 
 
-    restaurants, status = gateway.get_restaurants()
+    restaurants, status = get_getaway().get_restaurants()
     markers_to_add = []
     for restaurant in restaurants:
         rest = {

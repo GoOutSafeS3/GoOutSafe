@@ -1,6 +1,6 @@
 import functools
 from flask_login import current_user, LoginManager
-from monolith.gateway import gateway
+from monolith.gateway import get_getaway
 
 login_manager = LoginManager()
 
@@ -38,7 +38,7 @@ def operator_required(func):
 
 @login_manager.user_loader
 def load_user(user_id):
-    user, status = gateway.get_user(user_id)
+    user, status = get_getaway().get_user(user_id)
     if status == 200:
         user._authenticated = True
         return user

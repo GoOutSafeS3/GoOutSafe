@@ -4,7 +4,7 @@ from monolith.auth import admin_required, current_user, operator_required
 from flask_login import current_user, login_user, logout_user, login_required
 from monolith.forms import UserForm, BookingForm, BookingList
 from monolith.utilities.reservations import try_to_book, try_to_update
-from monolith.gateway import gateway
+from monolith.gateway import get_getaway
 import datetime
 
 reservations = Blueprint('reservations', __name__)
@@ -98,7 +98,7 @@ def _booking_list(restaurant_id):
                 return make_response(render_template('form.html', form=form, title="View reservations"),400)
 
 
-            qry,status_code = gateway.get_reservations(current_user['restaurant_id'], begin=from_datetime.isoformat(), end=to_datetime.isoformat())
+            qry,status_code = get_getaway().get_reservations(current_user['restaurant_id'], begin=from_datetime.isoformat(), end=to_datetime.isoformat())
             
             if status_code is None or status_code == 500:
                 flash("Sorry, an error occured. Please, try again.","error")
@@ -166,7 +166,7 @@ def _register_entrance(reservation_id):
         404 -- The reservation does not exist
     """
 
-    reservation, status = gateway.get_reservation(reservation_id)
+    reservation, status = get_getaway().get_reservation(reservation_id)
     
     if reservation is None or status != 200:
         return make_response(render_template('error.html', error=status),status)
@@ -175,7 +175,7 @@ def _register_entrance(reservation_id):
         return make_response(render_template('error.html', error='401'),401)
     
     if 'entrance_datetime' not in reservation or reservation['entrance_datetime'] is None:
-        result, status = gateway.register_entrance(reservation_id)
+        result, status = get_getaway().register_entrance(reservation_id)
         
         if status != 200:
             flash('An error occured, please try again','error')
@@ -196,7 +196,7 @@ def _reservation(reservation_id):
         404 -- The reservation does not exist
     """
 
-    reservation, status = gateway.get_reservation(reservation_id)
+    reservation, status = get_getaway().get_reservation(reservation_id)
     if reservation is None or status != 200:
         return make_response(render_template('error.html', error=status), status)
 
@@ -216,7 +216,7 @@ def _reservation_delete(reservation_id):
         404 -- The reservation does not exist
     """
 
-    reservation, status = gateway.get_reservation(reservation_id)
+    reservation, status = get_getaway().get_reservation(reservation_id)
     
     if reservation is None or status != 200:
         return make_response(render_template('error.html', error=status),status)
@@ -224,7 +224,7 @@ def _reservation_delete(reservation_id):
         if reservation['restaurant_id'] != current_user['rest_id'] and reservation['user_id'] != current_user['id']:
             return make_response(render_template('error.html', error='401'),401)
         else:
-            result, status = gateway.delete_reservation(reservation_id)
+            result, status = get_getaway().delete_reservation(reservation_id)
             if status != 200:
                 return make_response(render_template('error.html', error=status),status)
 

@@ -1,11 +1,13 @@
 from datetime import datetime
 from monolith.utilities.gateway_interface import GatewayInterface
 from monolith.utilities.request_timeout import get, post, put, patch, delete
+from flask import g
 
-gateway: GatewayInterface = None
+def get_getaway():
+    if 'gateway' not in g:
+        g.gateway = RealGateway("https://gateway.local:8080")
 
-def set_gateway(gw: GatewayInterface):
-    gateway = gw
+    return g.gateway
 
 class RealGateway(GatewayInterface):
     def __init__(self, gateway_addr):

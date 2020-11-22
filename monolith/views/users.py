@@ -5,7 +5,7 @@ from monolith.utilities.contact_tracing import get_user_contacts
 from werkzeug.security import check_password_hash
 from monolith.database import User, db, Restaurant, Booking
 from monolith.auth import health_authority_required, admin_required
-from monolith.gateway import gateway
+from monolith.gateway import get_getaway
 from monolith.forms import UserForm, OperatorForm, LoginForm, EditUserForm
 from monolith.utilities.notification import add_notification_restaurant_closed
 
@@ -22,7 +22,7 @@ def _users():
     Error status codes:
         401 -- If a user other than admin tries to view it
     """
-    users, status = gateway.get_users()
+    users, status = get_getaway().get_users()
     if users is None or status != 200:
         return render_template("error.html", error=500), 500
     
@@ -42,7 +42,7 @@ def user_bookings():
     if current_user['is_admin'] or current_user['is_health_authority'] or current_user['rest_id'] is not None:
         return make_response(render_template('error.html', error='404'),404)
     
-    reservations, status = gateway.get_user_future_reservations(current_user['id'])
+    reservations, status = get_getaway().get_user_future_reservations(current_user['id'])
 
     if reservations == []:
         flash("There are no reservations", "warning")
