@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, make_response
-from monolith.app import gateway
+from monolith.gateway import gateway
 from monolith.auth import current_user
 
 home = Blueprint('home', __name__)

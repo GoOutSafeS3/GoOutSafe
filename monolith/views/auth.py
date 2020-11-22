@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, request, flash, make_response
 from flask_login import login_user, logout_user
-from monolith.app import gateway
+from monolith.gateway import gateway
 from monolith.forms import LoginForm
 
 auth = Blueprint('auth', __name__)

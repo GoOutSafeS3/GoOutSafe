@@ -4,7 +4,7 @@ from monolith.auth import admin_required, current_user, operator_required
 from flask_login import current_user, login_user, logout_user, login_required
 from monolith.forms import UserForm, BookingForm, BookingList
 from monolith.utilities.reservations import try_to_book, try_to_update
-from monolith.app import gateway
+from monolith.gateway import gateway
 import datetime
 
 reservations = Blueprint('reservations', __name__)

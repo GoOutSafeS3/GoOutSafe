@@ -3,7 +3,7 @@ from monolith.auth import health_authority_required
 from monolith.forms import SearchUserForm
 import datetime
 from datetime import timedelta, datetime
-from monolith.app import gateway
+from monolith.gateway import gateway
 
 contact_tracing = Blueprint('contact_tracing', __name__)
 

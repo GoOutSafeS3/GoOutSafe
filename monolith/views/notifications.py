@@ -1,7 +1,7 @@
 from monolith.utilities.notification import delete_notification
 from flask import Blueprint, redirect, render_template, make_response
 from flask_login import login_required, current_user
-from monolith.app import gateway
+from monolith.gateway import gateway
 
 notifications_page = Blueprint('notifications_page', __name__)
 

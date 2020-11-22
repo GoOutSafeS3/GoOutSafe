@@ -2,6 +2,11 @@ from datetime import datetime
 from monolith.utilities.gateway_interface import GatewayInterface
 from monolith.utilities.request_timeout import get, post, put, patch, delete
 
+gateway: GatewayInterface = None
+
+def set_gateway(gw: GatewayInterface):
+    gateway = gw
+
 class RealGateway(GatewayInterface):
     def __init__(self, gateway_addr):
         self.addr = gateway_addr

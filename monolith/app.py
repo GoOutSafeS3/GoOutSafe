@@ -4,14 +4,12 @@ from monolith.views import blueprints
 from monolith.auth import login_manager
 from monolith.utilities.gateway_interface import GatewayInterface
 from monolith.database import db, User, Restaurant, Booking, Table, Rating
-from monolith.gateway import RealGateway
+from monolith.gateway import RealGateway, set_gateway
 import sys
 from flask import Flask
 import os
 import datetime
 import configparser
-
-gateway: GatewayInterface = None
 
 """
     The default app configuration: 
@@ -487,9 +485,6 @@ def create_app(configuration):
     app.config['SECRET_KEY'] = config["secret_key"]
     app.config['SQLALCHEMY_DATABASE_URI'] = config["sqlalchemy_database_uri"]
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config["sqlalchemy_track_modifications"]
-    app.config['result_backend'] = config['result_backend']
-    app.config['broker_url'] = config['broker_url']
-    app.config["UNMARK_AFTER"] = config['unmark_after']
 
     for bp in blueprints:
         app.register_blueprint(bp)
@@ -520,5 +515,5 @@ if __name__ == '__main__':
         c = sys.argv[1]
 
     app = create_app(c)
-    gateway = RealGateway("https://gateway.local:8080")
+    set_gateway(RealGateway("https://gateway.local:8080"))
     app.run()
