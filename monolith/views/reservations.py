@@ -4,7 +4,7 @@ from monolith.auth import admin_required, current_user, operator_required
 from flask_login import current_user, login_user, logout_user, login_required
 from monolith.forms import UserForm, BookingForm, BookingList
 from monolith.utilities.reservations import try_to_book, try_to_update
-from monolith.utilities.booking_client import get_bookings, get_a_booking, new_booking, edit_booking, delete_booking
+from monolith.app import gateway
 import datetime
 
 reservations = Blueprint('reservations', __name__)
@@ -98,7 +98,7 @@ def _booking_list(restaurant_id):
                 return make_response(render_template('form.html', form=form, title="View reservations"),400)
 
 
-            qry,status_code = get_bookings(rest=int(current_user.get_rest_id()), begin=from_datetime.isoformat(), end=to_datetime.isoformat())
+            qry,status_code = gateway.get_reservations(current_user['restaurant_id'], begin=from_datetime.isoformat(), end=to_datetime.isoformat())
             
             if status_code is None or status_code == 500:
                 flash("Sorry, an error occured. Please, try again.","error")
@@ -165,24 +165,23 @@ def _register_entrance(reservation_id):
         401 -- The user is not the restaurant operator
         404 -- The reservation does not exist
     """
-    
-    qry = db.session.query(Booking).filter_by(id = reservation_id).first()
-    
-    if qry is None:
-        return make_response(render_template('error.html', error='404'),404)
 
-    if qry.rest_id != current_user.get_rest_id():
+    reservation, status = gateway.get_reservation(reservation_id)
+    
+    if reservation is None or status != 200:
+        return make_response(render_template('error.html', error=status),status)
+
+    if reservation['restaurant_id'] != current_user['rest_id']:
         return make_response(render_template('error.html', error='401'),401)
     
-    if qry.entrance_datetime is None:
-        try:
-            qry.entrance_datetime = datetime.datetime.now()
-            db.session.add(qry)
-            db.session.commit()
-            return redirect(f"/reservations/{reservation_id}")
-        except:
+    if 'entrance_datetime' not in reservation or reservation['entrance_datetime'] is None:
+        result, status = gateway.register_entrance(reservation_id)
+        
+        if status != 200:
             flash('An error occured, please try again','error')
             return redirect(f"/reservations/{reservation_id}")
+            
+        return redirect(f"/reservations/{reservation_id}")
     else:
         flash('The entrance of this reservation has already been registered',"error")
         return redirect(f"/reservations/{reservation_id}")
@@ -197,15 +196,14 @@ def _reservation(reservation_id):
         404 -- The reservation does not exist
     """
 
-    qry = db.session.query(Booking,User).filter(Booking.id == reservation_id).filter(User.id == Booking.user_id).first()
+    reservation, status = gateway.get_reservation(reservation_id)
+    if reservation is None or status != 200:
+        return make_response(render_template('error.html', error=status), status)
+
+    if reservation['restaurant_id'] != current_user.rest_id:
+        return make_response(render_template('error.html', error='401'),401)
     
-    if qry is None:
-        return make_response(render_template('error.html', error='404'),404)
-    else:
-        if qry.Booking.rest_id != current_user.get_rest_id():
-            return make_response(render_template('error.html', error='401'),401)
-        
-        return render_template("reservation.html", reservation=qry)
+    return render_template("reservation.html", reservation=reservation)
 
 
 @reservations.route('/reservations/<int:reservation_id>/delete', methods=['GET', 'DELETE', 'POST'])
@@ -218,16 +216,18 @@ def _reservation_delete(reservation_id):
         404 -- The reservation does not exist
     """
 
-    qry = db.session.query(Booking).filter_by(id = reservation_id).first()
+    reservation, status = gateway.get_reservation(reservation_id)
     
-    if qry is None:
-        return make_response(render_template('error.html', error='404'),404)
+    if reservation is None or status != 200:
+        return make_response(render_template('error.html', error=status),status)
     else:
-        if qry.rest_id != current_user.get_rest_id() and qry.user_id != current_user.id:
+        if reservation['restaurant_id'] != current_user['rest_id'] and reservation['user_id'] != current_user['id']:
             return make_response(render_template('error.html', error='401'),401)
         else:
-            db.session.query(Booking).filter_by(id = reservation_id).delete()
-            db.session.commit()
+            result, status = gateway.delete_reservation(reservation_id)
+            if status != 200:
+                return make_response(render_template('error.html', error=status),status)
+
             flash("Reservation deleted","success")
             return redirect('/')
 
