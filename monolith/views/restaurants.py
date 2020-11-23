@@ -5,7 +5,6 @@ from monolith.gateway import get_getaway
 from monolith.auth import current_user,operator_required
 from flask_login import current_user,  login_required
 from monolith.forms import  RestaurantEditForm, TableAddForm, SearchRestaurantForm, RatingAddForm
-from monolith.utilities.restaurant import is_busy_table
 from datetime import datetime, timedelta
 from dotmap import DotMap
 

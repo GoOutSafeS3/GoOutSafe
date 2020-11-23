@@ -21,7 +21,7 @@ class TestLogin(unittest.TestCase):
     def test_login_post_admin(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        reply = do_login(client, "example@example.com","admin")
+        reply = do_login(client, "admin@example.com","admin")
         self.assertEqual(reply.status_code, 302)
         with self.app.test_request_context():
             self.assertEqual(reply.location, url_for('home.index',_external=True))
@@ -29,25 +29,25 @@ class TestLogin(unittest.TestCase):
     def test_login_post_wrong(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        reply = do_login(client, "example@example.com","wrong")
+        reply = do_login(client, "admin@example.com","wrong")
         self.assertEqual(reply.status_code, 401)
 
     def test_login_post_wrong2(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        reply = do_login(client, "example@wrong.com","admin")
+        reply = do_login(client, "admin@wrong.com","admin")
         self.assertEqual(reply.status_code, 401)
 
     def test_login_post_bad(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        reply = do_login(client, "example@example.com",None)
+        reply = do_login(client, "admin@example.com",None)
         self.assertEqual(reply.status_code, 400)
 
     def test_login_logout(self):
         with self.app.test_client() as client:
             client.set_app(self.app)
-            reply = do_login(client, "example@example.com", "admin")
+            reply = do_login(client, "admin@example.com", "admin")
             self.assertEqual(current_user.is_authenticated, True)
 
             reply = do_logout(client)
