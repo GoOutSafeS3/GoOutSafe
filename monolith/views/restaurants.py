@@ -7,6 +7,7 @@ from flask_login import current_user,  login_required
 from monolith.forms import  RestaurantEditForm, TableAddForm, SearchRestaurantForm, RatingAddForm
 from monolith.utilities.restaurant import is_busy_table
 from datetime import datetime, timedelta
+from dotmap import DotMap
 
 restaurants = Blueprint('restaurants', __name__)
 
@@ -15,11 +16,14 @@ restaurants = Blueprint('restaurants', __name__)
 def _restaurants(message=''):
     """ get the list of restaurants
 
+        Error status code:
+            500 -- Error try again later
     """
     allrestaurants, status = get_getaway.get_restaurants()
 
     if allrestaurants is None or status != 200:
-        return make_response(render_template("error.html", error = status), status)
+        flash("Sorry, an error occured. Please, try again.","error")
+        return make_response(render_template('form.html', title="View reservations"),500)
 
     markers_to_add = []
     for restaurant in allrestaurants:
@@ -51,6 +55,7 @@ def search_res():
     Error status code:
         400 -- The form is filled out incorrectly
         404 -- No restaurant with those characteristics was found
+        500 -- Error try again later
     """
     form = SearchRestaurantForm()
     if request.method == 'POST':
@@ -62,10 +67,13 @@ def search_res():
             if open_day.lower() == "not specified":
                 open_day = None
 
-
             allrestaurants, status = get_getaway.get_restaurants(request.form["name"], opening_time, open_day, request.form["cuisine_type"], request.form["menu"])
-
+    
             if allrestaurants is None or status != 200:
+                if status == None:
+                    flash("Sorry, an error occured. Please, try again.","error")
+                    return make_response(render_template('form.html', title="View reservations"),500)
+                flash("Bad form", "error")
                 return make_response(render_template("error.html", error = status), status)
 
             markers_to_add = []
@@ -107,15 +115,24 @@ def restaurant_sheet(restaurant_id):
 
     Error status code:
         404 -- No restaurant with id restaurant_id was found
+        500 -- Error try again later
     """
 
     restaurant, status = get_getaway.get_restaurant(restaurant_id)
     if restaurant is None or status != 200:
-        return make_response(render_template("error.html", error = status), status)
+        flash("Sorry, an error occured. Please, try again.","error")
+        return make_response(render_template('form.html', title="View reservations"),500)
 
     tables, status = get_getaway.get_restaurants_tables(restaurant_id)
     if tables is None or status != 200:
-        return make_response(render_template("error.html", error = status), status)
+        if status == None:
+            flash("Sorry, an error occured. Please, try again.","error")
+            return make_response(render_template('form.html', title="View reservations"),500)
+        elif status == 404:
+            flash("No restaurant with id restaurant_id was found", "error")
+            return make_response(render_template("error.html", error = status), status)
+        elif status == 204:
+            pass
 
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     closed_days = []
@@ -151,14 +168,22 @@ def _rate(restaurant_id):
                the request is malformed
         401 -- The user is not logged-in
         404 -- No restaurant with id restaurant_id was found
+        500 -- Error try again later
     """
 
     form = RatingAddForm()
     if form.validate_on_submit():
-        Rating,status = get_getaway.post_restaurant_rate(restaurant_id, current_user.id, form.rating.data)
-        if rating is None or status != 200:
-            if status == 400:
+        rating,status = get_getaway.post_restaurant_rate(restaurant_id, current_user.id, form.rating.data)
+        if rating is None or status != 202:
+            if status == None:
+                flash("Sorry, an error occured. Please, try again.","error")
+                return make_response(render_template('form.html', title="View reservations"),500)
+            elif status == 400:
                 flash('Bad request or Restaurant already rated by the user', "error")
+            elif status == 404:
+                flash('No restaurant with id restaurant_id was found', "error")
+            elif status == 500:
+                flash("Sorry, an error occured. Please, try again. [2]","error")
             return make_response(render_template("error.html", error = status), status)
         
         flash('Rating submitted', "success")
@@ -174,16 +199,18 @@ def _edit_restaurant(restaurant_id):
 
     Error status codes:
         400 -- The request is not valid, the form is filled out incorrectly or a generic error has occurred
-        401 -- The current user is not an operator or the operator of this restaurant
         404 -- The restaurant does not exists
+        409 -- The current user is not an operator or the operator of this restaurant
+        500 -- Error try again later
 
     Success codes:
-        200 -- The form is sent to the user
-        302 -- The modification was accepted
+        200 GET  -- The form is sent to the user
+        200 POST -- The modification was accepted
     """
     restaurant, status = get_getaway.get_restaurant(restaurant_id)
     if restaurant is None or status != 200:
-        return make_response(render_template("error.html", error = status), status)
+        flash("Sorry, an error occured. Please, try again.","error")
+        return make_response(render_template('form.html', title="View reservations"),500)
 
     if current_user.rest_id != restaurant_id:
         return make_response(render_template('error.html', error="Area reserved for the restaurant operator"), 401)
@@ -191,7 +218,22 @@ def _edit_restaurant(restaurant_id):
     if request.method == 'POST':
         form = RestaurantEditForm()
         if form.validate_on_submit():
-            
+            json = DotMap()
+            form.populate_obj(json)
+            restaurant,status = get_getaway.edit_restaurant(restaurant_id, json.toDict())
+            if restaurant is None or status != 200:
+                if status == None:
+                    flash("Sorry, an error occured. Please, try again.","error")
+                    return make_response(render_template('form.html', title="View reservations"),500)
+                elif status == 400:
+                    flash('Bad request or Restaurant already rated by the user', "error")
+                elif status == 404:
+                    flash('No restaurant with id restaurant_id was found', "error")
+                elif status == 409:
+                    flash('The restaurant has pending reservations tha conflict with the new openings, those must be deleted first', "error")
+                elif status == 500:
+                    flash("Sorry, an error occured. Please, try again. [2]","error")
+                return make_response(render_template("error.html", error = status), status)
             return redirect(f"/restaurants/{current_user.rest_id}")
         flash("Bad form", "error")
         return make_response(render_template('edit_restaurant.html', form=form), 400)
@@ -318,10 +360,11 @@ def _add_tables():
         400 -- The requested table capacity is invalid, or the request is malformed
         401 -- The request has been sent by an unauthenticated user, or the user
                 is not the owner of a restaurant
+        500 -- Error, try again later
 
     Success codes:
         200 -- The form is sent to the user
-        302 -- The addition is accepted
+        201 -- The addition is accepted
     """
 
     form = TableAddForm()
@@ -329,6 +372,10 @@ def _add_tables():
         if form.validate_on_submit():
             table, status = get_getaway.post_restaurant_tables(current_user.rest_id)
             if table is None or status != 200:
+                if status == None or status == 404:
+                    flash("Sorry, an error occured. Please, try again.","error")
+                    return make_response(render_template('form.html', title="View reservations"),500)
+                flash("Bad form", "error")
                 return make_response(render_template("error.html", error = status), status)
             return redirect(f"/restaurants/{current_user.rest_id}")
         flash("Bad form", "error")
@@ -346,14 +393,20 @@ def _edit_tables(table_id):
         401 -- The request has been sent by an unauthenticated user, or
                the user is not the owner of the table's restaurant
         404 -- A table with id table_id has not been found
+        409 -- The table has pending reservations tha conflict with the new capacity, those must be deleted first
+        500 -- Error, try again later
 
     Success codes:
-        200 -- The form is sent to the user
-        302 -- The edit is accepted
+        200 GET  -- The form is sent to the user
+        200 POST -- The edit is accepted
     """
     
     table, status = get_getaway.get_restaurants_table(current_user.rest_id, table_id)
     if table is None or status != 200:
+        if status == None:
+            flash("Sorry, an error occured. Please, try again.","error")
+            return make_response(render_template('form.html', title="View reservations"),500)
+        flash("A table with such id has not been found","error")
         return make_response(render_template("error.html", error = status), status)
 
     if current_user.rest_id != table.rest_id:
@@ -364,6 +417,13 @@ def _edit_tables(table_id):
         if form.validate_on_submit():
             table, status = get_getaway.edit_restaurants_table(current_user.rest_id, table_id, capacity = int(request.form['capacity']))
             if table is None or status != 200:
+                if status == None or status == 500 or status == 404:
+                    flash("Sorry, an error occured. Please, try again.","error")
+                    return make_response(render_template('form.html', title="View reservations"),500)
+                elif status == 400:
+                    flash("Bad form", "error")
+                elif status == 409:
+                    flash("The table has pending reservations tha conflict with the new capacity, those must be deleted first","error")
                 return make_response(render_template("error.html", error = status), status)
             return redirect(f"/restaurants/{current_user.rest_id}")
         flash("Bad form", "error")
@@ -381,12 +441,30 @@ def delete_table(table_id):
         401 -- The request has been sent by an unauthenticated user, or
                the user is not the owner of the table's restaurant
         404 -- A table with id table_id has not been found
-        412 -- The table has pending reservations, those must be deleted first
+        409 -- The table has pending reservations, those must be deleted first
+        500 -- Error, try again later
 
     Success codes:
-        302 -- The deletion is accepted
+        204 -- The deletion is accepted
     """
+
+    table, status = get_getaway.get_restaurants_table(current_user.rest_id, table_id)
+    if table is None or status != 200:
+        if status == None:
+            flash("Sorry, an error occured. Please, try again.","error")
+            return make_response(render_template('form.html', title="View reservations"),500)
+        flash("A table with such id has not been found","error")
+        return make_response(render_template("error.html", error = status), status)
+
+    if current_user.rest_id != table.rest_id:
+        return make_response(render_template('error.html', error="Area reserved for the restaurant operator"), 401)
+
 
     table, status = get_getaway.delete_restaurants_table(current_user.rest_id, table_id)
     if table is None or status != 200:
+        if status == None or status == 404 or status == 500:
+            flash("Sorry, an error occured. Please, try again.","error")
+            return make_response(render_template('form.html', title="View reservations"),500)
+        elif status == 409:
+            flash("The table has pending reservations, those must be deleted first","error")
         return make_response(render_template("error.html", error = status), status)
