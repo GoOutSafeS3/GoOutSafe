@@ -23,14 +23,14 @@
     <div class="opening_hours">
       <h4>Opening hours</h4>
         <p> First Opening:
-        {% if lunch_opening is none %}
+        {% if first_opening_hour is none %}
              closed
-        {% else %}  {{lunch_opening}}:00 -  {{lunch_closing}}:00
+        {% else %}  {{first_opening_hour}}:00 -  {{first_closing_hour}}:00
         {% endif %}
         </p>
-      {% if dinner_opening is not none %}
+      {% if second_opening_hour is not none %}
       <p>Second Opening:
-        {{dinner_opening}}:00 -  {{dinner_closing}}:00
+        {{second_opening_hour}}:00 -  {{second_closing_hour}}:00
         </p>
         {% endif %}
     </div>

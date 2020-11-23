@@ -1,7 +1,7 @@
 from datetime import datetime
 import datetime
 import requests
-
+from dotmap import DotMap
 TIMEOUT = 2
 
 def get(url):
@@ -12,7 +12,7 @@ def get(url):
     try:
         r = requests.get(url, timeout=TIMEOUT)
         try:
-            return r.json() ,r.status_code
+            return DotMap(r.json()) ,r.status_code
         except:
             return None, r.status_code  
     except:
@@ -26,7 +26,7 @@ def post(url,json):
     try:
         r = requests.post(url, json=json, timeout=TIMEOUT)
         try:
-            return r.json() ,r.status_code
+            return DotMap(r.json()) ,r.status_code
         except:
             return None, r.status_code  
     except:
@@ -40,7 +40,7 @@ def put(url,json):
     try:
         r = requests.put(url, json=json, timeout=TIMEOUT)
         try:
-            return r.json() ,r.status_code
+            return DotMap(r.json()) ,r.status_code
         except:
             return None, r.status_code  
     except:
@@ -54,7 +54,7 @@ def patch(url,json):
     try:
         r = requests.patch(url, json=json, timeout=TIMEOUT)
         try:
-            return r.json() ,r.status_code
+            return DotMap(r.json()) ,r.status_code
         except:
             return None, r.status_code  
     except:
@@ -68,7 +68,7 @@ def delete(url):
     try:
         r = requests.delete(url, timeout=TIMEOUT)
         try:
-            return r.json() ,r.status_code
+            return DotMap(r.json()) ,r.status_code
         except:
             return None, r.status_code   
     except:

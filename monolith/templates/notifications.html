@@ -1,111 +1,33 @@
 {% extends 'layout.html' %}
-    {% block content %}
-        {% if current_user.is_authenticated %}
-
-            {% if notifications %}
-                {% if current_user.is_operator %}
-                    <h5> To read </h5>
-                    {% for notification in notifications | sort(attribute='datetime') %}
-                        {% if not notification.already_read %}
-                            {% if notification.operator_notification_type == 1 %}
-
-                                    <div class="alert alert-danger" role="alert">
-                                        <strong>
-                                            A customer that has been in your restaurant in the last 14 days is positive.
-                                            <a href="/notifications/{{ notification.notification_id }}/mark_as_read" class="alert-link">Mark as read</a>
-                                        </strong>
-                                    </div>
-
-                                {% else %}
-
-                                    <div class="alert alert-danger" role="alert">
-                                    <strong>
-                                         The customer:
-                                         <ul>
-                                            <li> Email: {{ notification.user_positive_email }}</li>
-                                            <li> Name: {{ notification.user_positive_name }}</li>
-                                            Was marked Covid-19 positive. Please delete the reservation in date:
-                                            <li> Datetime: {{ notification.user_booking_date.strftime('%d-%m-%Y') }}</li>
-                                          </ul>
-
-                                         <a href="/notifications/{{ notification.notification_id }}/mark_as_read" class="alert-link">Mark as read</a>
-                                    </strong>
-                                    </div>
-
-                                {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                    <hr>                  
-                     <h5>Already read </h5>
-
-                    {% for notification in notifications | sort(attribute='datetime')%}
-                        {% if notification.already_read %}
-                            {% if notification.operator_notification_type == 1 %}
-
-                                <div class="alert alert-dark" role="alert">
-                                  [{{ notification.datetime.strftime('%d-%m-%Y') }}] -  A customer that has been in your restaurant in the last 14 days is positive.
-                                </div>
-
-                            {% else %}
-                                <div class="alert alert-dark" role="alert">
-                                   [{{ notification.datetime.strftime('%d-%m-%Y') }}] -  The customer:
-                                 <ul>
-                                    <li> Email: {{ notification.user_positive_email }}</li>
-                                    <li> Name: {{ notification.user_positive_name }}</li>
-                                 </ul>
-                                 <ul>
-                                    Was marked Covid-19 positive. Please delete the reservation in date:
-                                    <li> Datetime: {{ notification.user_booking_date.strftime('%d-%m-%Y') }}</li>
-                                  </ul>
-                                </div>
-                             {% endif %}
-                        {% endif %}
-                    {% endfor %}
-
-                {% else %}
-
-                    <h5> To read </h5>
-                    {% for notification in notifications  | sort(attribute='datetime')%}
-                        {% if not notification.already_read %}
-                            {% if notification.customer_notification_type == 0 %}
-                                <div class="alert alert-danger" role="alert">
-                                <strong> [{{ notification.datetime.strftime('%d-%m-%Y') }}] - You have had contact with a Covid-19 positive in the last 14 days.
-                                     <a href="/notifications/{{ notification.notification_id }}/mark_as_read" class="alert-link">Mark as read</a>
-                                </strong>
-                                </div>
-                            {% else %}
-                                <div class="alert alert-danger" role="alert">
-                                <strong> [{{ notification.datetime.strftime('%d-%m-%Y') }}] - The restaurant {{ notification.rest_closed_name }} has closed.
-                                    Your reservation for day {{ notification.user_booking_date.strftime('%d-%m-%Y') }} has been canceled.
-                                     <a href="/notifications/{{ notification.notification_id }}/mark_as_read" class="alert-link">Mark as read</a>
-                                </strong>
-                                 </div>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                    <hr>               
-                    <h5>Already read </h5>
-                    {% for notification in notifications | sort(attribute='datetime') %}
-                        {% if notification.already_read %}
-                             {% if notification.customer_notification_type == 0 %}
-                                <div class="alert alert-dark" role="alert">
-                                 [{{ notification.datetime.strftime('%d-%m-%Y') }}] - You have had contact with a Covid-19 positive in the last 14 days.
-                                </div>
-                             {% else %}
-                                 <div class="alert alert-dark" role="alert">
-                                    [{{ notification.datetime.strftime('%d-%m-%Y') }}] - The restaurant {{ notification.rest_closed_name }} has closed.
-                                    Your reservation for day {{ notification.user_booking_date.strftime('%d-%m-%Y') }} has been canceled.
-                                </div>
-                             {% endif %}
-                        {% endif %}
-                    {% endfor %}
-
+{% block content %}
+    {% if current_user.is_authenticated %}
+        {% if notifications %}
+            <h5> To read </h5>
+            {% for notification in notifications | sort(attribute='sent_on') %}
+                {% if notification.read_on is none %}
+                    <div class="alert alert-danger" role="alert">
+                        <strong>
+                            {{ notification.content }}
+                            <a href="/notifications/{{ notification.id }}/mark_as_read" class="alert-link">Mark as read</a>
+                        </strong>
+                    </div>
                 {% endif %}
-
-            {% else %}
-                 <div class="alert alert-dark" role="alert">
-                     You don't have notifications.
-                 </div>
-            {% endif %}
+            {% endfor %}
+            <hr>
+            <h5>Already read </h5>
+            {% for notification in notifications | sort(attribute='sent_on')%}
+                {% if notification.read_on is not none %}
+                    <div class="alert alert-danger" role="alert">
+                        <strong>
+                            {{ notification.content }}
+                        </strong>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-dark" role="alert">
+                You don't have notifications.
+            </div>
         {% endif %}
-    {% endblock %}
+    {% endif %}
+{% endblock %}
