@@ -63,16 +63,65 @@ class RealGateway(GatewayInterface):
                 "read_on": now
             })
 
-    #### RESTAURANTS ####
-    def get_restaurants(self):
-        return get(f"{self.addr}/restaurants")
+    #### RESTAURANTS ####    
+    def get_restaurants(self, name=None, opening_time=None, open_day=None, cuisine_type=None, menu=None):
+        url = f"{self.addr}/restaurants?"
+        if name is not None:
+            url += "name="+str(name)+"&"
+        if opening_time is not None:
+            url += "opening_time="+str(opening_time)+"&"
+        if open_day is not None:
+            url += "open_day="+str(open_day)+"&"
+        if cuisine_type is not None:
+            url += "cuisine_type="+str(cuisine_type)+"&"
+        if menu is not None:
+            url += "menu="+str(menu)+"&"
+        if url[-1] == "&":
+            url = url[:-1]
+        if url[-1] == "?":
+            url = url[:-1]
+        return get(url)
 
     def get_restaurant(self, rest_id):
         return get(f"{self.addr}/restaurants/{rest_id}")
 
+    def edit_restaurant(self, rest_id, json):
+        return put(f"{self.addr}/restaurants/{rest_id}", json=json)
+
+    def get_restaurant_rate(self, rest_id):
+        return get(f"{self.addr}/restaurants/{rest_id}/rate")
+
+    def post_restaurant_rate(self, rest_id, rater_id,rating):
+        return post(f"{self.addr}/restaurants/{rest_id}/rate", json={"rater_id":rater_id, "rating":rating })
+
     def get_user_future_reservations(self, user_id):
         today = datetime.today().isoformat()
         return get(f"{self.addr}/bookings?user={user_id}&from={today}")
+
+    #### TABLES ####
+    def get_restaurants_tables(self,rest_id, capacity=None):
+        url = f"{self.addr}/restaurants/{rest_id}/tables?"
+        if capacity is not None:
+            url += "capacity="+str(capacity)
+        if url[-1] == "?":
+            url = url[:-1]
+        return get(url)
+    
+    def post_restaurants_tables(self,rest_id, capacity):
+        url = f"{self.addr}/restaurants/{rest_id}/tables"
+        return post(url, json={"capacity":capacity})
+
+    def get_restaurants_table(self,rest_id, table_id):
+        url = f"{self.addr}/restaurants/{rest_id}/tables{table_id}"
+        return get(url)
+    
+    def edit_restaurants_table(self,rest_id, table_id, capacity):
+        url = f"{self.addr}/restaurants/{rest_id}/tables{table_id}"
+        return put(url, json={"capacity":capacity})
+
+    def delete_restaurants_table(self,rest_id, table_id):
+        url = f"{self.addr}/restaurants/{rest_id}/tables{table_id}"
+        return delete(url)
 
     #### RESERVATIONS ####
     def get_bookings(self, user=None, rest=None, table=None, begin=None, end=None, begin_entrance=None, end_entrance=None, with_user=True):

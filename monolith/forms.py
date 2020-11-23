@@ -73,16 +73,16 @@ class RestaurantEditForm(FlaskForm):
     phone = f.StringField('Restaurant Phone', validators=[DataRequired()])
     lat = f.FloatField('Restaurant Latitude', validators=[InputRequired()])
     lon = f.FloatField('Restaurant Longitude', validators=[InputRequired()])
-    opening_hour_lunch = f.IntegerField('First opening hour (first submitable booking time)', validators=[optional()])  # the opening hour for the lunch
-    closing_hour_lunch = f.IntegerField('First closing hour (last submitable booking time)', validators=[optional()]) # the closing hour for the lunch
-    opening_hour_dinner = f.IntegerField('Second opening hour (if available)', validators=[optional()]) # the opening hour for the dinner
-    closing_hour_dinner = f.IntegerField('Second closing hour (if available)', validators=[optional()]) # the closing hour for the dinner
+    first_opening_hour = f.IntegerField('First opening hour (first submitable booking time)', validators=[optional()])  # the opening hour for the lunch
+    first_closing_hour = f.IntegerField('First closing hour (last submitable booking time)', validators=[optional()]) # the closing hour for the lunch
+    second_opening_hour = f.IntegerField('Second opening hour (if available)', validators=[optional()]) # the opening hour for the dinner
+    second_closing_hour = f.IntegerField('Second closing hour (if available)', validators=[optional()]) # the closing hour for the dinner
     occupation_time = f.IntegerField('Time for a table to be clear again', validators=[InputRequired()])
     closed_days = f.SelectMultipleField('Closed days',  choices=[("1","Monday"), ("2","Tuesday"), ("3","Wednesday"), ("4","Thursday"),("5","Friday"), ("6","Saturday"),("7","Sunday")], validators=[InputRequired()])
     cuisine_type = f.StringField('Cousine type',validators=[DataRequired()])
     menu = f.StringField('Restaurant menu',validators=[DataRequired()])
 
-    display = ['name', 'phone', 'lat', 'lon','opening_hour_lunch', 'closing_hour_lunch', 'opening_hour_dinner','closing_hour_dinner','occupation_time', 'closed_days', 'cuisine_type','menu']
+    display = ['name', 'phone', 'lat', 'lon','first_opening_hour', 'first_closing_hour', 'second_opening_hour','second_closing_hour','occupation_time', 'closed_days', 'cuisine_type','menu']
 
 
 class TableAddForm(FlaskForm):
