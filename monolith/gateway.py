@@ -1,7 +1,6 @@
 from datetime import datetime
 from monolith.utilities.gateway_interface import GatewayInterface
 from monolith.utilities.request_timeout import get, post, put, patch, delete
-from flask import g
 
 def get_getaway():
     if 'gateway' not in g:
@@ -18,22 +17,39 @@ class RealGateway(GatewayInterface):
         return get(f"{self.addr}/users/{user_id}")
 
     # TODO
-    def search_users(self, data):
+    def search_users(self, ssn=None, phone=None, email=None, is_positive=None):
         pass
 
-    def get_users(self):
-        return get(f"{self.addr}/users")
+    def get_users(self,ssn=None, phone=None, email=None, is_positive=None):
+        url = self.addr + "/users"
+        params = '?'
+        if ssn is not None:
+            params += 'ssn=' + str(ssn) + '&'
+
+        if phone is not None:
+            params += 'phone=' + str(phone) + '&'
+
+        if email is not None:
+            params += 'email=' + str(email) + '&'
+
+        if is_positive is True:
+            params += 'is_positive=True'
+        elif is_positive is False:
+            params += 'is_positive=False'
+
+        return get(url + params)
 
     def _create_user(self, userdata):
         return post(f"{self.addr}/users", userdata)
-    
+
     # TODO
-    def login_user(self, userdata):
+    def delete_user(self, userdata):
         pass
+
 
     #### CONTACT TRACING ####
     def get_positive_users(self):
-        return get(f"{self.addr}/users?is_positive=true")
+        return get(f"{self.addr}/users?is_positive=True")
 
     def get_user_contacts(self, user_id, begin, end):
         return get(f"{self.addr}/users/{user_id}/contacts?begin={begin}&end={end}")
