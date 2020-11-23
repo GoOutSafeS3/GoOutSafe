@@ -3,7 +3,6 @@ from monolith.database import db, Restaurant, Booking, User, Table
 from monolith.auth import admin_required, current_user, operator_required
 from flask_login import current_user, login_user, logout_user, login_required
 from monolith.forms import UserForm, BookingForm, BookingList
-from monolith.utilities.reservations import try_to_book, try_to_update
 from monolith.gateway import get_getaway
 import datetime
 
@@ -19,12 +18,19 @@ def _book(restaurant_id):
         400 -- The form is filled in incorrectly or it is not possible to make a reservation with that data
         401 -- The user cannot make the reservation (it is positive, he is not a customer, he is not logged in)
         404 -- The restaurant does not exist
+        500 -- An error occured
     """
-    record = db.session.query(Restaurant).filter_by(id = restaurant_id).first()
+    form = BookingForm()
 
-    if record is None:
-        return make_response(render_template('error.html', error='404'), 404)
+    rest,code = get_getaway().get_restaurant(restaurant_id)
+    if code is not None and code == 404:
+        flash("Restaurant not found!","error")
+        return make_response(render_template('error.html', error='404'),404)
+    elif code is None or code != 200 or rest is None or rest == {}:
+        flash("Sorry, an error occured. Please, try again.","error")
+        return make_response(render_template('form.html', form=form, title="View reservations"),500)
 
+    """
     if current_user.is_admin or current_user.is_operator or current_user.is_health_authority:
         flash("Please log as customer to book a table","error")
         return make_response(render_template('error.html', error="401"), 401)
@@ -32,8 +38,8 @@ def _book(restaurant_id):
     if current_user.is_positive:
         flash("You cannot book as long as you are positive","error")
         return make_response(render_template('error.html', error="401"), 401)
+    """
 
-    form = BookingForm()
     if request.method == 'POST':
         if form.validate_on_submit():
             number_of_people = request.form["number_of_people"]
@@ -49,12 +55,14 @@ def _book(restaurant_id):
                 flash("You cannot book before now","error")
                 return make_response(render_template('form.html', form=form, title = "Book a table!"),400)
 
+            """
             if try_to_book(restaurant_id, int(number_of_people), booking_datetime):
                 flash("The booking was confirmed","success")
                 return redirect(f"/restaurants/{restaurant_id}")
             else:
                 flash("The reservation could not be made","error")
                 return make_response(render_template('form.html', form=form, title = "Book a table!"),400)
+            """
 
     return render_template('form.html', form=form, title = "Book a table!")
 
@@ -74,7 +82,7 @@ def _booking_list(restaurant_id):
     form = BookingList()
 
     rest,code = get_getaway().get_restaurant(restaurant_id)
-    if code == 404:
+    if code is not None and code == 404:
         flash("Restaurant not found!","error")
         return make_response(render_template('error.html', error='404'),404)
     elif code is None or code != 200 or rest is None or rest == {}:
@@ -134,7 +142,7 @@ def _today_booking_list(restaurant_id):
         500 -- An error occured
     """
     rest,code = get_getaway().get_restaurant(restaurant_id)
-    if code == 404:
+    if code is not None and code == 404:
         flash("Restaurant not found!","error")
         return make_response(render_template('error.html', error='404'),404)
     elif code is None or code != 200 or rest is None or rest == {}:
@@ -159,8 +167,6 @@ def _today_booking_list(restaurant_id):
     elif qry is None:
         qry = []
         flash("No reservations were found","warning")
-
-    flash(qry,"success")
 
     return make_response(render_template("reservations.html", reservations=qry, title="Today's Reservations"),200)
 
@@ -187,12 +193,12 @@ def _register_entrance(reservation_id):
 
     _, code = get_getaway().edit_booking(booking_id=reservation_id,entrance=True)
 
-    if code == 200:
+    if code is not None and code == 200:
         flash("Entrance registered!","success")
-    elif code == 404:
+    elif code is not None and code == 404:
         flash("Booking not found!","error")
         return make_response(render_template('error.html', error='404'),404)
-    elif code == 409 or code == 400:
+    elif code is not None and code == 409 or code == 400:
         flash("Impossible to edit the requested booking","warning")
     else:
         flash("Sorry, an error occured. Please, try again.","error")
@@ -200,20 +206,6 @@ def _register_entrance(reservation_id):
     
 
     return redirect(f"/reservations/{reservation_id}")
-
-    """
-    if 'entrance_datetime' not in reservation or reservation['entrance_datetime'] is None:
-        result, status = get_getaway().register_entrance(reservation_id)
-        
-        if status != 200:
-            flash('An error occured, please try again','error')
-            return redirect(f"/reservations/{reservation_id}")
-            
-        return redirect(f"/reservations/{reservation_id}")
-    else:
-        flash('The entrance of this reservation has already been registered',"error")
-        return redirect(f"/reservations/{reservation_id}")
-    """
 
 @reservations.route('/reservations/<int:reservation_id>', methods=['GET'])
 #@operator_required
@@ -226,14 +218,14 @@ def _reservation(reservation_id):
         500 -- An error occured
     """
 
-    booking, status = get_getaway().get_a_booking(id=reservation_id,with_user=True)
-    if  status is None or status != 200 or booking is None or booking == {}:
-        return make_response(render_template('error.html', error=status), status)
-
     """
     if reservation['restaurant_id'] != current_user.rest_id:
         return make_response(render_template('error.html', error='401'),401)
     """
+
+    booking, status = get_getaway().get_a_booking(id=reservation_id,with_user=True)
+    if  status is None or status != 200 or booking is None or booking == {}:
+        return make_response(render_template('error.html', error=status), status)
     
     return render_template("reservation.html", reservation=booking)
 
@@ -251,10 +243,13 @@ def _reservation_delete(reservation_id):
     """
     reservation, status = get_getaway().get_reservation(reservation_id)
     
-    if reservation is None or status != 200:
-        return make_response(render_template('error.html', error=status),status)
-    if reservation['restaurant_id'] != current_user['rest_id']:
-        return make_response(render_template('error.html', error='401'),401)
+    """
+
+    """
+    reservation, status = get_getaway().get_reservation(reservation_id)
+    
+        if reservation['restaurant_id'] != current_user['rest_id'] and reservation['user_id'] != current_user['id']:
+            return make_response(render_template('error.html', error='401'),401)
     """
 
     _, code = get_getaway().delete_booking(id=reservation_id)
@@ -273,23 +268,6 @@ def _reservation_delete(reservation_id):
 
     return redirect("/")
 
-
-    """
-    reservation, status = get_getaway().get_reservation(reservation_id)
-    
-    if reservation is None or status != 200:
-        return make_response(render_template('error.html', error=status),status)
-    else:
-        if reservation['restaurant_id'] != current_user['rest_id'] and reservation['user_id'] != current_user['id']:
-            return make_response(render_template('error.html', error='401'),401)
-        else:
-            result, status = get_getaway().delete_reservation(reservation_id)
-            if status != 200:
-                return make_response(render_template('error.html', error=status),status)
-
-            flash("Reservation deleted","success")
-            return redirect('/')
-    """
 
 @reservations.route('/reservations/<int:reservation_id>/edit', methods=['GET', 'POST'])
 @login_required
