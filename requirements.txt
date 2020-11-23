@@ -8,3 +8,4 @@ pip-tools
 email-validator
 flask-googlemaps
 requests
+dotmap

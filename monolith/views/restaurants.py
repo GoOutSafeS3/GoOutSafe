@@ -13,6 +13,9 @@ restaurants = Blueprint('restaurants', __name__)
 
 @restaurants.route('/restaurants')
 def _restaurants(message=''):
+    """ get the list of restaurants
+
+    """
     allrestaurants, status = get_getaway.get_restaurants()
 
     if allrestaurants is None or status != 200:
