@@ -1,25 +1,25 @@
 {% extends 'layout.html' %}
     {% block content %}
-          {% if current_user.is_operator %}
-            <h2>Your Reservations</h2>
+          {% if True or current_user.is_operator %}
+            <h2>Your Reservation</h2>
               <div>
-                  <li>Reservation Id: {{reservation.Booking.id}}</li>
-                  <li>Customer: {{reservation.User.lastname}} {{reservation.User.firstname}}</li>
-                  <li>For {{reservation.Booking.people_number}} people</li>
-                  <li>At: {{reservation.Booking.booking_datetime.strftime("%a %d %b %Y, %H:%M")}}</li>
-                  <li>Phone: {{reservation.User.phone}}</li>
-                  <li>Email: {{reservation.User.email}}</li>
-                  {% if reservation.Booking.entrance_datetime is not none %}
+                  <li>Reservation Id: {{reservation.id}}</li>
+                  <li>Customer: {{reservation.user.lastname}} {{reservation.user.firstname}}</li>
+                  <li>For {{reservation.number_of_people}} people</li>
+                  <li>At: {{reservation.booking_datetime}}</li>
+                  <li>Phone: {{reservation.user.phone}}</li>
+                  <li>Email: {{reservation.user.email}}</li>
+                  {% if reservation.entrance_datetime is not none %}
                     <li>
-                          Entrance registered on: {{reservation.Booking.entrance_datetime.strftime("%a %d %b %Y, %H:%M")}}
+                          Entrance registered on: {{reservation.entrance_datetime}}
                     </li>
                   {% endif %}
 
-                  {% if reservation.Booking.entrance_datetime is none %}
-                    <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/reservations/{{reservation.Booking.id}}/entrance"> Register Entrance </a>
+                  {% if reservation.entrance_datetime is none %}
+                    <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/reservations/{{reservation.id}}/entrance"> Register Entrance </a>
                   {% endif %}
                   
-                  <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/reservations/{{reservation.Booking.id}}/delete"> Delete </a>
+                  <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/reservations/{{reservation.id}}/delete"> Delete </a>
               </div>
 
           {% endif %}

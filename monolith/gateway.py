@@ -5,7 +5,7 @@ from flask import g
 
 def get_getaway():
     if 'gateway' not in g:
-        g.gateway = RealGateway("https://gateway.local:8080")
+        g.gateway = RealGateway("http://api:5000")
 
     return g.gateway
 
@@ -76,7 +76,7 @@ class RealGateway(GatewayInterface):
 
     #### RESERVATIONS ####
     def get_bookings(self, user=None, rest=None, table=None, begin=None, end=None, begin_entrance=None, end_entrance=None, with_user=True):
-        url = self.addr+"bookings?"
+        url = self.addr+"/bookings?"
 
         if user is not None:
             url += "user="+str(user)+"&"
@@ -105,7 +105,7 @@ class RealGateway(GatewayInterface):
         return get(url)
 
     def get_a_booking(self, id, with_user=True):
-        url = self.addr+"bookings/"+str(id)
+        url = self.addr+"/bookings/"+str(id)
         if with_user:
             url += "?with_user=true"
         return get(url)
@@ -118,7 +118,7 @@ class RealGateway(GatewayInterface):
             "booking_datetime":booking_datetime,
         }
 
-        return post(self.addr+"bookings",booking)
+        return post(self.addr+"/bookings",booking)
 
     def edit_booking(self, booking_id, number_of_people=None, booking_datetime=None, entrance=False):
         booking = {
@@ -130,7 +130,7 @@ class RealGateway(GatewayInterface):
         if booking_datetime is not None:
             booking["booking_datetime"] = booking_datetime
 
-        url = self.addr+"bookings/"+str(booking_id)
+        url = self.addr+"/bookings/"+str(booking_id)
 
         if entrance:
             url += "?entrance=true"
@@ -138,4 +138,4 @@ class RealGateway(GatewayInterface):
         return put(url,booking)
 
     def delete_booking(self, id):
-        return delete(self.addr+"bookings/"+str(id))
+        return delete(self.addr+"/bookings/"+str(id))

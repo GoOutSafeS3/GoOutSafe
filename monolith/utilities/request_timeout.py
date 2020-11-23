@@ -2,7 +2,7 @@ from datetime import datetime
 import datetime
 import requests
 
-TIMEOUT = 1
+TIMEOUT = 2
 
 def get(url):
     """ Makes a get request with a timeout.

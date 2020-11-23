@@ -86,19 +86,24 @@ class GatewayInterface(ABC):
     def get_user_future_reservations(self, user_id: int) -> Tuple[List[Dict], int]:
         pass
 
-    #### RESERVATIONS ####
+    #### BOOKINGS ####
+
     @abstractmethod
-    def get_reservation(self, reservation_id: int) -> Tuple[Dict, int]:
+    def get_bookings(self, user:int, rest:int, table:int, begin:str, end:str, begin_entrance:str, end_entrance:str, with_user:bool) -> Tuple[List[Dict], int]:
+       pass
+
+    @abstractmethod
+    def get_a_booking(self, id:int, with_user:bool)  -> Tuple[Dict, int]:
         pass
 
     @abstractmethod
-    def delete_reservation(self, reservation_id: int) -> Tuple[Dict, int]:
+    def new_booking(self, user_id:int, rest_id:int, number_of_people:int, booking_datetime:str)  -> Tuple[Dict, int]:
         pass
 
     @abstractmethod
-    def register_entrance(self, reservation_id: int) -> Tuple[Dict, int]:
+    def edit_booking(self, booking_id:int, number_of_people:int, booking_datetime:str, entrance:bool)  -> Tuple[Dict, int]:
         pass
 
     @abstractmethod
-    def get_reservations(self, restaurant_id: int, begin: str, end: str) -> Tuple[List[Dict], int]:
+    def delete_booking(self, id:int) -> Tuple[Dict, int]:
         pass
