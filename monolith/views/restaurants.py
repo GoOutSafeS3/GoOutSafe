@@ -1,6 +1,5 @@
 from flask import Blueprint, redirect, render_template, request, make_response, flash
 from flask_googlemaps import Map
-from monolith.utilities.restaurant import validate_hours
 from monolith.gateway import get_getaway
 from monolith.auth import current_user,operator_required
 from flask_login import current_user,  login_required

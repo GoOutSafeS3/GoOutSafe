@@ -31,10 +31,6 @@ class GatewayInterface(ABC):
         userdata['password'] = generate_password_hash(userdata['password'])
         return self._create_user(userdata)
 
-    @abstractmethod
-    def login_user(self, userdata: Dict) -> Tuple[Dict, int]:
-        pass
-
     def check_authenticate(self, user_id: int, password: str):
         user, status = self.get_user(user_id)
         if status != 200:
@@ -75,15 +71,43 @@ class GatewayInterface(ABC):
 
     #### RESTAURANTS ####
     @abstractmethod
-    def get_restaurants(self) -> Tuple[List[Dict], int]:
+    def get_restaurants(self, name: str, opening_time: int, open_day:int, cuisine_type:str, menu:str) -> Tuple[List[Dict], int]:
+        pass
+    
+    @abstractmethod
+    def get_restaurant(self, rest_id: int) -> Tuple[List[Dict], int]:
         pass
 
     @abstractmethod
-    def get_restaurant(self, rest_id: int) -> Tuple[Dict, int]:
+    def edit_restaurant(self, rest_id: int, json: Dict) -> Tuple[List[Dict], int]:
+        pass
+
+    @abstractmethod
+    def get_restaurant_rate(self, rest_id: int) -> Tuple[List[Dict], int]:
+        pass
+
+    @abstractmethod
+    def post_restaurant_rate(self, rest_id: int, rater_id: int, rating: int) -> Tuple[List[Dict], int]:
         pass
 
     @abstractmethod
     def get_user_future_reservations(self, user_id: int) -> Tuple[List[Dict], int]:
+        pass
+
+    #### TABLES ####
+    def get_restaurants_tables(self,rest_id: int, capacity=None) -> Tuple[List[Dict], int]:
+        pass
+    
+    def post_restaurants_tables(self,rest_id: int, capacity: int) -> Tuple[List[Dict], int]:
+        pass
+
+    def get_restaurants_table(self,rest_id: int, table_id: int) -> Tuple[List[Dict], int]:
+        pass
+    
+    def edit_restaurants_table(self,rest_id: int, table_id: int, capacity: int) -> Tuple[List[Dict], int]:
+        pass
+
+    def delete_restaurants_table(self,rest_id: int, table_id: int) -> Tuple[List[Dict], int]:
         pass
 
     #### BOOKINGS ####

@@ -1,6 +1,7 @@
 from datetime import datetime
 from monolith.utilities.gateway_interface import GatewayInterface
 from monolith.utilities.request_timeout import get, post, put, patch, delete
+from flask import g
 
 def get_getaway() -> GatewayInterface:
     if 'gateway' not in g:
