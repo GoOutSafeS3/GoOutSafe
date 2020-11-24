@@ -6,6 +6,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from monolith.forms import UserForm, BookingForm, BookingList
 from monolith.gateway import get_getaway
 import datetime
+import dateutil.parser
 
 reservations = Blueprint('reservations', __name__)
 
@@ -161,7 +162,7 @@ def _today_booking_list(restaurant_id):
     if current_user.rest_id  != restaurant_id:
         return make_response(render_template('error.html', error='401'), 401)
     
-    today = datetime.datetime.today()
+    today = datetime.datetime.now()
 
     from_datetime = today.replace(hour=0,minute=0,second=0,microsecond=0)
     to_datetime = today.replace(hour=23,minute=59,second=59,microsecond=999999)
@@ -300,9 +301,11 @@ def _reservation_edit(reservation_id):
         return make_response(render_template('error.html', error="401"), 401)
             
 
-    now = datetime.datetime.now()
+    old_booking_datetime = dateutil.parser.parse(booking["booking_datetime"])
+    timezone = old_booking_datetime.tzinfo
+    now = datetime.datetime.now(timezone) #timezone aware computation
 
-    if booking["booking_datetime"] <= now:
+    if old_booking_datetime <= now:
         flash("The reservation has expired","error")
         return make_response(render_template('error.html', error='404'), 404)
 
@@ -346,8 +349,8 @@ def _reservation_edit(reservation_id):
                 return make_response(render_template('form.html', form=form, title="View reservations"),500)
     elif request.method == "GET":
         obj["number_of_people"] = booking["number_of_people"]
-        obj["booking_date"] = booking["booking_datetime"].strftime('%d/%m/%Y')
-        obj["booking_hr"] = int(booking["booking_datetime"].strftime('%H'))
-        obj["booking_min"] = int((int(booking["booking_datetime"].strftime('%M'))/15))*15 #round to a multiple of 15
+        obj["booking_date"] = old_booking_datetime.strftime('%d/%m/%Y')
+        obj["booking_hr"] = int(old_booking_datetime.strftime('%H'))
+        obj["booking_min"] = int((int(old_booking_datetime.strftime('%M'))/15))*15 #round to a multiple of 15
         
     return render_template('edit-form.html', form=form, edited=obj, title = "Edit your booking")

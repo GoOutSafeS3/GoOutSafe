@@ -1,6 +1,7 @@
 from flask_googlemaps import GoogleMaps
 from monolith.views import blueprints
 from monolith.auth import login_manager
+from monolith.utilities import filters
 from flask import Flask
 
 
@@ -29,6 +30,8 @@ def create_app():
     login_manager.init_app(app)
 
     GoogleMaps(app)
+
+    filters.init_app(app)
     
     return app
 

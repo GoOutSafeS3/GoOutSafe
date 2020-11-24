@@ -3,7 +3,7 @@
     <ul>
       {% for booking in bookings: %}
       <li>
-        {{ booking.booking_datetime}}
+        {{ booking.booking_datetime | datetime}}
         <ul>
           <li>For {{booking.number_of_people}} people</li>
           <li><a  href="{{base_url}}/restaurants/{{booking.restaurant_id}}">Restaurant Profile</a></li>
