@@ -22,18 +22,18 @@ class TestEdit(unittest.TestCase):
         client.set_app(self.app)
         reply = client.t_get('/edit')
         self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))
-        do_login(client, "example@example.com", "admin")
+        do_login(client, "admin@example.com", "admin")
         reply = client.t_get('/edit')
         self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))
         do_logout(client)
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "admin@example.com", "health")
         reply = client.t_get('/edit')
         self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))
 
     def test_get_customer200(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "customer@example.com", "customer")
+        do_login(client, "gianni@example.com", "gianni")
         reply = client.t_get('/edit')
         self.assertEqual(reply.status_code, 200)
 
@@ -47,7 +47,7 @@ class TestEdit(unittest.TestCase):
     def test_password400(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "customer@example.com", "customer")
+        do_login(client, "gianni@example.com", "gianni")
         reply = client.t_get('/edit')
         self.assertEqual(reply.status_code, 200)
         form = {
@@ -60,12 +60,12 @@ class TestEdit(unittest.TestCase):
     def test_dateerror400(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "customer@example.com", "customer")
+        do_login(client, "gianni@example.com", "gianni")
         reply = client.t_get('/edit')
         self.assertEqual(reply.status_code, 200)
         form = {
             "dateofbirth":"11/11/2030",
-            "old_password": "customer"
+            "old_password": "gianni"
         }
         reply = client.t_post('/edit', data=form)
         self.assertEqual(reply.status_code, 400, msg=reply.get_data(as_text=True))
@@ -73,12 +73,12 @@ class TestEdit(unittest.TestCase):
     def test_telephone_exist400(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "customer@example.com", "customer")
+        do_login(client, "gianni@example.com", "gianni")
         reply = client.t_get('/edit')
         self.assertEqual(reply.status_code, 200)
         form = {
             "telephone": "2354673561",
-            "old_password": "customer"
+            "old_password": "gianni"
         }
         reply = client.t_post('/edit', data=form)
         self.assertEqual(reply.status_code, 400, msg=reply.get_data(as_text=True))
@@ -86,13 +86,13 @@ class TestEdit(unittest.TestCase):
     def test_password_repeat400(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "customer@example.com", "customer")
+        do_login(client, "gianni@example.com", "gianni")
         reply = client.t_get('/edit')
         self.assertEqual(reply.status_code, 200)
         form = {
             "new_password":"ciao",
             "password_repeat":"ciao421",
-            "old_password": "customer"
+            "old_password": "gianni"
         }
         reply = client.t_post('/edit', data=form)
         self.assertEqual(reply.status_code, 400, msg=reply.get_data(as_text=True))
@@ -100,7 +100,7 @@ class TestEdit(unittest.TestCase):
     def test_insert_old_password400(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "customer@example.com", "customer")
+        do_login(client, "gianni@example.com", "gianni")
         reply = client.t_get('/edit')
         self.assertEqual(reply.status_code, 200)
         form = {

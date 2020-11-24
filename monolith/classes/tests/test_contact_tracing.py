@@ -16,7 +16,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        users = ["example@example.com","customer@example.com","operator@example.com"]
+        users = ["admin@example.com","customer@example.com","operator@example.com"]
         passw = ["admin","customer","operator"]
         endpoints = ["/positives","/positives/mark","/positives/unmark","/positives/1/unmark", "/positives/contacts"]
 
@@ -324,7 +324,7 @@ class TestLogin(unittest.TestCase):
         do_login(client, "health@example.com", "health")
 
         form = {
-            "email":"positive@example.com",
+            "email":"alice@example.com",
             "telephone":"",
             "ssn":""
             }

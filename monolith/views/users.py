@@ -86,7 +86,7 @@ def delete_user():
             users, status_code = get_getaway().get_users(email=form.data['email'])
             if users is not None:
                 email, password = form.data['email'], form.data['password']
-                user = users.toDict()
+                user = users[0].toDict()
             else:
                 flash('Wrong email', 'error')
                 return make_response(render_template('delete_profile.html', form=form, title="Unregister"), 400)
@@ -255,7 +255,7 @@ def edit():
         json = json.toDict()
         user_to_edit, status_code = get_getaway().get_user(current_user.id)
 
-        if json['password'] == '':
+        if 'password' not in json or json['password'] == '':
             flash('Insert password to modify the account', 'error')
             return make_response(render_template('edit_profile.html', form=form, title="Modify your profile!"), 400)
 

@@ -28,14 +28,14 @@ class TestUnregistration(unittest.TestCase):
 
     def test_delete_log_as_admin(self):
         client = self.setup_app()        
-        do_login(client, "example@example.com","admin")
+        do_login(client, "admin@example.com","admin")
 
         reply = client.t_get('/delete')
         self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))
 
     def test_delete_log_as_health_authority(self):
         client = self.setup_app()        
-        do_login(client, "health@authority.com","health")
+        do_login(client, "health@example.com","health")
         
         reply = client.t_get('/delete')
         self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))
@@ -55,7 +55,7 @@ class TestUnregistration(unittest.TestCase):
         reply = client.t_post('/delete', data=form)
         self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
 
-        do_login(client, "example@example.com", "admin")
+        do_login(client, "admin@example.com", "admin")
         
         reply = client.t_get('/restaurants')
         self.assertNotIn("Trial Restaurant", reply.get_data(as_text=True), msg=reply.get_data(as_text=True))
@@ -71,34 +71,34 @@ class TestUnregistration(unittest.TestCase):
 
     def test_delete_log_as_customer(self):
         client = self.setup_app()        
-        do_login(client, "customer@example.com","customer")
+        do_login(client, "gianni@example.com","gianni")
 
         reply = client.t_get('/delete')
         self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
 
         form = {
-            "email": "customer@example.com",
-            "password": "customer"
+            "email": "gianni@example.com",
+            "password": "gianni"
         }
         reply = client.t_post('/delete', data=form)
         self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
         reply = client.t_get('/')
         self.assertIn("success",reply.get_data(as_text=True),  msg=reply.get_data(as_text=True))
 
-        do_login(client, "example@example.com", "admin")
+        do_login(client, "admin@example.com", "admin")
         reply = client.t_get('/users')
         self.assertNotIn("Customer Customer", reply.get_data(as_text=True), msg=reply.get_data(as_text=True))
         do_logout(client)
 
-        reply = do_login(client, "customer@example.com","customer")
+        reply = do_login(client, "gianni@example.com","gianni")
         self.assertEqual(reply.status_code, 401)
 
 
     def test_delete_log_as_positive_customer(self):
         client = self.setup_app()        
-        do_login(client, "positive@example.com","positive")
+        do_login(client, "alice@example.com","alice")
 
-        reply = self.do_delete(client, "positive@example.com","positive")
+        reply = self.do_delete(client, "alice@example.com","alice")
         self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
         reply = client.t_get('/')
         self.assertIn("You cannot delete your data as long as you are positive",reply.get_data(as_text=True),  msg=reply.get_data(as_text=True))
@@ -106,28 +106,28 @@ class TestUnregistration(unittest.TestCase):
 
     def test_delete_post_wrong_pass(self):
         client = self.setup_app()        
-        do_login(client, "customer@example.com","customer")
-        reply = self.do_delete(client, "customer@example.com","the_customer")
+        do_login(client, "gianni@example.com","gianni")
+        reply = self.do_delete(client, "gianni@example.com","the_customer")
         self.assertEqual(reply.status_code, 400, msg=reply.get_data(as_text=True))
         do_logout(client)
 
     def test_delete_post_wrong_mail(self):
         client = self.setup_app()        
-        do_login(client, "customer@example.com","customer")
+        do_login(client, "gianni@example.com","gianni")
         reply = self.do_delete(client, "the_customer@example.com","customer")
         self.assertEqual(reply.status_code, 400, msg=reply.get_data(as_text=True))
         do_logout(client)
 
     def test_delete_post_bad_pass(self):
         client = self.setup_app()        
-        do_login(client, "customer@example.com","customer")
-        reply = self.do_delete(client, "customer@example.com",None)
+        do_login(client, "gianni@example.com","gianni")
+        reply = self.do_delete(client, "gianni@example.com",None)
         self.assertEqual(reply.status_code, 400, msg=reply.get_data(as_text=True))
         do_logout(client)
 
     def test_delete_post_bad_mail(self):
         client = self.setup_app()        
-        do_login(client, "customer@example.com","customer")
-        reply = self.do_delete(client, None,"customer")
+        do_login(client, "gianni@example.com","gianni")
+        reply = self.do_delete(client, None,"gianni")
         self.assertEqual(reply.status_code, 400, msg=reply.get_data(as_text=True))
         do_logout(client)

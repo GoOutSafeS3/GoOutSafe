@@ -142,7 +142,7 @@ class TestRegistration(unittest.TestCase):
         tested_app.set_app(self.app)
 
         form = {
-            "email":"example@example.com",
+            "email":"admin@example.com",
             "firstname":"Tester",
             "lastname":"EE",
             "password":"42",
@@ -454,7 +454,7 @@ class TestRegistration(unittest.TestCase):
         tested_app.set_app(self.app)
 
         form = {
-            "email":"example@example.com",
+            "email":"admin@example.com",
             "firstname":"Tester",
             "lastname":"OEE",
             "password":"42",
@@ -658,7 +658,7 @@ class TestRegistration(unittest.TestCase):
         tested_app = self.app.test_client()
         tested_app.set_app(self.app)
 
-        tested_app.t_post('/login',data={"email":"example@example.com", "password": "admin"})
+        tested_app.t_post('/login',data={"email":"admin@example.com", "password": "admin"})
 
         reply = tested_app.get('/users')
         html = reply.get_data(as_text=True)
@@ -670,7 +670,7 @@ class TestRegistration(unittest.TestCase):
         tested_app = self.app.test_client()
         tested_app.set_app(self.app)
 
-        tested_app.t_post('/login',data={"email":"example@example.com", "password": "admin"})
+        tested_app.t_post('/login',data={"email":"admin@example.com", "password": "admin"})
 
         reply = tested_app.get('/users')
         html = reply.get_data(as_text=True)
