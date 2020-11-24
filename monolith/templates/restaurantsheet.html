@@ -36,12 +36,17 @@
     </div>
 
     <div class="closed_days">
+      {% if closed_days|length > 0 %}
       Closed days:
       <ul>
         {% for day in closed_days: %}
           <li>{{day}}</li>
         {% endfor %}
       </ul>
+      {% else %}
+      Always open!
+      {% endif %}
+      <br>
     </div>
     {% if current_user.is_operator and current_user.rest_id == id %}
 
