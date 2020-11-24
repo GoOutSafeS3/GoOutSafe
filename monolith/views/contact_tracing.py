@@ -34,8 +34,19 @@ def _contacts():
                 if request.form["email"] == "" and request.form["telephone"] == "" and request.form["ssn"] == "":
                     flash("Please fill in a field","warning")
                     return render_template('form.html', form=form, title="Find Contacts")
-
-                users, status = get_getaway().get_users(email=request.form["email"],phone =request.form["telephone"], ssn= request.form["ssn"])
+                if request.form["email"] != "":
+                    email_param = request.form['email']
+                else:
+                    email_param = None
+                if request.form["telephone"] != "":
+                    phone_param = request.form['telephone']
+                else:
+                    phone_param = None
+                if request.form["ssn"] != "":
+                    ssn_param = request.form['ssn']
+                else:
+                    ssn_param = None
+                users, status = get_getaway().get_users(email=email_param,phone=phone_param, ssn=ssn_param)
             except:
                 flash("Bad Form","error")
                 return render_template('form.html', form=form, title="Find Contacts")
@@ -59,6 +70,7 @@ def _contacts():
                 
     return render_template('form.html', form=form, title="Find Contacts")
 
+
 @contact_tracing.route('/positives/mark', methods=['GET','POST'])
 @health_authority_required
 def _mark_as_positive():
@@ -75,8 +87,19 @@ def _mark_as_positive():
                 if request.form["email"] == "" and request.form["telephone"] == "" and request.form["ssn"] == "":
                     flash("Please fill in a field","warning")
                     return render_template('mark_positives.html', form=form, title="Mark a User")
-
-                users, status = get_getaway().search_users(request.form)
+                if request.form["email"] != "":
+                    email_param = request.form['email']
+                else:
+                    email_param = None
+                if request.form["telephone"] != "":
+                    phone_param = request.form['telephone']
+                else:
+                    phone_param = None
+                if request.form["ssn"] != "":
+                    ssn_param = request.form['ssn']
+                else:
+                    ssn_param = None
+                users, status = get_getaway().get_users(email=email_param,phone=phone_param, ssn=ssn_param)
             except:
                 flash("Bad Form","error")
                 return render_template('mark_positives.html', form=form, title="Mark a User")
@@ -116,8 +139,19 @@ def _unmark_as_positive():
                 if request.form["email"] == "" and request.form["telephone"] == "" and request.form["ssn"] == "":
                     flash("Please fill in a field","warning")
                     return render_template('form.html', form=form, title="Unmark a User")
-
-                users, status = get_getaway().search_users(request.form)
+                if request.form["email"] != "":
+                    email_param = request.form['email']
+                else:
+                    email_param = None
+                if request.form["telephone"] != "":
+                    phone_param = request.form['telephone']
+                else:
+                    phone_param = None
+                if request.form["ssn"] != "":
+                    ssn_param = request.form['ssn']
+                else:
+                    ssn_param = None
+                users, status = get_getaway().get_users(email=email_param,phone=phone_param, ssn=ssn_param)
             except:
                 flash("Bad Form","error")
                 return render_template('mark_positives.html', form=form, title="Mark a User")
@@ -173,6 +207,7 @@ def _mark_as_positive_by_id(pos_id):
 
     return redirect("/positives")
 
+
 @contact_tracing.route('/positives/<int:pos_id>/unmark', methods=['GET'])
 @health_authority_required
 def _unmark_as_positive_by_id(pos_id):
@@ -192,6 +227,7 @@ def _unmark_as_positive_by_id(pos_id):
 
     return redirect("/positives")
 
+
 @contact_tracing.route('/positives/<int:user_id>/contacts')
 @health_authority_required
 def user_contacts(user_id):
@@ -201,8 +237,8 @@ def user_contacts(user_id):
         404 -- User not found or user not positive
     """
     users, status = get_getaway().get_user_contacts(user_id,
-        datetime.today() - timedelta(days = 14),
-        datetime.today())
+        begin=str(datetime.today() - timedelta(days=14)),
+        end=str(datetime.today()))
 
     if status == 404:
         flash("User not found","error")
