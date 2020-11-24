@@ -1,3 +1,4 @@
+from datetime import timedelta
 import unittest
 from monolith.app import create_app
 from flask_test_with_csrf import FlaskClient
@@ -15,12 +16,13 @@ class TestRestaurant(unittest.TestCase):
     def test_restaurant_list(self):
         client = self.app.test_client()
         client.set_app(self.app)
+        do_login(client, "anna@example.com", "anna")
         reply = client.t_get("/restaurants")
         self.assertEqual(reply.status_code, 200)
         reply_data = reply.get_data(as_text = True)
         with self.app.test_request_context():
             self.assertTrue("Rest 1" in reply_data)
-            self.assertIn("/restaurant/1", reply_data)
+            self.assertIn("/restaurants/1", reply_data)
 
     def test_restaurants_map(self):
         client = self.app.test_client()
@@ -71,12 +73,12 @@ class TestRestaurant(unittest.TestCase):
     def test_profile_has_closed_days(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        reply = client.t_get("/restaurants/4")
+        reply = client.t_get("/restaurants/2")
         self.assertEqual(reply.status_code, 200)
         reply_data = reply.get_data(as_text = True)
         with self.app.test_request_context():
             self.assertTrue("Monday" in reply_data)
-            self.assertTrue("Sunday" in reply_data)
+            self.assertFalse("Sunday" in reply_data)
             self.assertFalse("Tuesday" in reply_data)
             self.assertFalse("Wednesday" in reply_data)
             self.assertFalse("Thursday" in reply_data)
@@ -238,20 +240,21 @@ class TestRestaurant(unittest.TestCase):
     def test_overview_slots(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "operator4@example.com","operator")
-        reply = client.t_get("/restaurants/4/overview/2020/10/5")
+        do_login(client, "operator3@example.com","operator")
+        today = datetime.datetime.today()+timedelta(days=1) # TODO set fake data to have 2 bookings in a day 1 fist opening 1 second
+        reply = client.t_get(f"/restaurants/3/overview/{today.year}/{today.month}/{today.day}")
         reply_data = reply.get_data(as_text = True)
         self.assertIn("First opening:", reply_data)
         self.assertIn("Second opening:", reply_data)
 
-        today = datetime.datetime.today()
-        reply = client.t_get(f"/restaurants/4/overview/{today.year}/{today.month}/{today.day}")
+        today = datetime.datetime.today()+timedelta(days=2) # TODO set fake data to have 2 bookings in a day 1 fist opening
+        reply = client.t_get(f"/restaurants/3/overview/{today.year}/{today.month}/{today.day}")
         reply_data = reply.get_data(as_text = True)
         self.assertIn("First opening:", reply_data)
         self.assertNotIn("Second opening:", reply_data)
 
-        today = datetime.datetime.today()
-        reply = client.t_get(f"/restaurants/4/overview/2020/10/3")
+        today = datetime.datetime.today()-timedelta(days=2) # TODO set fake data to have 2 bookings in a day 1 second opening
+        reply = client.t_get(f"/restaurants/4/overview/{today.year}/{today.month}/{today.day}")
         reply_data = reply.get_data(as_text = True)
         self.assertNotIn("First opening:", reply_data)
         self.assertIn("Second opening:", reply_data)
@@ -308,13 +311,13 @@ class TestRestaurant(unittest.TestCase):
         do_login(client, "operator4@example.com","operator")
 
         data={
-            "from_h":"20",
+            "from_h":"00",
             "from_m":"00",
-            "to_h":"22",
+            "to_h":"24", # TODO change times
             "to_m":"00"
         }
-        
-        reply = client.t_get("/restaurants/4/overview/2020/10/5", query_string=data)
+        today_not = datetime.datetime.today()+timedelta(days=2)
+        reply = client.t_get("/restaurants/4/overview/{today_not.year}/{today_not.month}/{today_not.day}", query_string=data)
         reply_data = reply.get_data(as_text=True)
 
-        self.assertIn("No. people total: 5", reply_data) # TODO Change with actual data
+        self.assertIn("Number of people: 2", reply_data) # TODO Change fake data to have more reserations and have a time

@@ -48,7 +48,13 @@ class TestLogin(unittest.TestCase):
         with self.app.test_client() as client:
             client.set_app(self.app)
             reply = do_login(client, "admin@example.com", "admin")
-            self.assertEqual(current_user.is_authenticated, True)
+            self.assertEqual(reply.status_code, 302)
+            reply = client.t_get('/')
+            self.assertTrue("logout" in reply.get_data(as_text=True), msg = reply.get_data(as_text=True))
+            self.assertFalse("login" in reply.get_data(as_text=True))
 
             reply = do_logout(client)
-            self.assertEqual(current_user.is_authenticated, False)
+            reply = client.t_get('/')
+            self.assertTrue("login" in reply.get_data(as_text=True))
+            self.assertFalse("logout" in reply.get_data(as_text=True))
+

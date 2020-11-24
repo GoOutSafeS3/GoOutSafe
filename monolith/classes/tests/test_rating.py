@@ -91,7 +91,7 @@ class TestLogin(unittest.TestCase):
     def test_can_rate_once(self):
         with self.app.test_client() as client:
             client.set_app(self.app)
-            reply = do_login(client, "example@example.com", "admin")
+            reply = do_login(client, "admin@example.com", "admin")
             
             reply = client.t_post("/restaurants/2/rate", data = {"rating": "5"})
             self.assertEqual(reply.status_code, 200)
@@ -102,7 +102,7 @@ class TestLogin(unittest.TestCase):
     def test_rating_wrong(self):
         with self.app.test_client() as client:
             client.set_app(self.app)
-            reply = do_login(client, "example@example.com", "admin")
+            reply = do_login(client, "admin@example.com", "admin")
             
             reply = client.t_post("/restaurants/2/rate", data = {"rating": None})
             self.assertEqual(reply.status_code, 400)

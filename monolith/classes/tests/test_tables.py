@@ -6,28 +6,11 @@ from flask_login import current_user
 from utils import do_login, get_restaurant_id, get_tables_ids, send_registration_form
 from random import randint
 
-class TestLogin(unittest.TestCase):
+class TestTables(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.app = create_app()
         self.app.test_client_class = FlaskClient
-
-        client = self.app.test_client()
-        client.set_app(self.app)
-        form = {
-            "email":"testerGoodFormOperator2@test.me",
-            "firstname":"Tester2",
-            "lastname":"OGF2",
-            "password":"42",
-            "password_repeat":"42",
-            "dateofbirth":"01/01/1970",
-            "telephone":"1234567890",
-            "restaurant_name":"Restaurant at the End of the Pizza",
-            "restaurant_phone":"1234567891",
-            "restaurant_latitude":"43.431481",
-            "restaurant_longitude":"10.242915",
-        }
-        send_registration_form(client, '/create_operator', form)
     
     def start_operator(self):
         client = self.app.test_client()
@@ -42,7 +25,13 @@ class TestLogin(unittest.TestCase):
     def start_operator2(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "operator2@test.me", "operator")
+        do_login(client, "operator2@example.com", "operator")
+        return client
+
+    def start_operator3(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+        do_login(client, "operator3@example.com", "operator")
         return client
 
     def test_list_tables(self):
@@ -105,13 +94,13 @@ class TestLogin(unittest.TestCase):
 
     def test_post_delete_table(self):
         client, rest_id, ms, tab_id = self.start_operator()
-        tab_id = 2
+        tab_id = 7
         reply = client.t_get("/tables/%d/delete"%tab_id)
         self.assertEqual(reply.status_code, 302)
     
     def test_post_old_booking_delete_table(self):
-        client, rest_id, ms, tab_id = self.start_operator()
-        tab_id = 3
+        client = self.start_operator2()
+        tab_id = 2
         reply = client.t_get("/tables/%d/delete"%tab_id)
         self.assertEqual(reply.status_code, 302)
 
@@ -124,10 +113,10 @@ class TestLogin(unittest.TestCase):
         tab_id = ms[-1]
         client2 = self.start_operator2()
         reply = client2.t_get("/tables/%d/delete"%tab_id)
-        self.assertEqual(reply.status_code, 401)
+        self.assertEqual(reply.status_code, 401, msg=str(ms))
 
     def test_booked_delete_table(self):
-        client, rest_id, ms, tab_id = self.start_operator()
+        client = self.start_operator3()
         tab_id = 4
         reply = client.t_get("/tables/%d/delete"%tab_id)
-        self.assertEqual(reply.status_code, 412)
+        self.assertEqual(reply.status_code, 409)
