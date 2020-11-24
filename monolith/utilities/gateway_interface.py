@@ -38,6 +38,10 @@ class GatewayInterface(ABC):
         else:
             return check_password_hash(user['password'], password)
 
+    @abstractmethod
+    def set_user_restaurant(self, user_id: int, rest_id: int) -> Tuple[Dict, int]:
+        pass
+
     #### CONTACT TRACING ####
 
     @abstractmethod
@@ -75,11 +79,19 @@ class GatewayInterface(ABC):
         pass
     
     @abstractmethod
+    def post_restaurants(self, json: dict) -> Tuple[List[Dict], int]:
+        pass
+
+    @abstractmethod
     def get_restaurant(self, rest_id: int) -> Tuple[List[Dict], int]:
         pass
 
     @abstractmethod
     def edit_restaurant(self, rest_id: int, json: Dict) -> Tuple[List[Dict], int]:
+        pass
+
+    @abstractmethod
+    def delete_restaurant(self, rest_id: int) -> Tuple[List[Dict], int]:
         pass
 
     @abstractmethod

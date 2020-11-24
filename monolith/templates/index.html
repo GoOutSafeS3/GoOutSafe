@@ -59,23 +59,28 @@
             <h3>Welcome back {{ current_user.firstname }}!</h3>
 
           {% if current_user.is_operator %}
-            <br>
-            <h3>Your Restaurant:</h3>
-            {% for restaurant in restaurants %}
-              <div>
-                <h5>
-                  <li>
-                       <a href="/restaurants/{{ restaurant.id }}"> {{restaurant.name}}  </a>
-                       {{ restaurant.rating_val | round( 1, 'ceil') }}/5 Stars with {{restaurant.rating_num}} ratings
-                  </li>   
-                </h5>
-              </div>
+            {% if current_user.rest_id is none %}
                 <br>
-                  <a class="btn btn-outline-secondary btn-sm"  href="/restaurants/{{ restaurant.id }}/overview"> Reservations overview  </a>
-                  <a class="btn btn-outline-secondary btn-sm"  href="/restaurants/{{ restaurant.id }}/reservations/today"> Today's Reservations  </a>
-                  <a class="btn btn-outline-secondary btn-sm"  href="/restaurants/{{ restaurant.id }}/reservations"> Search Reservations  </a>
-                  <a class="btn btn-outline-secondary btn-sm"  href="/restaurants/{{ restaurant.id }}/edit"> Edit Restaurant  </a>
-            {% endfor %}
+                Create your restaurant <a href="/create_restaurant">here</a>
+            {% else %}
+                <br>
+                <h3>Your Restaurant:</h3>
+                {% for restaurant in restaurants %}
+                <div>
+                    <h5>
+                    <li>
+                        <a href="/restaurants/{{ restaurant.id }}"> {{restaurant.name}}  </a>
+                        {{ restaurant.rating_val | round( 1, 'ceil') }}/5 Stars with {{restaurant.rating_num}} ratings
+                    </li>   
+                    </h5>
+                </div>
+                    <br>
+                    <a class="btn btn-outline-secondary btn-sm"  href="/restaurants/{{ restaurant.id }}/overview"> Reservations overview  </a>
+                    <a class="btn btn-outline-secondary btn-sm"  href="/restaurants/{{ restaurant.id }}/reservations/today"> Today's Reservations  </a>
+                    <a class="btn btn-outline-secondary btn-sm"  href="/restaurants/{{ restaurant.id }}/reservations"> Search Reservations  </a>
+                    <a class="btn btn-outline-secondary btn-sm"  href="/restaurants/{{ restaurant.id }}/edit"> Edit Restaurant  </a>
+                {% endfor %}
+            {% endif %}
           {% endif %}
 
         {% else %}

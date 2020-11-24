@@ -12,7 +12,12 @@ def get(url):
     try:
         r = requests.get(url, timeout=TIMEOUT)
         try:
-            return DotMap(r.json()) ,r.status_code
+            ret = None
+            if type(r.json()) == list:
+                ret = [DotMap(el) for el in r.json()]
+            else:
+                ret = DotMap(r.json())
+            return ret, r.status_code
         except:
             return None, r.status_code  
     except:

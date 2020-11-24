@@ -47,6 +47,13 @@ class RealGateway(GatewayInterface):
     def delete_user(self, userdata):
         pass
 
+    def set_user_restaurant(self, user_id, rest_id):
+        user,status = self.get_user(user_id)
+        if user is None or status != 200:
+            return None, 500
+        # TODO fix to be able to set rest_id#################################################################################
+        pass
+
 
     #### CONTACT TRACING ####
     def get_positive_users(self):
@@ -99,11 +106,18 @@ class RealGateway(GatewayInterface):
             url = url[:-1]
         return get(url)
 
+    def post_restaurants(self, json):
+        return post(f"{self.addr}/restaurants", json=json)
+
     def get_restaurant(self, rest_id):
         return get(f"{self.addr}/restaurants/{rest_id}")
 
     def edit_restaurant(self, rest_id, json):
         return put(f"{self.addr}/restaurants/{rest_id}", json=json)
+
+    def delete_restaurant(self,rest_id):
+        url = f"{self.addr}/restaurants/{rest_id}"
+        return delete(url)
 
     def get_restaurant_rate(self, rest_id):
         return get(f"{self.addr}/restaurants/{rest_id}/rate")
@@ -129,15 +143,15 @@ class RealGateway(GatewayInterface):
         return post(url, json={"capacity":capacity})
 
     def get_restaurants_table(self,rest_id, table_id):
-        url = f"{self.addr}/restaurants/{rest_id}/tables{table_id}"
+        url = f"{self.addr}/restaurants/{rest_id}/tables/{table_id}"
         return get(url)
     
     def edit_restaurants_table(self,rest_id, table_id, capacity):
-        url = f"{self.addr}/restaurants/{rest_id}/tables{table_id}"
+        url = f"{self.addr}/restaurants/{rest_id}/tables/{table_id}"
         return put(url, json={"capacity":capacity})
 
     def delete_restaurants_table(self,rest_id, table_id):
-        url = f"{self.addr}/restaurants/{rest_id}/tables{table_id}"
+        url = f"{self.addr}/restaurants/{rest_id}/tables/{table_id}"
         return delete(url)
 
     #### RESERVATIONS ####

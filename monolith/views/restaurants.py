@@ -17,11 +17,11 @@ def _restaurants(message=''):
         Error status code:
             500 -- Error try again later
     """
-    allrestaurants, status = get_getaway.get_restaurants()
+    allrestaurants, status = get_getaway().get_restaurants()
 
     if allrestaurants is None or status != 200:
         flash("Sorry, an error occured. Please, try again.","error")
-        return make_response(render_template('form.html', title="View reservations"),500)
+        return make_response(render_template('error.html', error = status),500)
 
     markers_to_add = []
     for restaurant in allrestaurants:
@@ -54,6 +54,8 @@ def search_res():
         400 -- The form is filled out incorrectly
         404 -- No restaurant with those characteristics was found
         500 -- Error try again later
+    Success codes:
+        200
     """
     form = SearchRestaurantForm()
     if request.method == 'POST':
@@ -65,12 +67,12 @@ def search_res():
             if open_day.lower() == "not specified":
                 open_day = None
 
-            allrestaurants, status = get_getaway.get_restaurants(request.form["name"], opening_time, open_day, request.form["cuisine_type"], request.form["menu"])
+            allrestaurants, status = get_getaway().get_restaurants(request.form["name"], opening_time, open_day, request.form["cuisine_type"], request.form["menu"])
     
             if allrestaurants is None or status != 200:
                 if status == None:
                     flash("Sorry, an error occured. Please, try again.","error")
-                    return make_response(render_template('form.html', title="View reservations"),500)
+                    return make_response(render_template('error.html', error = status),500)
                 flash("Bad form", "error")
                 return make_response(render_template("error.html", error = status), status)
 
@@ -114,23 +116,25 @@ def restaurant_sheet(restaurant_id):
     Error status code:
         404 -- No restaurant with id restaurant_id was found
         500 -- Error try again later
+    Success codes:
+        200
     """
 
-    restaurant, status = get_getaway.get_restaurant(restaurant_id)
+    restaurant, status = get_getaway().get_restaurant(restaurant_id)
     if restaurant is None or status != 200:
         flash("Sorry, an error occured. Please, try again.","error")
-        return make_response(render_template('form.html', title="View reservations"),500)
+        return make_response(render_template('error.html', error = status),500)
 
-    tables, status = get_getaway.get_restaurants_tables(restaurant_id)
+    tables, status = get_getaway().get_restaurants_tables(restaurant_id)
     if tables is None or status != 200:
         if status == None:
             flash("Sorry, an error occured. Please, try again.","error")
-            return make_response(render_template('form.html', title="View reservations"),500)
+            return make_response(render_template('error.html', error = status),500)
         elif status == 404:
             flash("No restaurant with id restaurant_id was found", "error")
             return make_response(render_template("error.html", error = status), status)
         elif status == 204:
-            pass
+            tables = []
 
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     closed_days = []
@@ -167,15 +171,17 @@ def _rate(restaurant_id):
         401 -- The user is not logged-in
         404 -- No restaurant with id restaurant_id was found
         500 -- Error try again later
+    Success codes:
+        200
     """
 
     form = RatingAddForm()
     if form.validate_on_submit():
-        rating,status = get_getaway.post_restaurant_rate(restaurant_id, current_user.id, form.rating.data)
+        rating,status = get_getaway().post_restaurant_rate(restaurant_id, current_user.id, form.rating.data)
         if rating is None or status != 202:
             if status == None:
                 flash("Sorry, an error occured. Please, try again.","error")
-                return make_response(render_template('form.html', title="View reservations"),500)
+                return make_response(render_template('error.html', error = status),500)
             elif status == 400:
                 flash('Bad request or Restaurant already rated by the user', "error")
             elif status == 404:
@@ -188,6 +194,51 @@ def _rate(restaurant_id):
         return restaurant_sheet(restaurant_id)
     flash("Bad form", "error")
     return make_response(restaurant_sheet(restaurant_id), 400)
+
+@restaurants.route('/create_restaurant', methods=['GET', 'POST'])
+@operator_required
+def _create_restaurant():
+    """ Show the page for editing the restaurant with GET, the form can be submitted with POST
+
+    Error status codes:
+        400 -- The request is not valid, the form is filled out incorrectly or a generic error has occurred
+        404 -- The restaurant does not exists
+        409 -- The current user is not an operator or the operator of this restaurant
+        500 -- Error try again later
+
+    Success codes:
+        200 GET  -- The form is sent to the user
+        302 POST -- The modification was accepted
+    """
+
+    if current_user.rest_id != None:
+        return make_response(render_template('error.html', error="Restaurant already created"), 401)
+
+    if request.method == 'POST':
+        form = RestaurantEditForm()
+        if form.validate_on_submit():
+            json = DotMap()
+            form.populate_obj(json)
+            json = json.toDict()
+            json["closed_days"] = [int(i) for i in json["closed_days"]]
+            restaurant,status = get_getaway().post_restaurants(json)
+            if restaurant is None or status != 201:
+                if status == None or status == 500:
+                    flash("Sorry, an error occured. Please, try again.","error")
+                    return make_response(render_template('error.html', error = status),500)
+                elif status == 400:
+                    flash('Bad request', "error")
+                return make_response(render_template("error.html", error = status), status)
+            user,status = get_getaway().set_user_restaurant(current_user.id, restaurant.id)
+            if user is None or status != 200:
+                restaurant,status2 = get_getaway().delete_restaurant(restaurant.id)
+                flash("Sorry, an error occured. Please, try again.","error")
+                return make_response(render_template('error.html', error = status),500)
+            return redirect(f"/restaurants/{current_user.rest_id}")
+        flash("Bad form", "error")
+        return make_response(render_template('edit_restaurant.html', form=form), 400)
+    form = RestaurantEditForm()
+    return render_template('edit_restaurant.html', form=form)
 
 
 @restaurants.route('/restaurants/<int:restaurant_id>/edit', methods=['GET', 'POST'])
@@ -203,12 +254,12 @@ def _edit_restaurant(restaurant_id):
 
     Success codes:
         200 GET  -- The form is sent to the user
-        200 POST -- The modification was accepted
+        302 POST -- The modification was accepted
     """
-    restaurant, status = get_getaway.get_restaurant(restaurant_id)
+    restaurant, status = get_getaway().get_restaurant(restaurant_id)
     if restaurant is None or status != 200:
         flash("Sorry, an error occured. Please, try again.","error")
-        return make_response(render_template('form.html', title="View reservations"),500)
+        return make_response(render_template('error.html', error = status),500)
 
     if current_user.rest_id != restaurant_id:
         return make_response(render_template('error.html', error="Area reserved for the restaurant operator"), 401)
@@ -218,11 +269,13 @@ def _edit_restaurant(restaurant_id):
         if form.validate_on_submit():
             json = DotMap()
             form.populate_obj(json)
-            restaurant,status = get_getaway.edit_restaurant(restaurant_id, json.toDict())
+            json = json.toDict()
+            json["closed_days"] = [int(i) for i in json["closed_days"]]
+            restaurant,status = get_getaway().edit_restaurant(restaurant_id, json)
             if restaurant is None or status != 200:
                 if status == None:
                     flash("Sorry, an error occured. Please, try again.","error")
-                    return make_response(render_template('form.html', title="View reservations"),500)
+                    return make_response(render_template('error.html', error = status),500)
                 elif status == 400:
                     flash('Bad request or Restaurant already rated by the user', "error")
                 elif status == 404:
@@ -362,17 +415,17 @@ def _add_tables():
 
     Success codes:
         200 -- The form is sent to the user
-        201 -- The addition is accepted
+        302 -- The addition is accepted
     """
 
     form = TableAddForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            table, status = get_getaway.post_restaurant_tables(current_user.rest_id)
-            if table is None or status != 200:
+            table, status = get_getaway().post_restaurants_tables(current_user.rest_id, int(request.form['capacity']))
+            if table is None or status != 201:
                 if status == None or status == 404:
                     flash("Sorry, an error occured. Please, try again.","error")
-                    return make_response(render_template('form.html', title="View reservations"),500)
+                    return make_response(render_template('error.html', error = status),500)
                 flash("Bad form", "error")
                 return make_response(render_template("error.html", error = status), status)
             return redirect(f"/restaurants/{current_user.rest_id}")
@@ -396,28 +449,28 @@ def _edit_tables(table_id):
 
     Success codes:
         200 GET  -- The form is sent to the user
-        200 POST -- The edit is accepted
+        302 POST -- The edit is accepted
     """
     
-    table, status = get_getaway.get_restaurants_table(current_user.rest_id, table_id)
+    table, status = get_getaway().get_restaurants_table(current_user.rest_id, table_id)
     if table is None or status != 200:
         if status == None:
             flash("Sorry, an error occured. Please, try again.","error")
-            return make_response(render_template('form.html', title="View reservations"),500)
+            return make_response(render_template('error.html', error = status),500)
         flash("A table with such id has not been found","error")
         return make_response(render_template("error.html", error = status), status)
 
-    if current_user.rest_id != table.rest_id:
+    if current_user.rest_id != table.restaurant_id:
         return make_response(render_template('error.html', error="Area reserved for the restaurant operator"), 401)
 
     if request.method == 'POST':
         form = TableAddForm()
         if form.validate_on_submit():
-            table, status = get_getaway.edit_restaurants_table(current_user.rest_id, table_id, capacity = int(request.form['capacity']))
+            table, status = get_getaway().edit_restaurants_table(current_user.rest_id, table_id, capacity = int(request.form['capacity']))
             if table is None or status != 200:
                 if status == None or status == 500 or status == 404:
                     flash("Sorry, an error occured. Please, try again.","error")
-                    return make_response(render_template('form.html', title="View reservations"),500)
+                    return make_response(render_template('error.html', error = status),500)
                 elif status == 400:
                     flash("Bad form", "error")
                 elif status == 409:
@@ -443,26 +496,27 @@ def delete_table(table_id):
         500 -- Error, try again later
 
     Success codes:
-        204 -- The deletion is accepted
+        302 -- The deletion is accepted
     """
 
-    table, status = get_getaway.get_restaurants_table(current_user.rest_id, table_id)
+    table, status = get_getaway().get_restaurants_table(current_user.rest_id, table_id)
     if table is None or status != 200:
         if status == None:
             flash("Sorry, an error occured. Please, try again.","error")
-            return make_response(render_template('form.html', title="View reservations"),500)
+            return make_response(render_template('error.html', error = status),500)
         flash("A table with such id has not been found","error")
         return make_response(render_template("error.html", error = status), status)
 
-    if current_user.rest_id != table.rest_id:
+    if current_user.rest_id != table.restaurant_id:
         return make_response(render_template('error.html', error="Area reserved for the restaurant operator"), 401)
 
 
-    table, status = get_getaway.delete_restaurants_table(current_user.rest_id, table_id)
-    if table is None or status != 200:
+    table, status = get_getaway().delete_restaurants_table(current_user.rest_id, table_id)
+    if status != 204:
         if status == None or status == 404 or status == 500:
             flash("Sorry, an error occured. Please, try again.","error")
-            return make_response(render_template('form.html', title="View reservations"),500)
+            return make_response(render_template('error.html', error = status),500)
         elif status == 409:
             flash("The table has pending reservations, those must be deleted first","error")
         return make_response(render_template("error.html", error = status), status)
+    return redirect(f'/restaurants/{current_user.rest_id}')
