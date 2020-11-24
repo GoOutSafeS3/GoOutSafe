@@ -6,7 +6,7 @@
       <li>
         {{positive.lastname}} {{positive.firstname}}
         <ul>
-          <li>Date Of Birth: {{positive.dateofbirth.strftime("%d %b %Y")}}</li>
+          <li>Date Of Birth: {{ (positive.dateofbirth | parse_datetime).strftime("%d %b %Y")}}</li>
           <li>Email: {{positive.email}}</li>
           <li>Telephone: {{positive.phone}}</li>
           {% if positive.ssn %}
@@ -15,7 +15,7 @@
             <li>SSN: Not Inserted</li>
           {% endif %}
           {% if positive.is_positive %}
-            <li>Positive since: {{positive.positive_datetime.strftime("%d %b %Y, %H:%M")}}</li>
+            <li>Positive since: {{ (positive.positive_datetime | parse_datetime).strftime("%d %b %Y, %H:%M")}}</li>
             <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/positives/{{positive.id}}/unmark"> Unmark </a>
             <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/positives/{{positive.id}}/contacts"> View contacts </a>
           {% else %}
