@@ -4,16 +4,12 @@ from flask_test_with_csrf import FlaskClient
 from flask import url_for
 from flask_login import current_user
 from utils import do_login, do_logout, get_positives_id
-from monolith.utilities.contact_tracing import mark_as_positive, unmark_as_positive, get_user_contacts, get_user_visited_restaurants
-from monolith.background import unmark
 
 import datetime
-
-
 class TestLogin(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self.app = create_app("TEST")
+        self.app = create_app()
         self.app.test_client_class = FlaskClient
 
     def test_unhautorized_access(self):
@@ -38,7 +34,7 @@ class TestLogin(unittest.TestCase):
 
         endpoints = ["/positives","/positives/mark","/positives/unmark", "/positives/contacts"]
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
         for e in endpoints:
             reply = client.t_get(e)
             self.assertEqual(reply.status_code, 200, msg="endpoint: "+e+"\n"+reply.get_data(as_text=True))
@@ -48,7 +44,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
         reply = client.t_get("/positives")
         self.assertIn("Positive Positive",reply.get_data(as_text=True), msg=reply.get_data(as_text=True))
         do_logout(client)
@@ -59,7 +55,7 @@ class TestLogin(unittest.TestCase):
 
         endpoints = ["/positives/mark","/positives/unmark"]
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"customer@example.com",
@@ -79,7 +75,7 @@ class TestLogin(unittest.TestCase):
 
         endpoints = ["/positives/mark","/positives/unmark"]
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"",
@@ -99,7 +95,7 @@ class TestLogin(unittest.TestCase):
 
         endpoints = ["/positives/mark","/positives/unmark"]
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"",
@@ -119,7 +115,7 @@ class TestLogin(unittest.TestCase):
 
         endpoints = ["/positives/mark","/positives/unmark", "/positives/contacts"]
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"customer@example.com",
@@ -139,7 +135,7 @@ class TestLogin(unittest.TestCase):
 
         endpoints = ["/positives/mark","/positives/unmark", "/positives/contacts"]
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"",
@@ -160,7 +156,7 @@ class TestLogin(unittest.TestCase):
 
         endpoints = ["/positives/mark","/positives/unmark", "/positives/contacts"]
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"the_customer@example.com",
@@ -180,7 +176,7 @@ class TestLogin(unittest.TestCase):
 
         endpoints = ["/positives/mark","positives/unmark", "/positives/contacts"]
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"",
@@ -212,7 +208,7 @@ class TestLogin(unittest.TestCase):
 
         endpoints = ["/positives/mark","/positives/unmark", "/positives/contacts"]
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"customer@example.com",
@@ -231,7 +227,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"customer@example.com",
@@ -251,7 +247,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
         reply = client.t_get(f"/positives/99999/mark")
         self.assertEqual(reply.status_code, 404, msg=reply.get_data(as_text=True))
         do_logout(client)
@@ -260,7 +256,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"customer@example.com",
@@ -280,7 +276,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
         reply = client.t_get(f"/positives/99999/unmark")
         self.assertEqual(reply.status_code, 404, msg=reply.get_data(as_text=True))
         do_logout(client)
@@ -290,7 +286,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"customer@example.com",
@@ -306,20 +302,6 @@ class TestLogin(unittest.TestCase):
         self.assertEqual(reply.status_code, 404, msg=reply.get_data(as_text=True))
         do_logout(client)
 
-    def test_utilities_with_wrong_id(self):
-        with self.app.app_context():
-            self.assertFalse(mark_as_positive(99999))
-            self.assertFalse(unmark_as_positive(99999))
-
-    def test_user_contacts(self):
-        with self.app.app_context():
-            self.assertEqual(len(get_user_contacts(3, datetime.datetime(2020,10,19,10,15,0,0), datetime.datetime(2020,10,21,10,15,0,0))), 1)
-            self.assertEqual(len(get_user_contacts(3, datetime.datetime(2021,10,4,18,30,0,0), datetime.datetime(2021,10,6,18,30,0,0))), 0)
-    
-    def test_user_visited_restaurants(self):
-        with self.app.app_context():
-            self.assertEqual(len(get_user_visited_restaurants(3, datetime.datetime(2020,10,19,10,15,0,0), datetime.datetime(2020,10,21,10,15,0,0))), 1)
-    
     def test_contacts_need_ha(self):
         client = self.app.test_client()
         client.set_app(self.app)
@@ -329,20 +311,9 @@ class TestLogin(unittest.TestCase):
         self.assertEqual(reply.status_code, 401)
         do_logout(client)
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
         reply = client.t_get(f"/positives/7/contacts")
         self.assertEqual(reply.status_code, 200)
-        do_logout(client)
-
-    def test_background_process(self):
-        client = self.app.test_client()
-        client.set_app(self.app)
-
-        unmark.apply()
-
-        do_login(client, "health@authority.com", "health")
-        reply = client.t_get("/positives")
-        self.assertNotIn("old.positive@example.com",reply.get_data(as_text=True), msg=reply.get_data(as_text=True)) # A hard coded positive user but with a timestamp 14 days old
         do_logout(client)
 
 
@@ -350,7 +321,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"positive@example.com",
@@ -365,7 +336,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"",
@@ -380,7 +351,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"",
@@ -395,7 +366,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"customer@example.com",
@@ -411,7 +382,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         reply = client.t_get("/positives/3/contacts")
         self.assertEqual(reply.status_code,404,msg=reply.get_data(as_text=True))   
@@ -422,7 +393,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         reply = client.t_get("/positives/99999/contacts")
         self.assertEqual(reply.status_code,404,msg=reply.get_data(as_text=True))   

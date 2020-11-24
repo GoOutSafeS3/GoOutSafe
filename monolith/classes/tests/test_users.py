@@ -8,7 +8,7 @@ from utils import send_registration_form
 class TestRegistration(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self.app = create_app("TEST")
+        self.app = create_app()
         self.app.test_client_class = FlaskClient
 
     # --- CREATE_USER -------------------------------------------------------

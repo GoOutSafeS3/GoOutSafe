@@ -9,7 +9,7 @@ import datetime
 class TestNotifications(unittest.TestCase):
     @classmethod
     def setUp(self):
-        self.app = create_app("TEST")
+        self.app = create_app()
         self.app.test_client_class = FlaskClient
 
     def test_notifications_need_login(self):
