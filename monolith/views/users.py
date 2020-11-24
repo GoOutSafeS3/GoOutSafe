@@ -85,8 +85,8 @@ def delete_user():
     form = LoginForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            user,status_code = get_getaway().get_users(email=form.data['email'])
-            if user is not None:
+            users, status_code = get_getaway().get_users(email=form.data['email'])
+            if users is not None:
                 email, password = form.data['email'], form.data['password']
                 user = users[0]
             else:
