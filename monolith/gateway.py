@@ -52,8 +52,16 @@ class RealGateway(GatewayInterface):
         if user is None or status != 200:
             return None, 500
         if user['is_operator']:
+            user = user.toDict()
+            els = ["email", "firstname", "lastname", "phone", "dateofbirth", "password"]
+            arr = []
+            for k,v in user.items():
+                if k not in els:
+                    arr.append(k)
+            for a in arr:
+                del user[a]
             user['rest_id'] = rest_id
-            return put(f"{self.addr}/users/" + str(user_id), json=user)
+            return put(f"{self.addr}/users/{user_id}", json=user)
         else:
             return None, 400
 

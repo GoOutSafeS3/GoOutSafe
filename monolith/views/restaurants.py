@@ -102,7 +102,7 @@ def search_res():
                 zoom=15
             )
             return render_template("restaurants.html", sndmap=sndmap, restaurants=matches,
-                                   base_url="http://127.0.0.1:5000/restaurants")
+                                   base_url="/restaurants")
         flash("Bad form", "error")
         return make_response(render_template('form.html', form=form, title="Find a restaurant!"), 400)
     return make_response(render_template('form.html', form=form, title="Find a restaurant!"), 200)
