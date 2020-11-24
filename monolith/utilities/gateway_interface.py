@@ -14,6 +14,10 @@ class GatewayInterface(ABC):
         pass
 
     @abstractmethod
+    def edit_user(self, user_id: int, userdata: dict) -> Tuple[Dict, int]:
+        pass
+
+    @abstractmethod
     def get_users(self,email:str,phone:str,ssn:str) -> Tuple[List[Dict], int]:
         pass
 
