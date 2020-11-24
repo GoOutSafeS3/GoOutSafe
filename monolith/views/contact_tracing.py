@@ -110,7 +110,7 @@ def _mark_as_positive():
             if len(users) == 0:
                 flash("User not found","error")
                 return render_template('mark_positives.html', form=form, title="Mark a User")
-            elif len(status) > 1:
+            elif len(users) > 1:
                 flash("More users have been found, please try again","error")
                 return render_template('mark_positives.html', form=form, title="Mark a User")
             else:
