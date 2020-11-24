@@ -95,6 +95,7 @@ def delete_user():
                 usr, status = get_getaway().delete_user(user['id'])
                 if status == 204:
                     flash('Account deleted','success')
+                    logout_user(current_user)
                     return make_response(render_template('homepage.html'), 200)
                 if status == 400:
                     flash('Please try again', 'warning')
@@ -108,7 +109,7 @@ def delete_user():
         else:
             flash('Bad form','error')
             return make_response(render_template('delete_profile.html', form=form, title="Unregister"),400)
-    return make_response(render_template('delete_profile.html'),200)
+    return render_template('delete_profile.html', form=form, title="Unregister")
 
 
 @users.route('/create_user', methods=['GET', 'POST'])
@@ -134,12 +135,13 @@ def create_user():
                 flash('Passwords do not match', 'warning')
                 return make_response(render_template('form.html', form=form, title="Sign in!"),200)
 
-            user = {'firstname': form.firstname.data, 'lastname': form.lastname.data, 'email': json['email'],
+            user = {'firstname': json['firstname'], 'lastname': json['lastname'], 'email': json['email'],
                     'password': generate_password_hash(form.password.data), 'phone': json['telephone'],
                     'rest_id': None, 'is_operator': False, 'ssn': json['ssn'], 'is_admin': False,
                     'dateofbirth' : json['dateofbirth'], 'is_health_authority': False, 'is_positive': False}
 
             resp, status_code = get_getaway().create_user(userdata=user)
+
             if status_code == 200:
                 usr = User(user['id'], user['is_operator'], user['is_admin'], user['is_health_authority'],
                            user['password'], user['rest_id'], user['is_positive'])
@@ -252,7 +254,7 @@ def edit():
 
             response_user, status_code = get_getaway().edit_user(current_user.id, user_to_edit)
             if status_code == 200:
-                flash('Profile modified', 'success')
+                flash('Profile modified with success', 'success')
                 return redirect("/")
             elif status_code == 400:
                 flash('Bad request', 'warning')
