@@ -19,13 +19,13 @@ class TestRestaurant(unittest.TestCase):
         self.assertEqual(reply.status_code, 200)
         reply_data = reply.get_data(as_text = True)
         with self.app.test_request_context():
-            self.assertTrue("Trial Restaurant" in reply_data)
-            self.assertIn("True Italian Restaurant", reply_data)
+            self.assertTrue("Rest 1" in reply_data)
+            self.assertIn("/restaurant/1", reply_data)
 
     def test_restaurants_map(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "customer@example.com", "customer")
+        do_login(client, "anna@example.com", "anna")
         reply = client.t_get("/restaurants_map")
         do_logout(client)
         self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text = True))
@@ -33,7 +33,7 @@ class TestRestaurant(unittest.TestCase):
     def test_restaurants_map_notcustomer(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "example@example.com", "admin")
+        do_login(client, "admin@example.com", "admin")
         reply = client.t_get("/restaurants_map")
         self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text = True))
         do_logout(client)
@@ -41,36 +41,37 @@ class TestRestaurant(unittest.TestCase):
     def test_profile_has_name(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        reply = client.t_get("/restaurants/1")
+        reply = client.t_get("/restaurants/4")
         self.assertEqual(reply.status_code, 200)
         reply_data = reply.get_data(as_text = True)
         with self.app.test_request_context():
-            self.assertTrue("Trial Restaurant" in reply_data)
+            self.assertTrue("Rest 4" in reply_data)
 
     def test_profile_has_phone(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        reply = client.t_get("/restaurants/1")
+        reply = client.t_get("/restaurants/4")
         self.assertEqual(reply.status_code, 200)
         reply_data = reply.get_data(as_text = True)
         with self.app.test_request_context():
-            self.assertTrue("555123456" in reply_data)
+            self.assertTrue("050123456" in reply_data)
 
     def test_profile_has_opening_hours(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        reply = client.t_get("/restaurants/1")
+        reply = client.t_get("/restaurants/4")
         self.assertEqual(reply.status_code, 200)
         reply_data = reply.get_data(as_text = True)
         with self.app.test_request_context():
             self.assertTrue("10:00" in reply_data)
-            self.assertTrue("16:00" in reply_data)
+            self.assertTrue("12:00" in reply_data)
+            self.assertTrue("20:00" in reply_data)
             self.assertTrue("23:00" in reply_data)
 
     def test_profile_has_closed_days(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        reply = client.t_get("/restaurants/1")
+        reply = client.t_get("/restaurants/4")
         self.assertEqual(reply.status_code, 200)
         reply_data = reply.get_data(as_text = True)
         with self.app.test_request_context():
@@ -85,7 +86,7 @@ class TestRestaurant(unittest.TestCase):
     def test_profile_has_cuisine_type(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        reply = client.t_get("/restaurants/1")
+        reply = client.t_get("/restaurants/4")
         self.assertEqual(reply.status_code, 200)
         reply_data = reply.get_data(as_text = True)
         with self.app.test_request_context():
@@ -94,7 +95,7 @@ class TestRestaurant(unittest.TestCase):
     def test_profile_has_menu(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        reply = client.t_get("/restaurants/1")
+        reply = client.t_get("/restaurants/4")
         self.assertEqual(reply.status_code, 200)
         reply_data = reply.get_data(as_text = True)
         with self.app.test_request_context():
@@ -105,7 +106,7 @@ class TestRestaurant(unittest.TestCase):
     def test_bad_form_search(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "customer@example.com","customer")
+        do_login(client, "anna@example.com","anna")
         reply = client.t_get("/restaurants/search")
         self.assertEqual(reply.status_code, 200)
 
@@ -124,7 +125,7 @@ class TestRestaurant(unittest.TestCase):
     def test_empty_form_search(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "customer@example.com","customer")
+        do_login(client, "anna@example.com","anna")
         reply = client.t_get("/restaurants/search")
         self.assertEqual(reply.status_code, 200)
 
@@ -140,18 +141,18 @@ class TestRestaurant(unittest.TestCase):
         do_logout(client)
         reply_data = reply.get_data(as_text = True)
         self.assertEqual(reply.status_code, 200, msg=reply_data)
-        self.assertIn("Trial Restaurant", reply_data, msg=reply_data)
+        self.assertIn("Rest 1", reply_data, msg=reply_data)
 
 
     def test_good_form_search(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "customer@example.com","customer")
+        do_login(client, "anna@example.com","anna")
         reply = client.t_get("/restaurants/search")
         self.assertEqual(reply.status_code, 200)
 
         form = {
-            "name":"tRi",
+            "name":"Rest",
             "menu":"",
             "cuisine_type":"",
             "open_day":"0",
@@ -162,12 +163,12 @@ class TestRestaurant(unittest.TestCase):
         do_logout(client)
         reply_data = reply.get_data(as_text = True)
         self.assertEqual(reply.status_code, 200, msg=reply_data)
-        self.assertIn("Trial Restaurant", reply_data, msg=reply_data)
+        self.assertIn("Rest 4", reply_data, msg=reply_data)
 
     def test_goood_form_empty_search(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "customer@example.com","customer")
+        do_login(client, "anna@example.com","anna")
         reply = client.t_get("/restaurants/search")
         self.assertEqual(reply.status_code, 200)
 
@@ -187,7 +188,7 @@ class TestRestaurant(unittest.TestCase):
     def test_goood_form_multi_search(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "customer@example.com","customer")
+        do_login(client, "anna@example.com","anna")
         reply = client.t_get("/restaurants/search")
         self.assertEqual(reply.status_code, 200)
 
@@ -196,19 +197,19 @@ class TestRestaurant(unittest.TestCase):
             "menu":"",
             "cuisine_type":"italian",
             "open_day":"2",
-            "opening_time":"22"
+            "opening_time":"21"
         }
 
         reply = client.t_post("/restaurants/search",data=form)
         do_logout(client)
         reply_data = reply.get_data(as_text = True)
         self.assertEqual(reply.status_code, 200, msg=reply_data)
-        self.assertIn("Trial Restaurant", reply_data, msg=reply_data)
+        self.assertIn("Rest 4", reply_data, msg=reply_data)
 
     def test_goood_form_bad_time_search(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "customer@example.com","customer")
+        do_login(client, "anna@example.com","anna")
         reply = client.t_get("/restaurants/search")
         self.assertEqual(reply.status_code, 200)
 
@@ -237,20 +238,20 @@ class TestRestaurant(unittest.TestCase):
     def test_overview_slots(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "operator@example.com","operator")
-        reply = client.t_get("/restaurants/1/overview/2020/10/5")
+        do_login(client, "operator4@example.com","operator")
+        reply = client.t_get("/restaurants/4/overview/2020/10/5")
         reply_data = reply.get_data(as_text = True)
         self.assertIn("First opening:", reply_data)
         self.assertIn("Second opening:", reply_data)
 
         today = datetime.datetime.today()
-        reply = client.t_get(f"/restaurants/1/overview/{today.year}/{today.month}/{today.day}")
+        reply = client.t_get(f"/restaurants/4/overview/{today.year}/{today.month}/{today.day}")
         reply_data = reply.get_data(as_text = True)
         self.assertIn("First opening:", reply_data)
         self.assertNotIn("Second opening:", reply_data)
 
         today = datetime.datetime.today()
-        reply = client.t_get(f"/restaurants/1/overview/2020/10/3")
+        reply = client.t_get(f"/restaurants/4/overview/2020/10/3")
         reply_data = reply.get_data(as_text = True)
         self.assertNotIn("First opening:", reply_data)
         self.assertIn("Second opening:", reply_data)
@@ -269,7 +270,7 @@ class TestRestaurant(unittest.TestCase):
     def test_overview_invalid_range(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "operator@example.com","operator")
+        do_login(client, "operator4@example.com","operator")
 
         data={
             "from_h":"foo",
@@ -278,7 +279,7 @@ class TestRestaurant(unittest.TestCase):
             "to_m":"foo"
         }
         
-        reply = client.t_get("/restaurants/1/overview/2020/10/5", query_string=data)
+        reply = client.t_get("/restaurants/4/overview/2020/10/5", query_string=data)
         self.assertEqual(reply.status_code, 400)
 
         data={
@@ -288,7 +289,7 @@ class TestRestaurant(unittest.TestCase):
             "to_m":"00"
         }
         
-        reply = client.t_get("/restaurants/1/overview/2020/10/5", query_string=data)
+        reply = client.t_get("/restaurants/4/overview/2020/10/5", query_string=data)
         self.assertEqual(reply.status_code, 400)
 
         data={
@@ -298,13 +299,13 @@ class TestRestaurant(unittest.TestCase):
             "to_m":"00"
         }
         
-        reply = client.t_get("/restaurants/1/overview/2020/10/5", query_string=data)
+        reply = client.t_get("/restaurants/4/overview/2020/10/5", query_string=data)
         self.assertEqual(reply.status_code, 400)
 
     def test_overview_range(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "operator@example.com","operator")
+        do_login(client, "operator4@example.com","operator")
 
         data={
             "from_h":"20",
@@ -313,7 +314,7 @@ class TestRestaurant(unittest.TestCase):
             "to_m":"00"
         }
         
-        reply = client.t_get("/restaurants/1/overview/2020/10/5", query_string=data)
+        reply = client.t_get("/restaurants/4/overview/2020/10/5", query_string=data)
         reply_data = reply.get_data(as_text=True)
 
-        self.assertIn("No. people total: 5", reply_data)
+        self.assertIn("No. people total: 5", reply_data) # TODO Change with actual data

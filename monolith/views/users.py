@@ -40,7 +40,7 @@ def user_bookings():
         404 -- If the current user is not a customer
     """
     if current_user['is_admin'] or current_user['is_health_authority'] or current_user['rest_id'] is not None:
-        return make_response(render_template('error.html', error='404'),404)
+        return make_response(render_template('error.html', error='404'), 404)
     
     reservations, status = get_getaway().get_user_future_reservations(current_user['id'])
 

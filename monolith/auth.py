@@ -7,14 +7,15 @@ login_manager = LoginManager()
 
 
 class User:
-    def __init__(self, id, is_operator, is_admin, is_health, password):
+    def __init__(self, id, is_operator, is_admin, is_health, password, rest_id):
         self.id = id
         self._authenticated = False
         self.is_active = True
         self.is_operator = is_operator
         self.is_admin = is_admin
-        self.is_health = is_health
+        self.is_health_authority = is_health
         self.password = password
+        self.rest_id = rest_id
 
     @property
     def is_authenticated(self):
@@ -68,7 +69,8 @@ def operator_required(func):
 def load_user(user_id):
     user, status = get_getaway().get_user(user_id)
     if status == 200:
-        user._authenticated = True
-        return user
+        usr = User(user['id'],user['is_operator'],user['is_admin'],user['is_health_authority'], user["password"], user['rest_id'])
+        usr._authenticated = True
+        return usr
     else:
         return None

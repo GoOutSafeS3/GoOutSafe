@@ -42,7 +42,7 @@ class TestLogin(unittest.TestCase):
     def start_operator2(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "testerGoodFormOperator2@test.me", "42")
+        do_login(client, "operator2@test.me", "operator")
         return client
 
     def test_list_tables(self):
