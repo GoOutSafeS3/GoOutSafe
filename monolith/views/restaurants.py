@@ -65,10 +65,19 @@ def search_res():
             if opening_time.lower() == "not specified":
                 opening_time = None
             open_day = request.form["open_day"]
-            if open_day.lower() == "not specified":
+            if open_day == "0":
                 open_day = None
-
-            allrestaurants, status = get_getaway().get_restaurants(request.form["name"], opening_time, open_day, request.form["cuisine_type"], request.form["menu"])
+            name = request.form["name"]
+            if name == "":
+                name = None
+            cuisine_type = request.form["cuisine_type"]
+            if cuisine_type == "":
+                cuisine_type = None
+            menu = request.form["menu"]
+            if menu == "":
+                manu = None
+            
+            allrestaurants, status = get_getaway().get_restaurants(name, opening_time, open_day, cuisine_type, menu)
     
             if allrestaurants is None or status != 200:
                 if status == None:
