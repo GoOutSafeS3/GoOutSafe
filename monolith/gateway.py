@@ -127,17 +127,8 @@ class RealGateway(GatewayInterface):
     def get_restaurant_rate(self, rest_id):
         return get(f"{self.addr}/restaurants/{rest_id}/rate")
 
-<<<<<<< HEAD
     def post_restaurant_rate(self, rest_id, rater_id,rating):
         return post(f"{self.addr}/restaurants/{rest_id}/rate", json={"rater_id":rater_id, "rating":rating })        
-=======
-    def post_restaurant_rate(self, rest_id, rater_id, rating):
-        return post(f"{self.addr}/restaurants/{rest_id}/rate", json={"rater_id": rater_id, "rating": rating})
-
-    def get_user_future_reservations(self, user_id):
-        today = datetime.today().isoformat()
-        return get(f"{self.addr}/bookings?user={user_id}&from={today}")
->>>>>>> 4b7c43249bc9d836010d626acf5f18b6cb301457
 
     #### TABLES ####
     def get_restaurants_tables(self, rest_id, capacity=None):
