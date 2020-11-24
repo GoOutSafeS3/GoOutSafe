@@ -48,7 +48,7 @@ def _book(restaurant_id):
             booking_hr = request.form["booking_hr"]
             booking_min = request.form["booking_min"]
 
-            now = datetime.datetime.now()
+            now = datetime.datetime.now() + datetime.timedelta(hours=1) # timezone aware
             day, month, year = (int(x) for x in booking_date.split('/'))   
             booking_datetime = now.replace(year=year,month=month,day=day,hour=int(booking_hr),minute=int(booking_min),second=0,microsecond=0)
             
@@ -56,7 +56,7 @@ def _book(restaurant_id):
                 flash("You cannot book before now","error")
                 return make_response(render_template('form.html', form=form, title = "Book a table!"),400)
 
-            booking, code = get_getaway().new_booking(user_id=current_user.id ,rest_id=restaurant_id,number_of_people=number_of_people,booking_datetime=booking_datetime)
+            booking, code = get_getaway().new_booking(user_id=current_user.id ,rest_id=restaurant_id,number_of_people=int(number_of_people),booking_datetime=booking_datetime.isoformat())
             
             if booking is None or code is None:
                 flash("Sorry, an error occured. Please, try again.","error")
@@ -303,7 +303,7 @@ def _reservation_edit(reservation_id):
 
     old_booking_datetime = dateutil.parser.parse(booking["booking_datetime"])
     timezone = old_booking_datetime.tzinfo
-    now = datetime.datetime.now(timezone) #timezone aware computation
+    now = datetime.datetime.now(timezone) + datetime.timedelta(hours=1) #timezone aware computation
 
     if old_booking_datetime <= now:
         flash("The reservation has expired","error")
@@ -327,8 +327,9 @@ def _reservation_edit(reservation_id):
                 flash("You cannot book before now","error")
                 return make_response(render_template('form.html', form=form, title = "Edit your booking"),400)
 
-            booking,code = get_getaway().edit_booking(booking_id=reservation_id,number_of_people=number_of_people,booking_datetime=booking_datetime)
-            
+            booking,code = get_getaway().edit_booking(booking_id=reservation_id,number_of_people=int(number_of_people),booking_datetime=booking_datetime.isoformat())
+            flash(booking,"error")
+            flash(code,"success")
             if booking is None or code is None:
                 flash("Sorry, an error occured. Please, try again.","error")
                 return make_response(render_template('form.html', form=form, title="View reservations"),500)
