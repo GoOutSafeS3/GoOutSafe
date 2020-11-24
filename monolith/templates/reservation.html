@@ -1,17 +1,17 @@
 {% extends 'layout.html' %}
     {% block content %}
-          {% if True or current_user.is_operator %}
+          {% if current_user.is_operator %}
             <h2>Your Reservation</h2>
               <div>
                   <li>Reservation Id: {{reservation.id}}</li>
                   <li>Customer: {{reservation.user.lastname}} {{reservation.user.firstname}}</li>
                   <li>For {{reservation.number_of_people}} people</li>
-                  <li>At: {{reservation.booking_datetime}}</li>
+                  <li>At: {{reservation.booking_datetime | datetime}}</li>
                   <li>Phone: {{reservation.user.phone}}</li>
                   <li>Email: {{reservation.user.email}}</li>
                   {% if reservation.entrance_datetime is not none %}
                     <li>
-                          Entrance registered on: {{reservation.entrance_datetime}}
+                          Entrance registered on: {{reservation.entrance_datetime | datetime}}
                     </li>
                   {% endif %}
 

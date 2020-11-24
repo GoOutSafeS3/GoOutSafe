@@ -1,7 +1,5 @@
 flask
 flask-login
-celery
-redis
 flask-wtf
 flask-sqlalchemy
 pip-tools
@@ -9,3 +7,4 @@ email-validator
 flask-googlemaps
 requests
 dotmap
+python-dateutil

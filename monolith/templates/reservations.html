@@ -1,16 +1,16 @@
 {% extends 'layout.html' %}
     {% block content %}
-          {% if True or current_user.is_operator %}
+          {% if current_user.is_operator %}
               {% for reservation in reservations%}
               <div>
                 <li>
                   {{reservation.user.lastname}} {{reservation.user.firstname}} 
                     <ul>
                       <li> {{reservation.number_of_people}} people</li>
-                      <li> On {{reservation.booking_datetime}}</li>
+                      <li> On {{reservation.booking_datetime | datetime}}</li>
                         {% if reservation.entrance_datetime is not none %}
                         <li>
-                          Entrance registered on: {{reservation.entrance_datetime}}
+                          Entrance registered on: {{reservation.entrance_datetime | datetime}}
                         </li>
                         {% endif %}
                     </ul>
