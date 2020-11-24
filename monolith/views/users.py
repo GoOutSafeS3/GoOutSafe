@@ -1,13 +1,7 @@
 from datetime import date, timedelta, datetime
 from flask import Blueprint, redirect, render_template, request, flash, make_response
 from flask_login import login_required, logout_user, current_user, login_user
-<<<<<<< HEAD
-from monolith.utilities.contact_tracing import get_user_contacts
-from werkzeug.security import check_password_hash
-from monolith.database import User, db, Restaurant
-=======
 from werkzeug.security import check_password_hash, generate_password_hash
->>>>>>> 195d139fc4f2e5dd74354d8577faa9ae1a26e7f7
 from monolith.auth import health_authority_required, admin_required
 from monolith.gateway import get_getaway
 from monolith.forms import UserForm, OperatorForm, LoginForm, EditUserForm
