@@ -75,44 +75,36 @@ def delete_user():
     """
     if current_user.is_admin or current_user.is_health_authority:
         return make_response(render_template('error.html', error='401'),401)
+
     form = LoginForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            email, password = form.data['email'], form.data['password']
-            if current_user.email != email:
+            user,status_code = get_getaway().get_users(email=form.data['email'])
+            if user is not None:
+                email, password = form.data['email'], form.data['password']
+            else:
                 flash('Wrong email', 'error')
                 return make_response(render_template('delete_profile.html', form=form, title="Unregister"), 400)
-            user = db.session.query(User).filter(current_user.email == User.email).first()
-            checked = check_password_hash(current_user.password, password)
-            if user is not None and checked:
-                if current_user.is_positive:
+            checked = check_password_hash(user['password'], password)
+            if checked:
+                if user['is_positive']:
                     flash('You cannot delete your data as long as you are positive','error')
                     return redirect('/', code=302)
                 else:
-                    rest = Restaurant.query.filter_by(id=current_user.rest_id).first()
-                    logout_user()
-                    db.session.delete(user)
-                    if rest is not None:
-                        bookings = Booking.query.filter_by(rest_id=rest.id).all()
-                        for b in bookings: # send the notifications 
-                            if b.booking_datetime >= datetime.today():
-                                add_notification_restaurant_closed(rest, b.user_id, b.booking_datetime)
-                                db.session.delete(b)
-                        db.session.delete(rest)
-                    try:
-                        db.session.commit()
-                        flash('Your account has been deleted', 'success')
-                        return redirect('/', code=302)
-                    except: # pragma: no cover
-                        db.session.rollback()
-                        flash('There was a problem, please try again', 'error')
-                        return make_response(render_template('delete_profile.html', form=form, title="Unregister"), 400)
+                    usr, status = get_getaway().delete_user(user['id'])
+                    if status == 400:
+                        flash('Please try again', 'warning')
+                        return make_response(render_template('error.html', title="Unregister"), 400)
+                    if status == 500:
+                        flash('Please try again', 'error')
+                        return make_response(render_template('error.html', title="Unregister"), 500)
             else:
-                flash('Wrong email or password','error')
+                flash('Wrong password','error')
                 return make_response(render_template('delete_profile.html', form=form, title="Unregister"),400)
-        flash('Bad form','error')
-        return make_response(render_template('delete_profile.html', form=form, title="Unregister"),400)
-    return make_response(render_template('delete_profile.html', form=form, title="Unregister"),200)
+        else:
+            flash('Bad form','error')
+            return make_response(render_template('delete_profile.html', form=form, title="Unregister"),400)
+    return make_response(render_template('homepage.html'),200)
 
 
 @users.route('/create_user', methods=['GET', 'POST'])
