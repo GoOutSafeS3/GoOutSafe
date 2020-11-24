@@ -16,6 +16,11 @@ def do_datetime(dt, format=None):
         formatted = dt.strftime(format)
     return formatted
 
+def do_parse_datetime(dt):
+    """ Jinja template filter to parse a datetime string """
+    return dateutil.parser.parse(dt)
+
 def init_app(app):
     """Initialize a Flask application with custom filters."""
     app.jinja_env.filters['datetime'] = do_datetime
+    app.jinja_env.filters['parse_datetime'] = do_parse_datetime
