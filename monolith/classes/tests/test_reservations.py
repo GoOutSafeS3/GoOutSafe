@@ -7,11 +7,11 @@ from utils import do_login, do_logout
 class TestReservation(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self.app = create_app("TEST")
+        self.app = create_app()
         self.app.test_client_class = FlaskClient
 
     def setup_app(self):
-        self.app = create_app("TEST")
+        self.app = create_app()
         self.app.test_client_class = FlaskClient
         tested_app = self.app.test_client()
         tested_app.set_app(self.app)

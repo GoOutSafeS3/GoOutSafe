@@ -2,7 +2,7 @@ import unittest
 from monolith.app import create_app
 from flask_test_with_csrf import FlaskClient
 from utils import send_registration_form
-app = create_app("TEST")
+app = create_app()
 app.test_client_class = FlaskClient
 
 class TestLogin2(unittest.TestCase):
