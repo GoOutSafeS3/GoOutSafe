@@ -38,7 +38,7 @@ class RealGateway(GatewayInterface):
 
         return get(url + params)
 
-    def _create_user(self, userdata):
+    def create_user(self, userdata):
         return post(f"{self.addr}/users", json=userdata)
 
     def edit_user(self, user_id, userdata):

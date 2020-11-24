@@ -22,12 +22,8 @@ class GatewayInterface(ABC):
         pass
 
     @abstractmethod
-    def _create_user(self, userdata: Dict) -> Tuple[Dict, int]:
-        pass
-
     def create_user(self, userdata: Dict) -> Tuple[Dict, int]:
-        userdata['password'] = generate_password_hash(userdata['password'])
-        return self._create_user(userdata)
+        pass
 
     def check_authenticate(self, user_id: int, password: str):
         user, status = self.get_user(user_id)

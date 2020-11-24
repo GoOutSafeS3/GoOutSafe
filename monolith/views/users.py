@@ -2,7 +2,7 @@ from datetime import date, timedelta, datetime
 from flask import Blueprint, redirect, render_template, request, flash, make_response
 from flask_login import login_required, logout_user, current_user, login_user
 from werkzeug.security import check_password_hash, generate_password_hash
-from monolith.auth import health_authority_required, admin_required
+from monolith.auth import health_authority_required, admin_required, User
 from monolith.gateway import get_getaway
 from monolith.forms import UserForm, OperatorForm, LoginForm, EditUserForm
 from dotmap import DotMap
@@ -54,7 +54,7 @@ def user_bookings():
     return make_response(render_template('bookings.html', bookings=bookings, title="Your Reservations"),200)
 
 
-@users.route('/delete', methods=['GET', 'POST'])
+@users.route('/delete', methods=['GET', 'POST','DELETE'])
 @login_required
 def delete_user():
     """ Delete the current user profile and log out
@@ -90,26 +90,25 @@ def delete_user():
             else:
                 flash('Wrong email', 'error')
                 return make_response(render_template('delete_profile.html', form=form, title="Unregister"), 400)
-            checked = check_password_hash(user['password'], password)
+            checked = check_password_hash(user['password'],password)
             if checked:
-                if user['is_positive'] is True:
-                    flash('You cannot delete your data as long as you are positive','error')
-                    return redirect('/', code=302)
-                else:
-                    usr, status = get_getaway().delete_user(user['id'])
-                    if status == 400:
-                        flash('Please try again', 'warning')
-                        return make_response(render_template('error.html', title="Unregister"), 400)
-                    if status == 500:
-                        flash('Please try again', 'error')
-                        return make_response(render_template('error.html', title="Unregister"), 500)
+                usr, status = get_getaway().delete_user(user['id'])
+                if status == 204:
+                    flash('Account deleted','success')
+                    return make_response(render_template('homepage.html'), 200)
+                if status == 400:
+                    flash('Please try again', 'warning')
+                    return make_response(render_template('error.html', title="Unregister"), 400)
+                if status == 500:
+                    flash('Please try again', 'error')
+                    return make_response(render_template('error.html', title="Unregister"), 500)
             else:
                 flash('Wrong password','error')
                 return make_response(render_template('delete_profile.html', form=form, title="Unregister"),400)
         else:
             flash('Bad form','error')
             return make_response(render_template('delete_profile.html', form=form, title="Unregister"),400)
-    return make_response(render_template('homepage.html'),200)
+    return make_response(render_template('delete_profile.html'),200)
 
 
 @users.route('/create_user', methods=['GET', 'POST'])
@@ -127,45 +126,28 @@ def create_user():
     if request.method == 'POST':
 
         if form.validate_on_submit():
-            password = request.form['password']
-            password_repeat = request.form['password_repeat']
-            if password != password_repeat:
+            json = DotMap()
+            form.populate_obj(json)
+            json = json.toDict()
+
+            if json['password'] != json['password_repeat']:
                 flash('Passwords do not match', 'warning')
                 return make_response(render_template('form.html', form=form, title="Sign in!"),200)
 
-            email_param = form.email.data
-            phone_param = form.telephone.data
-            try:
-                ssn_param = form.ssn.data
-            except:
-                ssn_param = None
+            user = {'firstname': form.firstname.data, 'lastname': form.lastname.data, 'email': json['email'],
+                    'password': generate_password_hash(form.password.data), 'phone': json['telephone'],
+                    'rest_id': None, 'is_operator': False, 'ssn': json['ssn'], 'is_admin': False,
+                    'dateofbirth' : json['dateofbirth'], 'is_health_authority': False, 'is_positive': False}
 
-            users, status = get_getaway().get_users(email=email_param, phone=phone_param, ssn=ssn_param)
-            if users is not None and status == 200:
-                return make_response(render_template("error.html", error=status), status)
-            user = {'firstname': form.firstname.data, 'lastname': form.lastname.data, 'email': email_param,
-                    'password': generate_password_hash(form.password.data), 'phone': phone_param,
-                    'rest_id': None, 'is_operator': False, 'ssn': ssn_param, 'is_admin':False,
-                    'is_health_authority': False, 'is_positive': False}
-            today = datetime.today()
-            b_date = request.form["dateofbirth"]
-            day, month, year = (int(x) for x in b_date.split('/'))
-            birth_date = today.replace(year=year, month=month, day=day)
-            if birth_date >= today:
-                flash('Date Of Birth error', 'error')
-                return make_response(render_template('form.html', form=form, title="Sign in!"), 400)
-            user['dateofbirth'] = form.dateofbirth.data
-            user['ssn'] = form.ssn.data
-
-            user, status = get_getaway().create_user(user)
-            if status == 200:
+            resp, status_code = get_getaway().create_user(userdata=user)
+            if status_code == 200:
                 usr = User(user['id'], user['is_operator'], user['is_admin'], user['is_health_authority'],
                            user['password'], user['rest_id'], user['is_positive'])
                 login_user(usr)
+                flash('User registerd succesfully', 'success')
+                return redirect("/")
             else:
-                return make_response(render_template("error.html", error=status), status)
-            flash('User registerd succesfully', 'success')
-            return redirect("/")
+                return make_response(render_template("error.html", error=status_code), status_code)
 
     return render_template('form.html', form=form, title="Sign in!")
 
@@ -184,46 +166,31 @@ def create_operator():
     form = UserForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            password = request.form['password']
-            password_repeat = request.form['password_repeat']
-            if password != password_repeat:
+            json = DotMap()
+            form.populate_obj(json)
+            json = json.toDict()
+
+            if json['password'] != json['password_repeat']:
                 flash('Passwords do not match', 'warning')
                 return make_response(render_template('form.html', form=form, title="Sign in!"), 200)
 
-            email_param = form.email.data
-            phone_param = form.telephone.data
-            try:
-                ssn_param = form.ssn.data
-            except:
-                ssn_param = None
+            user = {'firstname': json['firstname'], 'lastname': json['lastname'], 'email': json['email'],
+                    'password': generate_password_hash(form.password.data), 'phone': json['telephone'],
+                    'rest_id': None, 'is_operator': True, 'ssn': json['ssn'], 'is_admin': False,
+                    'dateofbirth': json['dateofbirth'], 'is_health_authority': False, 'is_positive': False}
 
-            users, status = get_getaway().get_users(email=email_param, phone=phone_param, ssn=ssn_param)
-            if users is not None and status == 200:
-                return make_response(render_template("error.html", error=status), status)
-            user = {'firstname': form.firstname.data, 'lastname': form.lastname.data, 'email': form.email.data,
-                    'password': generate_password_hash(form.password.data), 'phone': form.telephone.data,
-                    'rest_id': None, 'is_operator': True, 'ssn': ssn_param, 'is_admin':False,
-                    'is_health_authority':False, 'is_positive':False}
-            today = datetime.today()
-            b_date = request.form["dateofbirth"]
-            day, month, year = (int(x) for x in b_date.split('/'))
-            birth_date = today.replace(year=year, month=month, day=day)
-            if birth_date >= today:
-                flash('Date Of Birth error', 'error')
-                return make_response(render_template('form.html', form=form, title="Sign in!"), 400)
-            user['dateofbirth'] = form.dateofbirth.data
-            user['ssn'] = form.ssn.data
-            user, status = get_getaway().create_user(user)
-            if status == 200:
+            resp, status_code = get_getaway().create_user(userdata=user)
+
+            if status_code == 200:
                 usr = User(user['id'], user['is_operator'], user['is_admin'], user['is_health_authority'],
                            user['password'], user['rest_id'], user['is_positive'])
                 login_user(usr)
+                flash('User registerd succesfully', 'success')
+                return redirect("/")
             else:
-                return make_response(render_template("error.html", error=status), status)
-            flash('Restaurant registered succesfully! Click Settings->Edit Restaurant to add your restaurant information!', 'success')
-            return redirect("/")
+                return make_response(render_template("error.html", error=status_code), status_code)
 
-    return render_template('form.html', form=form, title="Sign in!")
+        return render_template('form.html', form=form, title="Sign in!")
 
 
 @users.route('/edit', methods=['GET', 'POST'])
@@ -253,13 +220,17 @@ def edit():
         json = DotMap()
         form.populate_obj(json)
         json = json.toDict()
-        user_to_edit, status_code = get_getaway().get_user(current_user.id)
 
-        if 'password' not in json or json['password'] == '':
+        user_to_edit, status_code = get_getaway().get_user(current_user.id)
+        if status_code != 200:
+            flash('Try again', 'warning')
+            return make_response(render_template('edit_profile', form=form, title="Modify you profile!"), 400)
+
+        if json['old_password'] == '' or json['old_password'] is None:
             flash('Insert password to modify the account', 'error')
             return make_response(render_template('edit_profile.html', form=form, title="Modify your profile!"), 400)
 
-        checked = check_password_hash(current_user.password, json['password'])
+        checked = check_password_hash(current_user.password, json['old_password'])
         if checked:
             if 'new_password' in json and 'password_repeat' in json:
                 if json['new_password'] is not None and json['password_repeat'] is not None:
@@ -269,38 +240,9 @@ def edit():
                     else:
                         user_to_edit['password'] = generate_password_hash(json['new_password'])
 
-            if 'email' in json and json['email'] is not None:
-                users, status = get_getaway().get_users(email=json['email'])
-                if users is not None and status == 200:
-                    flash('The email already exists', 'error')
-                    return make_response(render_template('edit_profile.html',form=form, title="Modify your profile!"), 400)
-                else:
-                    user_to_edit['email'] = json['email']
-
-            if 'telephone' in json and json['telephone'] is not None:
-                users, status = get_getaway().get_users(phone=json['telephone'])
-                if users is not None and status == 200:
-                    flash('The phone already exists', 'error')
-                    return make_response(render_template('edit_profile.html', form=form, title="Modify your profile!"), 400)
-                else:
-                    user_to_edit['phone'] = json['telephone']
-            if 'ssn' in json and json['ssn'] is not None:
-                users, status = get_getaway().get_users(ssn=json['ssn'])
-                if users is not None and status == 200:
-                    flash('The SSN already exists', 'error')
-                    return make_response(
-                        render_template('edit_profile.html', form=form, title="Modify your profile!"), 400)
-                else:
-                    user_to_edit['ssn'] = json['ssn']
-
-            if 'dateofbirth' in json and json['dateofbirth'] is not None:
-                today = datetime.today()
-                b_date = json['dateofbirth']
-                day, month, year = (int(x) for x in b_date.split('/'))
-                birth_date = today.replace(year=year, month=month, day=day)
-                if birth_date > today:
-                    flash('Date Of Birth error', 'error')
-                    return make_response(render_template('edit_profile.html', form=form, title="Modify your profile!"),400)
+                elif (json['new_password'] is None and json['password_repeat'] is not None) or (json['new_password'] is not None and json['password_repeat'] is None):
+                    flash('Insert both password', 'warning')
+                    return make_response(render_template('edit_profile', form=form, title="Modify you profile!"), 400)
 
             if 'lastname' in json and json['lastname'] is not None:
                 user_to_edit['lastname'] = json['lastname']
@@ -308,7 +250,7 @@ def edit():
             if 'firstname' in json and json['firstname'] is not None:
                 user_to_edit['firstname'] = json['firstname']
 
-            response_user, status_code = get_getaway().edit_user(current_user.id,user_to_edit)
+            response_user, status_code = get_getaway().edit_user(current_user.id, user_to_edit)
             if status_code == 200:
                 flash('Profile modified', 'success')
                 return redirect("/")
