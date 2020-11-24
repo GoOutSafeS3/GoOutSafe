@@ -117,21 +117,6 @@ class Table(db.Model):
     rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
     capacity = db.Column(db.Integer)
     restaurant = relationship('Restaurant')
-    bookings = relationship('Booking')
-
-
-class Booking(db.Model):
-    __tablename__ = 'booking'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    rest_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
-    people_number = db.Column(db.Integer)
-    booking_datetime = db.Column(db.DateTime) # the time of  booking
-    entrance_datetime = db.Column(db.DateTime, default = None) # the time of entry
-    table_id = db.Column(db.Integer, db.ForeignKey('table.id'))
-    user = relationship('User')
-    restaurant = relationship('Restaurant')
-    table = relationship('Table')
 
 
 class Rating(db.Model):

@@ -9,7 +9,7 @@ import datetime
 class TestRestaurant(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self.app = create_app("TEST")
+        self.app = create_app()
         self.app.test_client_class = FlaskClient
 
     def test_restaurant_list(self):

@@ -1,9 +1,7 @@
-from monolith.utilities.request_timeout import get
 from flask import Blueprint, redirect, render_template, request, make_response, flash
-from monolith.database import db, Restaurant, Booking, User, Table
-from monolith.auth import admin_required, current_user, operator_required
-from flask_login import current_user, login_user, logout_user, login_required
-from monolith.forms import UserForm, BookingForm, BookingList
+from monolith.auth import current_user, operator_required
+from flask_login import current_user, login_required
+from monolith.forms import BookingForm, BookingList
 from monolith.gateway import get_getaway
 import datetime
 import dateutil.parser
@@ -328,8 +326,7 @@ def _reservation_edit(reservation_id):
                 return make_response(render_template('form.html', form=form, title = "Edit your booking"),400)
 
             booking,code = get_getaway().edit_booking(booking_id=reservation_id,number_of_people=int(number_of_people),booking_datetime=booking_datetime.isoformat())
-            flash(booking,"error")
-            flash(code,"success")
+            
             if booking is None or code is None:
                 flash("Sorry, an error occured. Please, try again.","error")
                 return make_response(render_template('form.html', form=form, title="View reservations"),500)

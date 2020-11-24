@@ -1,6 +1,6 @@
 import datetime
 from datetime import timedelta, datetime
-from monolith.database import Notification, db, Booking, User, Restaurant
+from monolith.database import Notification, db, User, Restaurant
 
 
 def add_notification(user_positive_id, user_notified_id, type):
@@ -45,10 +45,12 @@ def delete_notification(notification_id):
 def add_bookings_notifications(user_id):
     """ Add the notifications about future booking by positive users """
     today = datetime.today()
+    """
     user_bookings = db.session.query(Booking). \
         filter(Booking.user_id == user_id). \
         filter(Booking.booking_datetime >= today). \
         all()
+    """
     for b in user_bookings:
         notification = Notification()
         notification.datetime = today
