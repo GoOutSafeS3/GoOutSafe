@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user
 from monolith.gateway import get_getaway
 from monolith.forms import LoginForm
 from werkzeug.security import check_password_hash
-from GoOutSafe.monolith.auth import User
+from monolith.auth import User
 
 auth = Blueprint('auth', __name__)
 
