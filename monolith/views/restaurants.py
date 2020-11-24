@@ -42,7 +42,7 @@ def _restaurants(message=''):
         zoom=15
     )
     return render_template("restaurants.html", message=message, sndmap=sndmap, restaurants=allrestaurants,
-                           base_url="http://127.0.0.1:5000/restaurants")
+                           base_url="/restaurants")
 
 
 @restaurants.route('/restaurants/search', methods=["GET", "POST"])
