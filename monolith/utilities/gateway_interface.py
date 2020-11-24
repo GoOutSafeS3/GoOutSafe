@@ -92,10 +92,6 @@ class GatewayInterface(ABC):
     def post_restaurant_rate(self, rest_id: int, rater_id: int, rating: int) -> Tuple[List[Dict], int]:
         pass
 
-    @abstractmethod
-    def get_user_future_reservations(self, user_id: int) -> Tuple[List[Dict], int]:
-        pass
-
     #### TABLES ####
     def get_restaurants_tables(self,rest_id: int, capacity=None) -> Tuple[List[Dict], int]:
         pass

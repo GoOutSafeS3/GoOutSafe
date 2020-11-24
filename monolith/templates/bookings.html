@@ -3,15 +3,13 @@
     <ul>
       {% for booking in bookings: %}
       <li>
-        {{booking.Restaurant.name}}
+        {{ booking.booking_datetime}}
         <ul>
-          <li>{{ booking.Booking.booking_datetime.strftime("%a %d %b %Y, %H:%M") }}</li>
-          <li>For {{booking.Booking.people_number}} people</li>
-          <li>Telephone {{booking.Restaurant.phone}}</li>
-          <li><a  href="{{base_url}}/restaurants/{{booking.Booking.rest_id}}">Restaurant Profile</a></li>
+          <li>For {{booking.number_of_people}} people</li>
+          <li><a  href="{{base_url}}/restaurants/{{booking.restaurant_id}}">Restaurant Profile</a></li>
           
-          <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/reservations/{{booking.Booking.id}}/edit"> Edit </a>
-          <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/reservations/{{booking.Booking.id}}/delete"> Delete </a>
+          <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/reservations/{{booking.id}}/edit"> Edit </a>
+          <a class="btn btn-outline-secondary btn-sm"  href="{{base_url}}/reservations/{{booking.id}}/delete"> Delete </a>
 
         </ul>
       </li>

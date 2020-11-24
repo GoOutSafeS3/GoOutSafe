@@ -20,7 +20,7 @@ def login():
                 password_hash = user['password']
                 checked = check_password_hash(password_hash, password)
                 if checked:
-                    usr = User(user['id'],user['is_operator'],user['is_admin'],user['is_health_authority'], password_hash, user['rest_id'])
+                    usr = User(user['id'],user['is_operator'],user['is_admin'],user['is_health_authority'], password_hash, user['rest_id'], user['is_positive'])
                     login_user(usr)
                     return redirect('/')
                 else:

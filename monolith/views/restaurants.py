@@ -328,29 +328,38 @@ def restaurant_reservations_overview(restaurant_id, year, month, day):
         filter(Restaurant.id == restaurant_id).\
         first()
 
-    if restaurant is None:
-        return make_response(render_template('error.html', error='404'), 404)
+    restaurant, status = get_getaway().get_restaurant(restaurant_id)
 
-    reservations = db.session.query(Booking).\
-        filter(Booking.rest_id == restaurant_id).\
-        filter(Booking.booking_datetime >= date_start).\
-        filter(Booking.booking_datetime < date_end).\
-        all()
+    if restaurant is None or status != 200:
+        return make_response(render_template('error.html', error=status), status)
+
+    reservations, status = get_getaway().get_bookings(
+        None,                   # User
+        restaurant_id,          # Restaurant
+        None,                   # Table
+        date_start.isoformat(), # Begin
+        date_end.isoformat(),   # End
+        None,                   # Entrance begin
+        None,                   # Entrance end
+        False)                  # With user
+
+    if reservations is None or status != 200:
+        return make_response(render_template('error.html', error=status), status)
 
     lunch_reservations = []
     dinner_reservations = []
 
-    if restaurant.opening_hour_lunch is not None:
-        slot_begin = datetime(year, month, day, restaurant.opening_hour_lunch)
-        slot_end = datetime(year, month, day, restaurant.closing_hour_lunch)
+    if restaurant.first_opening_hour is not None:
+        slot_begin = datetime(year, month, day, restaurant.first_opening_hour)
+        slot_end = datetime(year, month, day, restaurant.first_closing_hour)
 
         for reserv in reservations:
             if reserv.booking_datetime >= slot_begin and reserv.booking_datetime < slot_end:
                 lunch_reservations.append(reserv)
 
-    if restaurant.opening_hour_dinner is not None:
-        slot_begin = datetime(year, month, day, restaurant.opening_hour_dinner)
-        slot_end = datetime(year, month, day, restaurant.closing_hour_dinner)
+    if restaurant.second_opening_hour is not None:
+        slot_begin = datetime(year, month, day, restaurant.second_opening_hour)
+        slot_end = datetime(year, month, day, restaurant.second_closing_hour)
 
         for reserv in reservations:
             if reserv.booking_datetime >= slot_begin and reserv.booking_datetime < slot_end:
@@ -378,19 +387,26 @@ def restaurant_reservations_overview(restaurant_id, year, month, day):
 
         if slot_end < slot_begin:
             return make_response(render_template('error.html', error='Slot start must be before slot end'), 400)
+
+        slot_reservations, status = get_getaway().get_bookings(
+            None,                   # User
+            restaurant_id,          # Restaurant
+            None,                   # Table
+            slot_begin.isoformat(), # Begin
+            slot_end.isoformat(),   # End
+            None,                   # Entrance begin
+            None,                   # Entrance end
+            False)                  # With user
         
-        slot_reservations = db.session.query(Booking).\
-            filter(Booking.rest_id == restaurant_id).\
-            filter(Booking.booking_datetime >= slot_begin).\
-            filter(Booking.booking_datetime < slot_end).\
-            all()
+        if slot_reservations is None or status != 200:
+            return make_response(render_template('error.html', error=status), status)
 
         people_total = 0
         for reserv in slot_reservations:
-            people_total = people_total + reserv.people_number
+            people_total = people_total + reserv.number_of_people
 
     return render_template('overview.html',
-        restaurant = db.session.query(Restaurant).filter(Restaurant.id == restaurant_id).first(),
+        restaurant = restaurant,
         lunch=lunch_reservations,
         dinner=dinner_reservations,
         current = date_start,
