@@ -10,16 +10,6 @@ class GatewayInterface(ABC):
         pass
 
     @abstractmethod
-    def search_users(self, data: Dict[str, str]) -> Tuple[List[Dict], int]:
-        """
-        data fields:
-        - email: string
-        - telephone: string
-        - ssn: string
-        """
-        pass
-
-    @abstractmethod
     def get_users(self) -> Tuple[List[Dict], int]:
         pass
 
