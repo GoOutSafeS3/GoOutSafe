@@ -117,6 +117,6 @@ class TestTables(unittest.TestCase):
 
     def test_booked_delete_table(self):
         client = self.start_operator3()
-        tab_id = 4
+        tab_id = 5
         reply = client.t_get("/tables/%d/delete"%tab_id)
         self.assertEqual(reply.status_code, 409)
