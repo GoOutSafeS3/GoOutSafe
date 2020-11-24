@@ -3,11 +3,9 @@ from flask import Blueprint, redirect, render_template, request, flash, make_res
 from flask_login import login_required, logout_user, current_user, login_user
 from monolith.utilities.contact_tracing import get_user_contacts
 from werkzeug.security import check_password_hash, generate_password_hash
-from monolith.database import User, db, Restaurant, Booking
 from monolith.auth import health_authority_required, admin_required
 from monolith.gateway import get_getaway
 from monolith.forms import UserForm, OperatorForm, LoginForm, EditUserForm
-from monolith.utilities.notification import add_notification_restaurant_closed
 from dotmap import DotMap
 
 users = Blueprint('users', __name__)

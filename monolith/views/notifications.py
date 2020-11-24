@@ -1,4 +1,3 @@
-from monolith.utilities.notification import delete_notification
 from flask import Blueprint, redirect, render_template, make_response
 from flask_login import login_required, current_user
 from monolith.gateway import get_getaway
@@ -20,7 +19,7 @@ def list_notifications(): # pragma: no cover
     if current_user is not None and hasattr(current_user, 'id'):
         if current_user.is_admin or current_user.is_health_authority:
             return make_response(render_template('error.html', error='404'), 404)
-        notifications, status = get_getaway().get_notifications(current_user['id'])
+        notifications, status = get_getaway().get_notifications(current_user.id)
         return render_template("notifications.html", notifications=notifications, title="Notifications")
 
 
