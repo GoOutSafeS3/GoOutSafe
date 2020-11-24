@@ -5,6 +5,7 @@ from monolith.auth import current_user,operator_required
 from flask_login import current_user,  login_required
 from monolith.forms import  RestaurantEditForm, TableAddForm, SearchRestaurantForm, RatingAddForm
 from datetime import datetime, timedelta
+from dateutil import parser
 from dotmap import DotMap
 
 restaurants = Blueprint('restaurants', __name__)
@@ -324,10 +325,6 @@ def restaurant_reservations_overview(restaurant_id, year, month, day):
     if current_user.rest_id != restaurant_id:
         return make_response(render_template('error.html', error="Area reserved for the restaurant operator"), 401)
 
-    restaurant = db.session.query(Restaurant).\
-        filter(Restaurant.id == restaurant_id).\
-        first()
-
     restaurant, status = get_getaway().get_restaurant(restaurant_id)
 
     if restaurant is None or status != 200:
@@ -354,7 +351,8 @@ def restaurant_reservations_overview(restaurant_id, year, month, day):
         slot_end = datetime(year, month, day, restaurant.first_closing_hour)
 
         for reserv in reservations:
-            if reserv.booking_datetime >= slot_begin and reserv.booking_datetime < slot_end:
+            booking_datetime = parser.parse(reserv.booking_datetime, ignoretz = True)
+            if booking_datetime >= slot_begin and booking_datetime < slot_end:
                 lunch_reservations.append(reserv)
 
     if restaurant.second_opening_hour is not None:
@@ -362,7 +360,8 @@ def restaurant_reservations_overview(restaurant_id, year, month, day):
         slot_end = datetime(year, month, day, restaurant.second_closing_hour)
 
         for reserv in reservations:
-            if reserv.booking_datetime >= slot_begin and reserv.booking_datetime < slot_end:
+            booking_datetime = parser.parse(reserv.booking_datetime, ignoretz = True)
+            if booking_datetime >= slot_begin and booking_datetime < slot_end:
                 dinner_reservations.append(reserv)
 
     slot_begin = None
