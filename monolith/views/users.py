@@ -1,4 +1,4 @@
-from datetime import timedelta, datetime
+from datetime import date, timedelta, datetime
 from flask import Blueprint, redirect, render_template, request, flash, make_response
 from flask_login import login_required, logout_user, current_user, login_user
 from monolith.utilities.contact_tracing import get_user_contacts
@@ -38,16 +38,22 @@ def user_bookings():
 
     Error status codes:
         404 -- If the current user is not a customer
+        500 -- An error occured
     """
-    if current_user['is_admin'] or current_user['is_health_authority'] or current_user['rest_id'] is not None:
+    if current_user.is_admin or current_user.is_health_authority or current_user.is_operator:
         return make_response(render_template('error.html', error='404'),404)
     
-    reservations, status = get_getaway().get_user_future_reservations(current_user['id'])
+    now = datetime.now().replace(hour=0,minute=0, second=0, microsecond=0)
+    bookings, status_code = get_getaway().get_bookings(user=current_user.id, begin=now)
 
-    if reservations == []:
-        flash("There are no reservations", "warning")
+    if status_code is None or status_code != 200:
+        flash("Sorry, an error occured. Please, try again.","error")
+        bookings = []
+    elif bookings is None or bookings==[]:
+        bookings = []
+        flash("No reservations were found","warning")
 
-    return make_response(render_template('bookings.html', bookings=reservations, title="Your Reservations"),200)
+    return make_response(render_template('bookings.html', bookings=bookings, title="Your Reservations"),200)
 
 
 @users.route('/delete', methods=['GET', 'POST'])
