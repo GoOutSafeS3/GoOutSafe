@@ -10,7 +10,11 @@ class GatewayInterface(ABC):
         pass
 
     @abstractmethod
-    def get_users(self) -> Tuple[List[Dict], int]:
+    def delete_user(self, user_id: int) -> Tuple[Dict, int]:
+        pass
+
+    @abstractmethod
+    def get_users(self,email:str,phone:str,ssn:str) -> Tuple[List[Dict], int]:
         pass
 
     @abstractmethod

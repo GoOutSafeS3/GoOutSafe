@@ -22,6 +22,7 @@ def positives():
         return make_response(render_template("error.html", error = status), status)
     return render_template("positives.html", positives = positives, title="Positives")
 
+
 @contact_tracing.route('/positives/contacts', methods=['GET','POST'])
 @health_authority_required
 def _contacts():
@@ -34,7 +35,7 @@ def _contacts():
                     flash("Please fill in a field","warning")
                     return render_template('form.html', form=form, title="Find Contacts")
 
-                users, status = get_getaway().search_users(request.form)
+                users, status = get_getaway().get_users(email=request.form["email"],phone =request.form["telephone"], ssn= request.form["ssn"])
             except:
                 flash("Bad Form","error")
                 return render_template('form.html', form=form, title="Find Contacts")

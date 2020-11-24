@@ -88,6 +88,7 @@ def delete_user():
             user,status_code = get_getaway().get_users(email=form.data['email'])
             if user is not None:
                 email, password = form.data['email'], form.data['password']
+                user = users[0]
             else:
                 flash('Wrong email', 'error')
                 return make_response(render_template('delete_profile.html', form=form, title="Unregister"), 400)
