@@ -23,7 +23,7 @@ class TestNotifications(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        do_login(client, "example@example.com", "admin")
+        do_login(client, "admin@example.com", "admin")
         reply = client.t_get("/notifications")
         self.assertEqual(reply.status_code, 404)
         do_logout(client)
@@ -104,12 +104,12 @@ class TestNotifications(unittest.TestCase):
         client.t_post("/positives/mark", form)
         do_logout(client)
 
-        do_login(client, "customer@example.com", "customer")
+        do_login(client, "alice@example.com", "alice")
         reply = client.t_get("/notifications/1/mark_as_read")
         self.assertEqual(reply.status_code, 401)
         do_logout(client)
 
-        do_login(client, "alice@example.com", "alice")
+        do_login(client, "gianni@example.com", "gianni")
         reply = client.t_get("/notifications/1/mark_as_read")
         self.assertEqual(reply.status_code, 200)
         do_logout(client)
