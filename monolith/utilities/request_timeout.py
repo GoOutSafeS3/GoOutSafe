@@ -28,10 +28,17 @@ def post(url,json):
 
     Returns the json object if with the status code (or None, None in case of timeout).
     """
+    if type(json) == DotMap:
+        json = json.toDict()
     try:
         r = requests.post(url, json=json, timeout=TIMEOUT)
         try:
-            return DotMap(r.json()) ,r.status_code
+            ret = None
+            if type(r.json()) == list:
+                ret = [DotMap(el) for el in r.json()]
+            else:
+                ret = DotMap(r.json())
+            return ret, r.status_code
         except:
             return None, r.status_code  
     except:
@@ -42,10 +49,17 @@ def put(url,json):
 
     Returns the json object if with the status code (or None, None in case of timeout).
     """
+    if type(json) == DotMap:
+        json = json.toDict()
     try:
         r = requests.put(url, json=json, timeout=TIMEOUT)
         try:
-            return DotMap(r.json()) ,r.status_code
+            ret = None
+            if type(r.json()) == list:
+                ret = [DotMap(el) for el in r.json()]
+            else:
+                ret = DotMap(r.json())
+            return ret, r.status_code
         except:
             return None, r.status_code  
     except:
@@ -56,10 +70,17 @@ def patch(url,json):
 
     Returns the json object if with the status code (or None, None in case of timeout).
     """
+    if type(json) == DotMap:
+        json = json.toDict()
     try:
         r = requests.patch(url, json=json, timeout=TIMEOUT)
         try:
-            return DotMap(r.json()) ,r.status_code
+            ret = None
+            if type(r.json()) == list:
+                ret = [DotMap(el) for el in r.json()]
+            else:
+                ret = DotMap(r.json())
+            return ret, r.status_code
         except:
             return None, r.status_code  
     except:
@@ -73,7 +94,12 @@ def delete(url):
     try:
         r = requests.delete(url, timeout=TIMEOUT)
         try:
-            return DotMap(r.json()) ,r.status_code
+            ret = None
+            if type(r.json()) == list:
+                ret = [DotMap(el) for el in r.json()]
+            else:
+                ret = DotMap(r.json())
+            return ret, r.status_code
         except:
             return None, r.status_code   
     except:
