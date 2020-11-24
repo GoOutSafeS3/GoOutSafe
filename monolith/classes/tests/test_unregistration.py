@@ -35,7 +35,7 @@ class TestUnregistration(unittest.TestCase):
 
     def test_delete_log_as_health_authority(self):
         client = self.setup_app()        
-        do_login(client, "health@authority.com","health")
+        do_login(client, "health@example.com","health")
         
         reply = client.t_get('/delete')
         self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))

@@ -26,7 +26,7 @@ class TestEdit(unittest.TestCase):
         reply = client.t_get('/edit')
         self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))
         do_logout(client)
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
         reply = client.t_get('/edit')
         self.assertEqual(reply.status_code, 401, msg=reply.get_data(as_text=True))
 

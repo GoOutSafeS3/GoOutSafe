@@ -28,7 +28,7 @@ class TestNotifications(unittest.TestCase):
         self.assertEqual(reply.status_code, 404)
         do_logout(client)
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
         reply = client.t_get("/notifications")
         self.assertEqual(reply.status_code, 404)
         do_logout(client)
@@ -44,7 +44,7 @@ class TestNotifications(unittest.TestCase):
         self.assertIn("t have notifications", reply_data)
 
         do_logout(client)
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"gianni@example.com",
@@ -63,7 +63,7 @@ class TestNotifications(unittest.TestCase):
         self.assertIn("You have had contact with a Covid-19 positive in the last 14 days", reply_data)
 
         do_logout(client)
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"gianni@example.com",
@@ -93,7 +93,7 @@ class TestNotifications(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        do_login(client, "health@authority.com", "health")
+        do_login(client, "health@example.com", "health")
 
         form = {
             "email":"gianni@example.com",
