@@ -6,7 +6,7 @@ from flask_login import current_user
 from utils import do_login, do_logout, get_positives_id
 
 import datetime
-class TestLogin(unittest.TestCase):
+class TestContactTracing(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.app = create_app()
@@ -46,7 +46,7 @@ class TestLogin(unittest.TestCase):
 
         do_login(client, "health@example.com", "health")
         reply = client.t_get("/positives")
-        self.assertIn("Alice Vecchio",reply.get_data(as_text=True), msg=reply.get_data(as_text=True))
+        self.assertIn("Vecchio Alice",reply.get_data(as_text=True), msg=reply.get_data(as_text=True))
         do_logout(client)
 
     def test_mark_unmark_mail(self):
@@ -218,7 +218,7 @@ class TestLogin(unittest.TestCase):
 
         client.t_post("/positives/unmark",form) # now we're sure the user isn't marked
         reply = client.t_post("/positives/unmark",form)
-        self.assertEqual(reply.status_code, 200, msg=reply.get_data(as_text=True))
+        self.assertEqual(reply.status_code, 400, msg=reply.get_data(as_text=True))
         self.assertIn("The user is not positive", reply.get_data(as_text=True), msg=reply.get_data(as_text=True))
         do_logout(client)
 
@@ -291,7 +291,7 @@ class TestLogin(unittest.TestCase):
         client.t_get(f"/positives/{match}/unmark") # now the user is unmarked 
 
         reply = client.t_get(f"/positives/{match}/unmark")
-        self.assertEqual(reply.status_code, 404, msg=reply.get_data(as_text=True))
+        self.assertEqual(reply.status_code, 400, msg=reply.get_data(as_text=True))
         do_logout(client)
 
     def test_contacts_need_ha(self):
@@ -348,7 +348,7 @@ class TestLogin(unittest.TestCase):
         form = {
             "email":"",
             "telephone":"",
-            "ssn":"TESTALICESSN"
+            "ssn":"TESTALICESSN1234"
             }
         reply = client.t_post("/positives/contacts",form)
         self.assertEqual(reply.status_code,302,msg=reply.get_data(as_text=True))    
