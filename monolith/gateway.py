@@ -39,7 +39,7 @@ class RealGateway(GatewayInterface):
         return get(url + params)
 
     def create_user(self, userdata):
-        return post(f"{self.addr}/users", json=userdata)
+        return post(url= self.addr + '/users/', json=userdata)
 
     def edit_user(self, user_id, userdata):
         return put(f"{self.addr}/users/"+str(user_id), json=userdata)
@@ -67,6 +67,7 @@ class RealGateway(GatewayInterface):
 
 
     #### CONTACT TRACING ####
+
     def get_positive_users(self):
         return get(f"{self.addr}/users?is_positive=True")
 
@@ -75,8 +76,11 @@ class RealGateway(GatewayInterface):
 
     def mark_user(self, user_id):
         user, status = get(f"{self.addr}/users/" + str(user_id))
+        if status != 200 or user is None:
+            return None, None
         user['is_positive'] = True
-        return put(f"{self.addr}/users/" + str(user_id),json=user)
+        user['positive_datetime'] = datetime.today().isoformat()
+        return put(f"{self.addr}/users/" + str(user_id), json=user)
 
     def unmark_user(self, user_id):
         user, status = get(f"{self.addr}/users/" + str(user_id))
