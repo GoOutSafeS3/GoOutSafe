@@ -131,6 +131,9 @@ def create_user():
             form.populate_obj(json)
             json = json.toDict()
 
+            if json['ssn'] == '':
+                json['ssn'] = None
+
             if json['password'] != json['password_repeat']:
                 flash('Passwords do not match', 'warning')
                 return make_response(render_template('form.html', form=form, title="Sign in!"),200)
@@ -138,14 +141,15 @@ def create_user():
             user = {'firstname': json['firstname'], 'lastname': json['lastname'], 'email': json['email'],
                     'password': generate_password_hash(form.password.data), 'phone': json['telephone'],
                     'rest_id': None, 'is_operator': False, 'ssn': json['ssn'], 'is_admin': False,
-                    'dateofbirth' : json['dateofbirth'], 'is_health_authority': False, 'is_positive': False}
+                    'dateofbirth' : json['dateofbirth'].strftime("%Y-%m-%d'"), 'is_health_authority': False, 'is_positive': False}
+
 
             resp, status_code = get_getaway().create_user(userdata=user)
             if resp is None or status_code is None:
                 flash("Sorry, an error occured. Please, try again.", "error")
                 return make_response(render_template('form.html', form=form, title="Sign in!"), 500)
             if status_code == 200 or status_code == 201:
-                usr = User(user['id'], user['is_operator'], user['is_admin'], user['is_health_authority'],
+                usr = User(resp.id, False, user['is_admin'], user['is_health_authority'],
                            user['password'], user['rest_id'], user['is_positive'])
                 login_user(usr)
                 flash('User registerd succesfully', 'success')
@@ -174,6 +178,10 @@ def create_operator():
             form.populate_obj(json)
             json = json.toDict()
 
+            if json['ssn'] == '':
+                json['ssn'] = None
+
+
             if json['password'] != json['password_repeat']:
                 flash('Passwords do not match', 'warning')
                 return make_response(render_template('form.html', form=form, title="Sign in!"), 200)
@@ -181,14 +189,14 @@ def create_operator():
             user = {'firstname': json['firstname'], 'lastname': json['lastname'], 'email': json['email'],
                     'password': generate_password_hash(form.password.data), 'phone': json['telephone'],
                     'rest_id': None, 'is_operator': True, 'ssn': json['ssn'], 'is_admin': False,
-                    'dateofbirth': json['dateofbirth'], 'is_health_authority': False, 'is_positive': False}
+                    'dateofbirth': json['dateofbirth'].strftime("%Y-%m-%d'"), 'is_health_authority': False, 'is_positive': False}
 
             resp, status_code = get_getaway().create_user(userdata=user)
             if resp is None or status_code is None:
                 flash("Sorry, an error occured. Please, try again.", "error")
                 return make_response(render_template('form.html', form=form, title="Sign in!"), 500)
-            if status_code == 200:
-                usr = User(user['id'], user['is_operator'], user['is_admin'], user['is_health_authority'],
+            if status_code == 200 or status_code == 201:
+                usr = User(resp.id, True, user['is_admin'], user['is_health_authority'],
                            user['password'], user['rest_id'], user['is_positive'])
                 login_user(usr)
                 flash('User registerd succesfully', 'success')
@@ -196,7 +204,7 @@ def create_operator():
             else:
                 return make_response(render_template("error.html", error=status_code), status_code)
 
-        return render_template('form.html', form=form, title="Sign in!")
+    return render_template('form.html', form=form, title="Sign in!")
 
 
 @users.route('/edit', methods=['GET', 'POST'])
