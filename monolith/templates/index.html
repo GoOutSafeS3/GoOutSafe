@@ -6,7 +6,7 @@
                 {% if notification.read_on is none %}
                     <div class="alert alert-danger" role="alert">
                         <strong>
-                            {{ notification.content }} <a href="/notifications/{{ notification.id }}/mark_as_read" class="alert-link">Mark as read</a>
+                            {{ notification.content }} <a href="{{ notification.url }}/mark_as_read" class="alert-link">Mark as read</a>
                         </strong>
                     </div>
                 {% endif %}

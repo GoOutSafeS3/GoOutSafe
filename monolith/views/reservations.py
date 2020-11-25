@@ -247,6 +247,9 @@ def _reservation_delete(reservation_id):
 
     booking, status = get_getaway().get_a_booking(id=reservation_id)
     
+    if status == 404:
+        flash("Booking not found!","error")
+        return make_response(render_template('error.html', error='404'),404)
     if booking is None or status is None or status != 200:
         flash("Sorry, an error occured. Please, try again.","error")
         return make_response(render_template("index.html"),500)

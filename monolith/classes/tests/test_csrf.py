@@ -15,7 +15,7 @@ class TestLogin2(unittest.TestCase):
         # But now, `client` is an instance of the class we defined!
 
         form = {
-            "email":"testerGoodFormOperator@test.me",
+            "email":"asadasddas@test.me",
             "firstname":"Tester",
             "lastname":"OGF",
             "password":"42",
@@ -23,12 +23,6 @@ class TestLogin2(unittest.TestCase):
             "dateofbirth":"01/01/1970",
             "telephone":"12345678900",
             "ssn": "",
-        }
-        restdata = {
-            "restaurant_name":"Restaurant at the End of the Universe",
-            "restaurant_phone":"1234567890",
-            "restaurant_latitude":"43.431489",
-            "restaurant_longitude":"10.242911",
         }
 
         reply = send_registration_form(tested_app,'/create_operator', form)
