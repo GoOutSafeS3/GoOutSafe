@@ -128,6 +128,19 @@ class TestEdit(unittest.TestCase):
         reply = client.t_post('/edit', data=form)
         self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
 
+        form = {
+            "old_password": "pass12",
+            "firstname":"Alice Beatrice",
+            "lastname":"alice",
+            "new_password":"alice",
+            "password_repeat":"alice",
+            "email":"alice@example.com",
+            "dateofbirth":"01/01/1970",
+            "telephone":"12345678900",
+        }
+        reply = client.t_post('/edit', data=form)
+        self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
+
     def test_existing_ssn400(self):
         client = self.app.test_client()
         client.set_app(self.app)
