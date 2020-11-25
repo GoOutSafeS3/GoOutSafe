@@ -36,7 +36,7 @@ def _contacts():
             try:
                 if request.form["email"] == "" and request.form["telephone"] == "" and request.form["ssn"] == "":
                     flash("Please fill in a field","warning")
-                    return render_template('form.html', form=form, title="Find Contacts")
+                    return make_response(render_template('form.html', form=form, title="Find Contacts"), 400)
                 if request.form["email"] != "":
                     email_param = request.form['email']
                 else:
@@ -52,15 +52,18 @@ def _contacts():
                 users, status = get_getaway().get_users(email=email_param,phone=phone_param, ssn=ssn_param)
             except:
                 flash("Bad Form","error")
-                return render_template('form.html', form=form, title="Find Contacts")
+                return make_response(render_template('form.html', form=form, title="Find Contacts"), 400)
 
+            if status == 404:
+                flash("User not found","error")
+                return render_template('form.html', form=form, title="Find Contacts")
             if users is None or status != 200:
                 return make_response(render_template('error.html', error = status), status)
 
             if len(users) == 0:
                 flash("User not found","error")
                 return render_template('form.html', form=form, title="Find Contacts")
-            elif len(status) > 1:
+            elif len(users) > 1:
                 flash("More users have been found, please try again","error")
                 return render_template('form.html', form=form, title="Find Contacts")
             else:
@@ -89,7 +92,7 @@ def _mark_as_positive():
             try:
                 if request.form["email"] == "" and request.form["telephone"] == "" and request.form["ssn"] == "":
                     flash("Please fill in a field","warning")
-                    return render_template('mark_positives.html', form=form, title="Mark a User")
+                    return make_response(render_template('mark_positives.html', form=form, title="Mark a User"), 400)
                 if request.form["email"] != "":
                     email_param = request.form['email']
                 else:
@@ -105,9 +108,12 @@ def _mark_as_positive():
                 users, status = get_getaway().get_users(email=email_param,phone=phone_param, ssn=ssn_param)
             except:
                 flash("Bad Form","error")
-                return render_template('mark_positives.html', form=form, title="Mark a User")
+                return make_response(render_template('mark_positives.html', form=form, title="Mark a User"), 400)
 
-            if users is None or status != 200:
+            if status == 404:
+                flash("User not found","error")
+                return render_template('mark_positives.html', form=form, title="Mark a User")
+            elif users is None or status != 200:
                 return make_response(render_template('error.html', error = status), status)
 
             if len(users) == 0:
@@ -121,12 +127,14 @@ def _mark_as_positive():
 
             result, status = get_getaway().mark_user(user['id'])
 
-            if result is not None and status == 200:
+            if status != 200:
                 flash("The user was marked","success")
                 return redirect("/positives")
-            else:
+            elif status == 404:
                 flash("User not found","error")
                 return render_template('mark_positives.html', form=form, title="Mark a User")
+            else:
+                return make_response(render_template('error.html', error=status), status)
         
     return render_template('mark_positives.html', form=form, title="Mark a User")
 
@@ -141,7 +149,7 @@ def _unmark_as_positive():
             try:
                 if request.form["email"] == "" and request.form["telephone"] == "" and request.form["ssn"] == "":
                     flash("Please fill in a field","warning")
-                    return render_template('form.html', form=form, title="Unmark a User")
+                    return make_response(render_template('form.html', form=form, title="Unmark a User"), 400)
                 if request.form["email"] != "":
                     email_param = request.form['email']
                 else:
@@ -157,15 +165,18 @@ def _unmark_as_positive():
                 users, status = get_getaway().get_users(email=email_param,phone=phone_param, ssn=ssn_param)
             except:
                 flash("Bad Form","error")
-                return render_template('mark_positives.html', form=form, title="Mark a User")
+                return make_response(render_template('mark_positives.html', form=form, title="Mark a User"), 400)
 
+            if status == 404:
+                flash("User not found","error")
+                return render_template('form.html', form=form, title="Unmark a User")
             if users is None or status != 200:
                 return make_response(render_template('error.html', error = status), status)
 
             if len(users) == 0:
                 flash("User not found","error")
                 return render_template('form.html', form=form, title="Unmark a User")
-            elif len(status) > 1:
+            elif len(users) > 1:
                 flash("More users have been found, please try again","error")
                 return render_template('form.html', form=form, title="Unmark a User")
             else:
@@ -173,16 +184,18 @@ def _unmark_as_positive():
 
             if not user['is_positive']:
                 flash("The user is not positive","warning")
-                return render_template('form.html', form=form, title="Unmark a User")
+                return make_response(render_template('form.html', form=form, title="Unmark a User"), 400)
 
             result, status = get_getaway().unmark_user(user['id'])
 
-            if result is not None and status == 200:
+            if status == 200:
                 flash("The user was unmarked","success")
                 return redirect("/positives")
-            else:
+            elif status == 404:
                 flash("User not found","error")
                 return render_template('form.html', form=form, title="Unmark a User")
+            else:
+                return make_response(render_template('error.html', error=status), status)
 
     return render_template('form.html', form=form, title="Unmark a User")
 
@@ -239,6 +252,15 @@ def user_contacts(user_id):
     Error status codes:
         404 -- User not found or user not positive
     """
+    user, status = get_getaway().get_user(user_id)
+    if user is None or status != 200:
+        flash("User not found","error")
+        return make_response(render_template('error.html', error='404'), 404)
+
+    if not user.is_positive:
+        flash("User not found","error")
+        return make_response(render_template('error.html', error='404'), 404)
+
     users, status = get_getaway().get_user_contacts(user_id,
         begin=str(datetime.today() - timedelta(days=14)),
         end=str(datetime.today()))

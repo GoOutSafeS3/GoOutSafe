@@ -70,6 +70,8 @@ class TestReservation(unittest.TestCase):
             }
             reply = client.t_post("/restaurants/3/book", data=form)
             self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
+            reply = client.t_get("/restaurants/3", data=form)
+            self.assertIn("The booking was confirmed", reply.get_data(as_text=True), msg=reply.get_data(as_text=True))
 
     def test_booking_restaurantNone(self):
         with self.app.test_client() as client:
@@ -345,17 +347,8 @@ class TestReservation(unittest.TestCase):
 
             reply = client.t_post("/reservations/2/delete")
             self.assertEqual(reply.status_code, 302)
-
-
-    def test_rese_delete_user(self):
-        client = self.setup_app()
-        form = {
-            "email": "anna@example.com",
-            "password": "anna"
-        }
-        reply = client.t_post('/login', data=form)
-        reply = client.t_post("/reservations/1/delete")
-        self.assertEqual(reply.status_code, 302)
+            reply = client.t_get("/")
+            self.assertIn("Booking deleted!",reply.get_data(as_text=True),msg=reply.get_data(as_text=True))
 
     def test_rese_delete_bad_user(self):
         client = self.setup_app()
@@ -367,7 +360,6 @@ class TestReservation(unittest.TestCase):
         reply = client.t_post("/reservations/5/delete")
         self.assertEqual(reply.status_code, 401)
 
-    """
     def test_rese_good_edit(self):
         client = self.setup_app()
         u_form = {
@@ -378,15 +370,17 @@ class TestReservation(unittest.TestCase):
 
         tomorrow = datetime.datetime.now() + datetime.timedelta(days=1)
         form = {
-            "number_of_people": "1",
+            "number_of_people": "2",
             "booking_date": tomorrow.strftime("%d/%m/%Y"),
-            "booking_hr": "13",
+            "booking_hr": "11",
             "booking_min": "30"
         }
 
         reply = client.t_post("/reservations/1/edit", data=form)
         self.assertEqual(reply.status_code, 302,msg=reply.get_data(as_text=True))
-
+        reply = client.t_get("/restaurants/4", data=form)
+        self.assertEqual(reply.status_code, 200,msg=reply.get_data(as_text=True))
+        self.assertIn("The booking was edited!",reply.get_data(as_text=True),msg=reply.get_data(as_text=True))
 
     def test_rese_bad_date_edit(self):
         client = self.setup_app()
@@ -403,7 +397,7 @@ class TestReservation(unittest.TestCase):
             "booking_min": "30"
         }
 
-        reply = client.t_post("/reservations/5/edit", data=form)
+        reply = client.t_post("/reservations/1/edit", data=form)
         self.assertEqual(reply.status_code, 400,msg=reply.get_data(as_text=True))
 
     def test_rese_bad_edit(self):
@@ -414,15 +408,17 @@ class TestReservation(unittest.TestCase):
         }
         reply = client.t_post('/login', data=u_form)
 
+        tomorrow = datetime.datetime.now() + datetime.timedelta(days=1)
         form = {
-            "number_of_people": "1",
-            "booking_date": "08/11/2020",
+            "number_of_people": "2",
+            "booking_date": tomorrow.strftime("%d/%m/%Y"),
             "booking_hr": "13",
             "booking_min": "30"
         }
 
+
         reply = client.t_post("/reservations/5/edit", data=form)
-        self.assertEqual(reply.status_code, 400,msg=reply.get_data(as_text=True))
+        self.assertEqual(reply.status_code, 401,msg=reply.get_data(as_text=True))
 
 
     def test_rese_get_edit(self):
@@ -433,7 +429,7 @@ class TestReservation(unittest.TestCase):
         }
         reply = client.t_post('/login', data=u_form)
 
-        reply = client.t_get("/reservations/5/edit")
+        reply = client.t_get("/reservations/1/edit")
         self.assertEqual(reply.status_code, 200,msg=reply.get_data(as_text=True))
 
     def test_rese_404_edit(self):
@@ -445,7 +441,7 @@ class TestReservation(unittest.TestCase):
         }
         reply = client.t_post('/login', data=u_form)
 
-        reply = client.t_get("/reservations/9999/edit")
+        reply = client.t_get("/reservations/42/edit")
         self.assertEqual(reply.status_code, 404,msg=reply.get_data(as_text=True))
 
     def test_rese_401_edit(self):
@@ -460,21 +456,6 @@ class TestReservation(unittest.TestCase):
         reply = client.t_get("/reservations/4/edit")
         self.assertEqual(reply.status_code, 401,msg=reply.get_data(as_text=True))
 
-    
-    
-    def test_cannot_edit_positive(self):
-        client = self.app.test_client()
-        client.set_app(self.app)
-
-        form = {
-            "email": "alice@example.com",
-            "password": "alice"
-        }
-        reply = client.t_post('/login', data=form)
-        self.assertEqual(reply.status_code, 302)
-        reply = client.t_get("/reservations/6/edit")
-        self.assertEqual(reply.status_code, 401)
-
 
     def test_cannot_edit_old_booking(self):
         client = self.app.test_client()
@@ -486,10 +467,8 @@ class TestReservation(unittest.TestCase):
         }
         reply = client.t_post('/login', data=form)
         self.assertEqual(reply.status_code, 302)
-        reply = client.t_get("/reservations/7/edit")
+        reply = client.t_get("/reservations/8/edit")
         self.assertEqual(reply.status_code, 404)
-
-    """
 
     def test_get_todays_list(self):
         client = self.app.test_client()
@@ -500,6 +479,15 @@ class TestReservation(unittest.TestCase):
         self.assertEqual(reply.status_code, 200)
         do_logout(client)
 
+    def test_get_todays_list_not_found(self):
+        client = self.app.test_client()
+        client.set_app(self.app)
+
+        do_login(client, "operator3@example.com","operator")
+        reply = client.t_get("/restaurants/42/reservations/today")
+        self.assertEqual(reply.status_code, 404)
+        do_logout(client)
+
     def test_get_todays_list_401(self):
         client = self.app.test_client()
         client.set_app(self.app)
@@ -508,12 +496,11 @@ class TestReservation(unittest.TestCase):
         self.assertEqual(reply.status_code, 401,msg=reply.get_data(as_text=True))
         do_logout(client)
 
-"""
     def test_entrance_401(self):
         client = self.app.test_client()
         client.set_app(self.app)
         do_login(client, "anna@example.com","anna")
-        reply = client.t_get("/reservations/9/entrance")
+        reply = client.t_get("/reservations/1/entrance")
         self.assertEqual(reply.status_code, 401,msg=reply.get_data(as_text=True))
         do_logout(client)
 
@@ -521,7 +508,7 @@ class TestReservation(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
         do_login(client, "operator3@example.com","operator3")
-        reply = client.t_get("/reservations/9/entrance")
+        reply = client.t_get("/reservations/1/entrance")
         self.assertEqual(reply.status_code, 401,msg=reply.get_data(as_text=True))
         do_logout(client)
 
@@ -536,58 +523,23 @@ class TestReservation(unittest.TestCase):
     def test_register_entrance(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "operator@example.com","operator")
-        reply = client.t_get("/reservations/9/entrance")
+        do_login(client, "operator3@example.com","operator")
+        reply = client.t_get("/reservations/2/entrance")
         self.assertEqual(reply.status_code, 302,msg=reply.get_data(as_text=True))
-        reply = client.t_get("/restaurants/1/reservations/today")
-        self.assertNotIn("The entrance of this reservation has already been registered",reply.get_data(as_text=True),msg=reply.get_data(as_text=True))
+        reply = client.t_get("/reservations/2")
+        self.assertEqual(reply.status_code, 200,msg=reply.get_data(as_text=True))
+        self.assertIn("Entrance registered!",reply.get_data(as_text=True),msg=reply.get_data(as_text=True))
         do_logout(client)
 
-    def test_register_entrance_2(self):
-        client = self.app.test_client()
-        client.set_app(self.app)
-        do_login(client, "operator@example.com","operator")
-        reply = client.t_get("/reservations/9/entrance")
-        self.assertEqual(reply.status_code, 302,msg=reply.get_data(as_text=True))
-        reply = client.t_get("/restaurants/1/reservations/today")
-        self.assertIn("The entrance of this reservation has already been registered",reply.get_data(as_text=True),msg=reply.get_data(as_text=True))
-        do_logout(client)
+    def test_zeta_rese_delete_user(self):
+        client = self.setup_app()
+        form = {
+            "email": "anna@example.com",
+            "password": "anna"
+        }
+        reply = client.t_post('/login', data=form)
+        reply = client.t_post("/reservations/1/delete")
+        self.assertEqual(reply.status_code, 302)
 
-    def test_book_one_period_rest(self):
-        with self.app.test_client() as client:
-            client.set_app(self.app)
-            form = {
-                "email": "anna@example.com",
-                "password":"anna"
-            }
-            reply = client.t_post('/login', data=form)
-            self.assertEqual(reply.status_code, 302)
-            form = {
-                "number_of_people": "2",
-                "booking_date": "05/10/2021",
-                "booking_hr": "12",
-                "booking_min": "0"
-            }
-            reply = client.t_post("/restaurants/3/book", data=form)
-            self.assertEqual(reply.status_code, 302)
-
-    def test_bad_book_one_period_rest(self):
-        with self.app.test_client() as client:
-            client.set_app(self.app)
-            form = {
-                "email": "anna@example.com",
-                "password":"anna"
-            }
-            reply = client.t_post('/login', data=form)
-            self.assertEqual(reply.status_code, 302)
-            form = {
-                "number_of_people": "2",
-                "booking_date": "05/10/2021",
-                "booking_hr": "9",
-                "booking_min": "0"
-            }
-            reply = client.t_post("/restaurants/3/book", data=form)
-            self.assertEqual(reply.status_code, 400)
-"""
 if __name__ == '__main__':
     unittest.main()
