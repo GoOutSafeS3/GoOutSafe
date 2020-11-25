@@ -47,7 +47,7 @@ class TestNotifications(unittest.TestCase):
         do_login(client, "health@example.com", "health")
 
         form = {
-            "email":"gianni@example.com",
+            "email":"anna@example.com",
             "telephone":"",
             "ssn":""
             }
@@ -56,7 +56,7 @@ class TestNotifications(unittest.TestCase):
 
         do_logout(client)
 
-        do_login(client, "alice@example.com", "alice")
+        do_login(client, "giulia@example.com", "giulia")
 
         reply = client.t_get("/notifications")
         reply_data = reply.get_data(as_text=True)
@@ -66,7 +66,7 @@ class TestNotifications(unittest.TestCase):
         do_login(client, "health@example.com", "health")
 
         form = {
-            "email":"gianni@example.com",
+            "email":"anna@example.com",
             "telephone":"",
             "ssn":""
             }
@@ -96,7 +96,7 @@ class TestNotifications(unittest.TestCase):
         do_login(client, "health@example.com", "health")
 
         form = {
-            "email":"gianni@example.com",
+            "email":"anna@example.com",
             "telephone":"",
             "ssn":""
             }
@@ -104,14 +104,14 @@ class TestNotifications(unittest.TestCase):
         client.t_post("/positives/mark", form)
         do_logout(client)
 
-        do_login(client, "alice@example.com", "alice")
+        do_login(client, "anna@example.com", "anna")
         reply = client.t_get("/notifications/1/mark_as_read")
         self.assertEqual(reply.status_code, 401)
         do_logout(client)
 
-        do_login(client, "gianni@example.com", "gianni")
+        do_login(client, "giulia@example.com", "giulia")
         reply = client.t_get("/notifications/1/mark_as_read")
-        self.assertEqual(reply.status_code, 200)
+        self.assertEqual(reply.status_code, 302)
         do_logout(client)
 
 
