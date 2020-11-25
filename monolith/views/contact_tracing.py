@@ -214,12 +214,11 @@ def _mark_as_positive_by_id(pos_id):
         404 -- User not found
     """
     user, status = get_getaway().mark_user(pos_id)
-
-    if status == 404:
+    flash(status)
+    if status == 404 or user is None:
         flash("User not found","error")
         return make_response(render_template('error.html', error='404'), 404)
-    elif user is None or status != 200:
-        flash(user, "success")
+    elif status != 200:
         return make_response(render_template("error.html", error = status), status)
 
     return redirect("/positives")
@@ -236,10 +235,12 @@ def _unmark_as_positive_by_id(pos_id):
     """
     user, status = get_getaway().unmark_user(pos_id)
 
-    if status == 404:
+    flash(user,"success")
+    flash(status,"warning")
+    if status == 404 or user is None:
         flash("User not found","error")
         return make_response(render_template('error.html', error='404'), 404)
-    elif user is None or status != 200:
+    elif status != 200:
         return make_response(render_template("error.html", error = status), status)
 
     return redirect("/positives")

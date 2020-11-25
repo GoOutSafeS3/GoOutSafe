@@ -84,6 +84,8 @@ class RealGateway(GatewayInterface):
 
     def unmark_user(self, user_id):
         user, status = get(f"{self.addr}/users/" + str(user_id))
+        if status != 200 or user is None:
+            return None, None
         user['is_positive'] = False
         return put(f"{self.addr}/users/" + str(user_id), json=user)
 
