@@ -230,7 +230,7 @@ def edit():
         user_to_edit, status_code = get_getaway().get_user(current_user.id)
         if status_code != 200:
             flash('Try again', 'warning')
-            return make_response(render_template('edit_profile', form=form, title="Modify you profile!"), 400)
+            return make_response(render_template('edit_profile.html', form=form, title="Modify you profile!"), 400)
 
         if json['old_password'] == '' or json['old_password'] is None:
             flash('Insert password to modify the account', 'error')
@@ -242,13 +242,13 @@ def edit():
                 if json['new_password'] is not None and json['password_repeat'] is not None:
                     if json['new_password'] != json['password_repeat']:
                         flash('Passwords do not match', 'warning')
-                        return make_response(render_template('edit_profile', form=form, title="Modify you profile!"), 400)
+                        return make_response(render_template('edit_profile.html', form=form, title="Modify you profile!"), 400)
                     else:
                         user_to_edit['password'] = generate_password_hash(json['new_password'])
 
                 elif (json['new_password'] is None and json['password_repeat'] is not None) or (json['new_password'] is not None and json['password_repeat'] is None):
                     flash('Insert both password', 'warning')
-                    return make_response(render_template('edit_profile', form=form, title="Modify you profile!"), 400)
+                    return make_response(render_template('edit_profile.html', form=form, title="Modify you profile!"), 400)
 
             if 'lastname' in json and json['lastname'] is not None:
                 user_to_edit['lastname'] = json['lastname']
