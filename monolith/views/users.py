@@ -98,11 +98,11 @@ def delete_user():
                     logout_user(current_user)
                     return make_response(render_template('homepage.html'), 200)
                 if status == 400:
-                    flash('Please try again', 'warning')
-                    return make_response(render_template('error.html', title="Unregister"), 400)
+                    flash(usr['detail'], 'warning')
+                    return make_response(render_template('delete_profile.html'), 400)
                 if status == 500:
                     flash('Please try again', 'error')
-                    return make_response(render_template('error.html', title="Unregister"), 500)
+                    return make_response(render_template('delete_profile.html', title="Unregister"), 500)
             else:
                 flash('Wrong password','error')
                 return make_response(render_template('delete_profile.html', form=form, title="Unregister"),400)
@@ -112,7 +112,7 @@ def delete_user():
     return render_template('delete_profile.html', form=form, title="Unregister")
 
 
-@users.route('/create_user', methods=['GET', 'POST'])
+@users.route('/create_user', methods=['GET','POST'])
 def create_user():
     """ Create a customer account and login
     
@@ -130,6 +130,10 @@ def create_user():
             json = DotMap()
             form.populate_obj(json)
             json = json.toDict()
+            ssn = None
+
+            if 'ssn' in json and ssn != '':
+                ssn = json['ssn']
 
             if json['password'] != json['password_repeat']:
                 flash('Passwords do not match', 'warning')
@@ -137,8 +141,10 @@ def create_user():
 
             user = {'firstname': json['firstname'], 'lastname': json['lastname'], 'email': json['email'],
                     'password': generate_password_hash(form.password.data), 'phone': json['telephone'],
-                    'rest_id': None, 'is_operator': False, 'ssn': json['ssn'], 'is_admin': False,
+                    'rest_id': None, 'is_operator': False, 'is_admin': False,
                     'dateofbirth' : json['dateofbirth'], 'is_health_authority': False, 'is_positive': False}
+            if ssn:
+                user['ssn'] = ssn
 
             resp, status_code = get_getaway().create_user(userdata=user)
             if resp is None or status_code is None:
@@ -173,6 +179,10 @@ def create_operator():
             json = DotMap()
             form.populate_obj(json)
             json = json.toDict()
+            ssn = None
+
+            if 'ssn' in json and ssn !='':
+                ssn = json['ssn']
 
             if json['password'] != json['password_repeat']:
                 flash('Passwords do not match', 'warning')
@@ -180,8 +190,10 @@ def create_operator():
 
             user = {'firstname': json['firstname'], 'lastname': json['lastname'], 'email': json['email'],
                     'password': generate_password_hash(form.password.data), 'phone': json['telephone'],
-                    'rest_id': None, 'is_operator': True, 'ssn': json['ssn'], 'is_admin': False,
+                    'rest_id': None, 'is_operator': True, 'is_admin': False,
                     'dateofbirth': json['dateofbirth'], 'is_health_authority': False, 'is_positive': False}
+            if ssn:
+                user['ssn'] = ssn
 
             resp, status_code = get_getaway().create_user(userdata=user)
             if resp is None or status_code is None:

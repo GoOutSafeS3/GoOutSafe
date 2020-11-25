@@ -4,6 +4,7 @@ import requests
 from dotmap import DotMap
 TIMEOUT = 2
 
+
 def get(url):
     """ Makes a get request with a timeout.
 
@@ -18,10 +19,13 @@ def get(url):
             else:
                 ret = DotMap(r.json())
             return ret, r.status_code
-        except:
-            return None, r.status_code  
-    except:
+        except Exception as e:
+            print(e)
+            return None, r.status_code
+    except Exception as e:
+        print(e)
         return None,None
+
 
 def post(url,json):
     """ Makes a post request with a timeout.
@@ -39,10 +43,13 @@ def post(url,json):
             else:
                 ret = DotMap(r.json())
             return ret, r.status_code
-        except:
-            return None, r.status_code  
-    except:
+        except Exception as e:
+            print(e)
+            return None, r.status_code
+    except Exception as e:
+        print(e)
         return None,None
+
 
 def put(url,json):
     """ Makes a put request with a timeout.
@@ -60,9 +67,11 @@ def put(url,json):
             else:
                 ret = DotMap(r.json())
             return ret, r.status_code
-        except:
-            return None, r.status_code  
-    except:
+        except Exception as e:
+            print(e)
+            return None, r.status_code
+    except Exception as e:
+        print(e)
         return None,None
 
 def patch(url,json):

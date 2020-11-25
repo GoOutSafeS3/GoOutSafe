@@ -18,6 +18,9 @@ Error status codes:
 def positives():
     """ Allows you to view the list of currently positive users """
     positives, status = get_getaway().get_positive_users()
+    if status == 404:
+        flash('There are no positives account','warning')
+        return make_response(render_template("positives.html", positives = None,title="Positives"),302)
     if positives is None or status != 200:
         return make_response(render_template("error.html", error = status), status)
     return render_template("positives.html", positives = positives, title="Positives")

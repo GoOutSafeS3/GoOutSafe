@@ -1,5 +1,6 @@
 {% extends 'layout.html' %}
 {% block content %}
+    {% if positives %}
     <br>
     <ul>
       {% for positive in positives: %}
@@ -28,5 +29,7 @@
           <br>
       {% endfor %}
     </ul>
+    {% endif %}
+
     <a class="btn btn-outline-secondary btn-sm"  href="/"> Back to Homepage </a>
 {% endblock %}
