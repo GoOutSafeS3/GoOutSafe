@@ -132,8 +132,11 @@ def restaurant_sheet(restaurant_id):
 
     restaurant, status = get_getaway().get_restaurant(restaurant_id)
     if restaurant is None or status != 200:
-        flash("Sorry, an error occured. Please, try again.","error")
-        return make_response(render_template('error.html', error = status),500)
+        if status == 404:
+            flash('No restaurant with id restaurant_id was found', "error")
+        else:
+            flash("Sorry, an error occured. Please, try again.","error")
+        return make_response(render_template('error.html', error = status),status)
 
     tables, status = get_getaway().get_restaurants_tables(restaurant_id)
     if tables is None or status != 200:
@@ -234,7 +237,7 @@ def _create_restaurant():
             restaurant,status = get_getaway().post_restaurants(json)
             if restaurant is None or status != 201:
                 if status == None or status == 500:
-                    flash("Sorry, an error occured. Please, try again.","error")
+                    flash("Sorry, an error occured. Please, try again. [1,%d]"%status,"error")
                     return make_response(render_template('error.html', error = status),500)
                 elif status == 400:
                     flash('Bad request', "error")
@@ -242,8 +245,9 @@ def _create_restaurant():
             user,status = get_getaway().set_user_restaurant(current_user.id, restaurant.id)
             if user is None or status != 200:
                 restaurant,status2 = get_getaway().delete_restaurant(restaurant.id)
-                flash("Sorry, an error occured. Please, try again.","error")
+                flash("Sorry, an error occured. Please, try again. [2,%d]"%status,"error")
                 return make_response(render_template('error.html', error = status),500)
+            current_user.rest_id = restaurant.id
             return redirect(f"/restaurants/{current_user.rest_id}")
         flash("Bad form", "error")
         return make_response(render_template('edit_restaurant.html', form=form), 400)
@@ -268,8 +272,11 @@ def _edit_restaurant(restaurant_id):
     """
     restaurant, status = get_getaway().get_restaurant(restaurant_id)
     if restaurant is None or status != 200:
-        flash("Sorry, an error occured. Please, try again.","error")
-        return make_response(render_template('error.html', error = status),500)
+        if status == 404:
+            flash('No restaurant with id restaurant_id was found', "error")
+        else:
+            flash("Sorry, an error occured. Please, try again.","error")
+        return make_response(render_template('error.html', error = status),status)
 
     if current_user.rest_id != restaurant_id:
         return make_response(render_template('error.html', error="Area reserved for the restaurant operator"), 401)

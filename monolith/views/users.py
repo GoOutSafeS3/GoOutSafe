@@ -202,6 +202,7 @@ def create_operator():
                 flash('User registerd succesfully', 'success')
                 return redirect("/")
             else:
+                flash('ERROR'+str(status_code)+str(resp), 'success')
                 return make_response(render_template("error.html", error=status_code), status_code)
 
     return render_template('form.html', form=form, title="Sign in!")
