@@ -16,8 +16,8 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        users = ["admin@example.com","customer@example.com","operator@example.com"]
-        passw = ["admin","customer","operator"]
+        users = ["admin@example.com","gianni@example.com","operator@example.com"]
+        passw = ["admin","gianni","operator"]
         endpoints = ["/positives","/positives/mark","/positives/unmark","/positives/1/unmark", "/positives/contacts"]
 
         for i in range(len(users)):
@@ -58,7 +58,7 @@ class TestLogin(unittest.TestCase):
         do_login(client, "health@example.com", "health")
 
         form = {
-            "email":"customer@example.com",
+            "email":"gianni@example.com",
             "telephone":"",
             "ssn":""
             }
@@ -79,7 +79,7 @@ class TestLogin(unittest.TestCase):
 
         form = {
             "email":"",
-            "telephone":"1234567890",
+            "telephone":"46966711",
             "ssn":""
             }
 
@@ -100,7 +100,7 @@ class TestLogin(unittest.TestCase):
         form = {
             "email":"",
             "telephone":"",
-            "ssn":"1234567890"
+            "ssn":"ANNASSN4791DFGYU"
             }
 
         for e in endpoints:
@@ -118,9 +118,9 @@ class TestLogin(unittest.TestCase):
         do_login(client, "health@example.com", "health")
 
         form = {
-            "email":"customer@example.com",
-            "telephone":"0987654321",
-            "ssn":"1234567890"
+            "email":"gianni@example.com",
+            "telephone":"3939675681",
+            "ssn":"ANNASSN4791DFGYU"
             }
 
         for e in endpoints:
@@ -211,7 +211,7 @@ class TestLogin(unittest.TestCase):
         do_login(client, "health@example.com", "health")
 
         form = {
-            "email":"customer@example.com",
+            "email":"gianni@example.com",
             "telephone":"",
             "ssn":""
             }
@@ -230,7 +230,7 @@ class TestLogin(unittest.TestCase):
         do_login(client, "health@example.com", "health")
 
         form = {
-            "email":"customer@example.com",
+            "email":"gianni@example.com",
             "telephone":"",
             "ssn":""
             }
@@ -259,7 +259,7 @@ class TestLogin(unittest.TestCase):
         do_login(client, "health@example.com", "health")
 
         form = {
-            "email":"customer@example.com",
+            "email":"gianni@example.com",
             "telephone":"",
             "ssn":""
             }
@@ -289,7 +289,7 @@ class TestLogin(unittest.TestCase):
         do_login(client, "health@example.com", "health")
 
         form = {
-            "email":"customer@example.com",
+            "email":"gianni@example.com",
             "telephone":"",
             "ssn":""
             }
@@ -306,7 +306,7 @@ class TestLogin(unittest.TestCase):
         client = self.app.test_client()
         client.set_app(self.app)
 
-        do_login(client, "customer@example.com", "customer")
+        do_login(client, "gianni@example.com", "gianni")
         reply = client.t_get(f"/positives/7/contacts")
         self.assertEqual(reply.status_code, 401)
         do_logout(client)
@@ -340,7 +340,7 @@ class TestLogin(unittest.TestCase):
 
         form = {
             "email":"",
-            "telephone":"5551234565",
+            "telephone":"463366711",
             "ssn":""
             }
         reply = client.t_post("/positives/contacts",form)
@@ -356,7 +356,7 @@ class TestLogin(unittest.TestCase):
         form = {
             "email":"",
             "telephone":"",
-            "ssn":"9876543210"
+            "ssn":"TESTALICESSN"
             }
         reply = client.t_post("/positives/contacts",form)
         self.assertEqual(reply.status_code,302,msg=reply.get_data(as_text=True))    
@@ -369,7 +369,7 @@ class TestLogin(unittest.TestCase):
         do_login(client, "health@example.com", "health")
 
         form = {
-            "email":"customer@example.com",
+            "email":"gianni@example.com",
             "telephone":"",
             "ssn":""
             }
