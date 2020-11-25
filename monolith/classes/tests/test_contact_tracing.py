@@ -46,7 +46,7 @@ class TestLogin(unittest.TestCase):
 
         do_login(client, "health@example.com", "health")
         reply = client.t_get("/positives")
-        self.assertIn("Positive Positive",reply.get_data(as_text=True), msg=reply.get_data(as_text=True))
+        self.assertIn("Alice Vecchio",reply.get_data(as_text=True), msg=reply.get_data(as_text=True))
         do_logout(client)
 
     def test_mark_unmark_mail(self):
@@ -145,7 +145,7 @@ class TestLogin(unittest.TestCase):
 
         for e in endpoints:
             reply = client.t_post(e,form)
-            self.assertEqual(reply.status_code, 200, msg="endpoint: "+e+"\n"+reply.get_data(as_text=True))
+            self.assertEqual(reply.status_code, 400, msg="endpoint: "+e+"\n"+reply.get_data(as_text=True))
             self.assertIn("Please fill in a field", reply.get_data(as_text=True), msg=reply.get_data(as_text=True))
         do_logout(client)
 
@@ -189,7 +189,7 @@ class TestLogin(unittest.TestCase):
             bad_form[f] = None
             for e in endpoints:
                 reply = client.t_post(e,bad_form)
-                self.assertEqual(reply.status_code, 200, msg="form: "+str(bad_form)+"\nendpoint: "+e+"\n"+reply.get_data(as_text=True))
+                self.assertEqual(reply.status_code, 400, msg="form: "+str(bad_form)+"\nendpoint: "+e+"\n"+reply.get_data(as_text=True))
                 self.assertIn("Bad Form",reply.get_data(as_text=True),  msg="endpoint: "+e+"\n"+reply.get_data(as_text=True))
     
 
@@ -197,7 +197,7 @@ class TestLogin(unittest.TestCase):
         bad_form["dateofbirth"] = "01/01/1969"
         for e in endpoints:
             reply = client.t_post(e,bad_form)
-            self.assertEqual(reply.status_code, 200, msg="form: "+str(bad_form)+"\nendpoint: "+e+"\n"+reply.get_data(as_text=True))
+            self.assertEqual(reply.status_code, 400, msg="form: "+str(bad_form)+"\nendpoint: "+e+"\n"+reply.get_data(as_text=True))
             self.assertIn("Bad Form",reply.get_data(as_text=True),  msg="endpoint: "+e+"\n"+reply.get_data(as_text=True))
         
         do_logout(client)
@@ -229,15 +229,7 @@ class TestLogin(unittest.TestCase):
 
         do_login(client, "health@example.com", "health")
 
-        form = {
-            "email":"gianni@example.com",
-            "telephone":"",
-            "ssn":""
-            }
-
-        client.t_post("/positives/unmark",form) # now we're sure that there is at least one negative user
-        match = get_positives_id(client)[0]
-        reply = client.t_get(f"/positives/{match}/mark")
+        reply = client.t_get(f"/positives/1/mark")
         self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
         self.assertEqual(reply.location, "http://localhost/positives", msg=reply.location)
         do_logout(client)
