@@ -84,7 +84,7 @@ def delete_user():
     if request.method == 'POST':
         if form.validate_on_submit():
             users, status_code = get_getaway().get_users(email=form.data['email'])
-            if users is not None:
+            if users is not None and status_code != 404:
                 email, password = form.data['email'], form.data['password']
                 user = users[0].toDict()
             else:
