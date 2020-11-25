@@ -272,5 +272,10 @@ def user_contacts(user_id):
         return make_response(render_template('error.html', error='404'), 404)
     elif status != 200:
         return make_response(render_template('error.html', error=status), status)
-        
+    
+    users2 = []
+    for usr in users:
+        if "flag" not in usr:
+            users2.append(usr)
+    users = users2
     return render_template("users.html", users=users)

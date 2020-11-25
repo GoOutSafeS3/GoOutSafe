@@ -110,7 +110,7 @@ class TestNotifications(unittest.TestCase):
         do_logout(client)
 
         do_login(client, "giulia@example.com", "giulia")
-        reply = client.t_get("/notifications/1/mark_as_read")
+        reply = client.t_get("/notifications/2/mark_as_read")
         self.assertEqual(reply.status_code, 302)
         do_logout(client)
 
