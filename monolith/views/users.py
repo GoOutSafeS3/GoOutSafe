@@ -84,7 +84,10 @@ def delete_user():
     if request.method == 'POST':
         if form.validate_on_submit():
             users, status_code = get_getaway().get_users(email=form.data['email'])
-            if users is not None and status_code != 404:
+            if status_code != 200:
+                flash('Wrong password or mail','success')
+                return make_response(render_template('error.html', title="Unregister"), 400)
+            if users is not None:
                 email, password = form.data['email'], form.data['password']
                 user = users[0].toDict()
             else:
@@ -95,10 +98,10 @@ def delete_user():
                 usr, status = get_getaway().delete_user(user['id'])
                 if status == 204:
                     flash('Account deleted','success')
-                    logout_user(current_user)
-                    return make_response(render_template('homepage.html'), 200)
+                    logout_user()
+                    return redirect("/")
                 if status == 400:
-                    flash('Please try again', 'warning')
+                    flash(usr.detail, 'warning')
                     return make_response(render_template('error.html', title="Unregister"), 400)
                 if status == 500:
                     flash('Please try again', 'error')
