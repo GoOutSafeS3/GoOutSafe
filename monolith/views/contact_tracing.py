@@ -127,7 +127,7 @@ def _mark_as_positive():
 
             result, status = get_getaway().mark_user(user['id'])
 
-            if status != 200:
+            if status == 200:
                 flash("The user was marked","success")
                 return redirect("/positives")
             elif status == 404:
@@ -219,6 +219,7 @@ def _mark_as_positive_by_id(pos_id):
         flash("User not found","error")
         return make_response(render_template('error.html', error='404'), 404)
     elif user is None or status != 200:
+        flash(user, "success")
         return make_response(render_template("error.html", error = status), status)
 
     return redirect("/positives")
