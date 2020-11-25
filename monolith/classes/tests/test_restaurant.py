@@ -237,27 +237,15 @@ class TestRestaurant(unittest.TestCase):
         reply = client.t_get("/restaurants/1/overview/2020/10/10")
         self.assertEqual(reply.status_code, 401)
 
-    def test_overview_slots(self):
+    def test_overview_slot(self):
         client = self.app.test_client()
         client.set_app(self.app)
         do_login(client, "operator3@example.com","operator")
-        today = datetime.datetime.today()+timedelta(days=1) # TODO set fake data to have 2 bookings in a day 1 fist opening 1 second
-        reply = client.t_get(f"/restaurants/3/overview/{today.year}/{today.month}/{today.day}")
-        reply_data = reply.get_data(as_text = True)
-        self.assertIn("First opening:", reply_data)
-        self.assertIn("Second opening:", reply_data)
-
-        today = datetime.datetime.today()+timedelta(days=2) # TODO set fake data to have 2 bookings in a day 1 fist opening
+        today = datetime.datetime.today()+timedelta(days=1)
         reply = client.t_get(f"/restaurants/3/overview/{today.year}/{today.month}/{today.day}")
         reply_data = reply.get_data(as_text = True)
         self.assertIn("First opening:", reply_data)
         self.assertNotIn("Second opening:", reply_data)
-
-        today = datetime.datetime.today()-timedelta(days=2) # TODO set fake data to have 2 bookings in a day 1 second opening
-        reply = client.t_get(f"/restaurants/4/overview/{today.year}/{today.month}/{today.day}")
-        reply_data = reply.get_data(as_text = True)
-        self.assertNotIn("First opening:", reply_data)
-        self.assertIn("Second opening:", reply_data)
 
     def test_overview_wrong_operator(self):
         client = self.app.test_client()
@@ -308,16 +296,17 @@ class TestRestaurant(unittest.TestCase):
     def test_overview_range(self):
         client = self.app.test_client()
         client.set_app(self.app)
-        do_login(client, "operator4@example.com","operator")
+        do_login(client, "operator3@example.com","operator")
 
         data={
             "from_h":"00",
             "from_m":"00",
-            "to_h":"24", # TODO change times
-            "to_m":"00"
+            "to_h":"23",
+            "to_m":"59"
         }
-        today_not = datetime.datetime.today()+timedelta(days=2)
-        reply = client.t_get("/restaurants/4/overview/{today_not.year}/{today_not.month}/{today_not.day}", query_string=data)
+        today_not = datetime.datetime.today()+timedelta(days=1)
+        reply = client.t_get(f"/restaurants/3/overview/{today_not.year}/{today_not.month}/{today_not.day}", query_string=data)
         reply_data = reply.get_data(as_text=True)
 
-        self.assertIn("Number of people: 2", reply_data) # TODO Change fake data to have more reserations and have a time
+        self.assertIn("Number of people: 1", reply_data) 
+        do_logout(client)
