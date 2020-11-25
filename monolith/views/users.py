@@ -141,8 +141,10 @@ def create_user():
                     'dateofbirth' : json['dateofbirth'], 'is_health_authority': False, 'is_positive': False}
 
             resp, status_code = get_getaway().create_user(userdata=user)
-
-            if status_code == 200:
+            if resp is None or status_code is None:
+                flash("Sorry, an error occured. Please, try again.", "error")
+                return make_response(render_template('form.html', form=form, title="Sign in!"), 500)
+            if status_code == 200 or status_code == 201:
                 usr = User(user['id'], user['is_operator'], user['is_admin'], user['is_health_authority'],
                            user['password'], user['rest_id'], user['is_positive'])
                 login_user(usr)
@@ -182,7 +184,9 @@ def create_operator():
                     'dateofbirth': json['dateofbirth'], 'is_health_authority': False, 'is_positive': False}
 
             resp, status_code = get_getaway().create_user(userdata=user)
-
+            if resp is None or status_code is None:
+                flash("Sorry, an error occured. Please, try again.", "error")
+                return make_response(render_template('form.html', form=form, title="Sign in!"), 500)
             if status_code == 200:
                 usr = User(user['id'], user['is_operator'], user['is_admin'], user['is_health_authority'],
                            user['password'], user['rest_id'], user['is_positive'])
