@@ -312,7 +312,7 @@ class TestLogin(unittest.TestCase):
         do_logout(client)
 
         do_login(client, "health@example.com", "health")
-        reply = client.t_get(f"/positives/7/contacts")
+        reply = client.t_get(f"/positives/13/contacts")
         self.assertEqual(reply.status_code, 200)
         do_logout(client)
 
