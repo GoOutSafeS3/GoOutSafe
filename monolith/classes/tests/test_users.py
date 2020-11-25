@@ -25,7 +25,10 @@ class TestRegistration(unittest.TestCase):
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
             "telephone":"01234567890",
-            "ssn":""
+            'ssn':None,
+            'is_operator': False,
+            'is_admin': False,
+            'is_health_authority': False
         }
 
         reply = send_registration_form(tested_app, '/create_user', form)
@@ -33,6 +36,10 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             302,msg=reply)
+
+        tested_app.t_post('/login', data={"email": "admin@example.com", "password": "admin"})
+        resp = tested_app.get('/users')
+        print(resp.get_json())
 
     def test_user_regood_form(self):
         tested_app = self.app.test_client()
@@ -46,7 +53,10 @@ class TestRegistration(unittest.TestCase):
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
             "telephone":"01234567890",
-            "ssn":""
+            "ssn":None,
+            'is_operator': False,
+            'is_admin': False,
+            'is_health_authority': False
         }
 
         reply = send_registration_form(tested_app, '/create_user', form)
@@ -67,7 +77,10 @@ class TestRegistration(unittest.TestCase):
             "dateofbirth":"01/01/1970",
             "telephone":"1234567890",
             "password_repeat":"password",
-            "ssn":""
+            "ssn":None,
+            'is_operator': False,
+            'is_admin': False,
+            'is_health_authority': False
         }
 
         fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat"]
@@ -80,7 +93,7 @@ class TestRegistration(unittest.TestCase):
             
             self.assertEqual(
                 reply["status_code"],
-                200,msg=reply)
+                302, msg=reply)
             
 
     def test_user_empty_field(self):
@@ -95,7 +108,10 @@ class TestRegistration(unittest.TestCase):
             "dateofbirth":"01/01/1970",
             "telephone":"1234567890",
             "password_repeat":"password",
-            "ssn":""
+            "ssn": None,
+            'is_operator': False,
+            'is_admin': False,
+            'is_health_authority': False
         }
 
         fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat"]
@@ -122,7 +138,10 @@ class TestRegistration(unittest.TestCase):
             "dateofbirth":"01/01/1970",
             "telephone":"1234567890",
             "password_repeat":"password",
-            "ssn":""
+            "ssn":None,
+            'is_operator': False,
+            'is_admin': False,
+            'is_health_authority': False
         }
 
         fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat"]
@@ -149,7 +168,10 @@ class TestRegistration(unittest.TestCase):
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
             "telephone":"1234567890",
-            "ssn":""
+            "ssn":None,
+            'is_operator': False,
+            'is_admin': False,
+            'is_health_authority': False
         }
 
         reply = send_registration_form(tested_app, '/create_user', form)
@@ -164,13 +186,16 @@ class TestRegistration(unittest.TestCase):
 
         form = {
             "email":"testerExistingNameSurname@tester.com",
-            "firstname":"Tester",
-            "lastname":"ENS",
+            "firstname":"Daniele",
+            "lastname":"Verdi",
             "password":"42",
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
             "telephone":"12345678902",
-            "ssn":""
+            "ssn": None,
+            'is_operator': False,
+            'is_admin': False,
+            'is_health_authority': False
         }
 
         reply = send_registration_form(tested_app, '/create_user', form)
@@ -191,14 +216,17 @@ class TestRegistration(unittest.TestCase):
             "password_repeat":"42",
             "dateofbirth":"thisisadateofbirth",
             "telephone":"1234567890",
-            "ssn":""
+            "ssn":None,
+            'is_operator': False,
+            'is_admin': False,
+            'is_health_authority': False
         }
 
         reply = send_registration_form(tested_app, '/create_user', form)
         
         self.assertEqual(
             reply["status_code"],
-            200,msg=reply)
+            200, msg=reply)
 
     def test_user_wrong_repeated_password(self):
         tested_app = self.app.test_client()
@@ -212,14 +240,17 @@ class TestRegistration(unittest.TestCase):
             "password_repeat":"43",
             "dateofbirth":"01/01/1970",
             "telephone":"1234567890",
-            "ssn":""
+            "ssn": None,
+            'is_operator': False,
+            'is_admin': False,
+            'is_health_authority': False
         }
 
         reply = send_registration_form(tested_app, '/create_user', form)
         
         self.assertEqual(
             reply["status_code"],
-            200,msg=reply)
+            400, msg=reply)
 
     def test_user_wrong_email(self):
         tested_app = self.app.test_client()
@@ -233,7 +264,10 @@ class TestRegistration(unittest.TestCase):
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
             "telephone":"1234567890",
-            "ssn":""
+            "ssn": None,
+            'is_operator': False,
+            'is_admin': False,
+            'is_health_authority': False
         }
 
         reply = send_registration_form(tested_app, '/create_user', form)
@@ -251,10 +285,12 @@ class TestRegistration(unittest.TestCase):
             "firstname":"Tester",
             "lastname":"SSN",
             "password":"42",
-            "password_repeat":"42",
             "dateofbirth":"01/01/1970",
             "telephone":"0123456789001",
-            "ssn":"0192837465"
+            "ssn":"0192837465HGTHUA",
+            'is_operator': False,
+            'is_admin': False,
+            'is_health_authority': False
         }
 
         reply = send_registration_form(tested_app, '/create_user', form)
@@ -263,7 +299,7 @@ class TestRegistration(unittest.TestCase):
             reply["status_code"],
             302,msg=reply)
 
-    def test_user_with_ssn_form_existing(self):
+    def test_Z_user_with_ssn_form_existing(self):
         tested_app = self.app.test_client()
         tested_app.set_app(self.app)
 
@@ -275,7 +311,10 @@ class TestRegistration(unittest.TestCase):
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
             "telephone":"0123456789002",
-            "ssn":"0192837465"
+            "ssn":"0192837465HGTHUA",
+            'is_operator': False,
+            'is_admin': False,
+            'is_health_authority': False
         }
 
         reply = send_registration_form(tested_app, '/create_user', form)
@@ -296,13 +335,12 @@ class TestRegistration(unittest.TestCase):
             "firstname":"Tester",
             "lastname":"OGF",
             "password":"42",
-            "password_repeat":"42",
             "dateofbirth":"01/01/1970",
             "telephone":"12345678900",
-            "restaurant_name":"Restaurant at the End of the Universe",
-            "restaurant_phone":"1234567890",
-            "restaurant_latitude":"43.431489",
-            "restaurant_longitude":"10.242911",
+            'is_operator':True,
+            'is_admin':False,
+            'is_health_authority':False,
+            'ssn':None
         }
 
         reply = send_registration_form(tested_app, '/create_operator', form)
@@ -310,144 +348,6 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(
             reply["status_code"],
             302,msg=reply)
-
-    def test_operator_regood_form(self):
-        tested_app = self.app.test_client()
-        tested_app.set_app(self.app)
-
-        form = {
-            "email":"testerGoodFormOperatorm@test.me",
-            "firstname":"Tester",
-            "lastname":"OGF",
-            "password":"42",
-            "password_repeat":"42",
-            "dateofbirth":"01/01/1970",
-            "telephone":"12345678900",
-            "restaurant_name":"Restaurant at the End of the Universe",
-            "restaurant_phone":"1234567890",
-            "restaurant_latitude":"43.431489",
-            "restaurant_longitude":"10.242911",
-        }
-
-        reply = send_registration_form(tested_app, '/create_operator', form)
-        
-        self.assertEqual(
-            reply["status_code"],
-            400,msg=reply)
-
-    def test_operator_same_operator_form(self):
-        tested_app = self.app.test_client()
-        tested_app.set_app(self.app)
-
-        form = {
-            "email":"testerGoodFormOperator@test.me",
-            "firstname":"Tester",
-            "lastname":"SOF",
-            "password":"42",
-            "password_repeat":"42",
-            "dateofbirth":"01/01/1970",
-            "telephone":"12345678901",
-            "restaurant_name":"The Restaurant (almost) at the End of the Universe",
-            "restaurant_phone":"1234567890",
-            "restaurant_latitude":"43.431489",
-            "restaurant_longitude":"10.242911",
-        }
-
-        reply = send_registration_form(tested_app, '/create_operator', form)
-        
-        self.assertEqual(
-            reply["status_code"],
-            400,msg=reply)
-
-    def test_operator_missing_field(self):
-        tested_app = self.app.test_client()
-        tested_app.set_app(self.app)
-
-        form = {
-            "email":"email@email.com",
-            "firstname":"firstname",
-            "lastname":"lastname",
-            "password":"password",
-            "dateofbirth":"01/01/1970",
-            "telephone":"1234567890",
-            "password_repeat":"password",
-            "restaurant_name":"The Restaurant at the End of the Universe",
-            "restaurant_phone":"1234567890",
-            "restaurant_latitude":"43.431489",
-            "restaurant_longitude":"10.242911",
-        }
-
-        fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat","restaurant_name","restaurant_phone","restaurant_latitude","restaurant_longitude"]
-
-        for f in fields:
-            tested_form = form
-            del tested_form[f]
-
-            reply = send_registration_form(tested_app, '/create_operator', form)
-            
-            self.assertEqual(
-                reply["status_code"],
-                200,msg=reply)
-
-    def test_operator_empty_field(self):
-        tested_app = self.app.test_client()
-        tested_app.set_app(self.app)
-
-        form = {
-            "email":"email@email.com",
-            "firstname":"firstname",
-            "lastname":"lastname",
-            "password":"password",
-            "dateofbirth":"01/01/1970",
-            "telephone":"1234567890",
-            "password_repeat":"password",
-            "restaurant_name":"The Restaurant at the End of the Universe",
-            "restaurant_phone":"1234567890",
-            "restaurant_latitude":"43.431489",
-            "restaurant_longitude":"10.242911",
-        }
-
-        fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat","restaurant_name","restaurant_phone","restaurant_latitude","restaurant_longitude"]
-
-        for f in fields:
-            tested_form = form
-            tested_form[f] = ""
-
-            reply = send_registration_form(tested_app, '/create_operator', form)
-            
-            self.assertEqual(
-                reply["status_code"],
-                200,msg=reply)
-
-    def test_operator_none_field(self):
-            tested_app = self.app.test_client()
-            tested_app.set_app(self.app)
-
-            form = {
-                "email":"email@email.com",
-                "firstname":"firstname",
-                "lastname":"lastname",
-                "password":"password",
-                "dateofbirth":"01/01/1970",
-                "telephone":"1234567890",
-                "password_repeat":"password",
-                "restaurant_name":"The Restaurant at the End of the Universe",
-                "restaurant_phone":"1234567890",
-                "restaurant_latitude":"43.431489",
-                "restaurant_longitude":"10.242911",
-            }
-
-            fields = ["email","firstname","lastname","password","dateofbirth","telephone","password_repeat","restaurant_name","restaurant_phone","restaurant_latitude","restaurant_longitude"]
-
-            for f in fields:
-                tested_form = form
-                tested_form[f] = None
-
-                reply = send_registration_form(tested_app, '/create_operator', form)
-                
-                self.assertEqual(
-                    reply["status_code"],
-                    200,msg=reply)
 
     def test_operator_existing_email(self):
         tested_app = self.app.test_client()
@@ -461,10 +361,10 @@ class TestRegistration(unittest.TestCase):
             "password_repeat":"42",
             "dateofbirth":"01/01/1970",
             "telephone":"1234567890",
-            "restaurant_name":"The Restaurant at the End of the Universe",
-            "restaurant_phone":"1234567890",
-            "restaurant_latitude":"43.431489",
-            "restaurant_longitude":"10.242911",
+            'ssn':None,
+            'is_operator': True,
+            'is_admin': False,
+            'is_health_authority': False
         }
 
         reply = send_registration_form(tested_app, '/create_operator', form)
@@ -473,53 +373,6 @@ class TestRegistration(unittest.TestCase):
             reply["status_code"],
             400,msg=reply)
 
-    def test_operator_existing_name_surname(self):
-        tested_app = self.app.test_client()
-        tested_app.set_app(self.app)
-
-        form = {
-            "email":"testerExistingNameSurnameOperator@tester.com",
-            "firstname":"Tester",
-            "lastname":"OENS",
-            "password":"42",
-            "password_repeat":"42",
-            "dateofbirth":"01/01/1970",
-            "telephone":"12345678903",
-            "restaurant_name":"The Restaurant at the End of the Universe",
-            "restaurant_phone":"1234567890",
-            "restaurant_latitude":"43.431489",
-            "restaurant_longitude":"10.242911",
-        }
-
-        reply = send_registration_form(tested_app, '/create_operator', form)
-        
-        self.assertEqual(
-            reply["status_code"],
-            302,msg=reply) 
-
-    def test_operator_wrong_dateofbirth(self):
-        tested_app = self.app.test_client()
-        tested_app.set_app(self.app)
-
-        form = {
-            "email":"testerWrongDateOfBirth@test.me",
-            "firstname":"Tester",
-            "lastname":"ODoB",
-            "password":"42",
-            "password_repeat":"42",
-            "dateofbirth":"thisisadateofbirth",
-            "telephone":"1234567890",
-            "restaurant_name":"The Restaurant at the End of the Universe",
-            "restaurant_phone":"1234567890",
-            "restaurant_latitude":"43.431489",
-            "restaurant_longitude":"10.242911",
-        }
-
-        reply = send_registration_form(tested_app, '/create_operator', form)
-        
-        self.assertEqual(
-            reply["status_code"],
-            200,msg=reply)
 
     def test_operator_wrong_repeated_password(self):
         tested_app = self.app.test_client()
@@ -533,90 +386,18 @@ class TestRegistration(unittest.TestCase):
             "password_repeat":"43",
             "dateofbirth":"01/01/1970",
             "telephone":"1234567890",
-            "restaurant_name":"The Restaurant at the End of the Universe",
-            "restaurant_phone":"1234567890",
-            "restaurant_latitude":"43.431489",
-            "restaurant_longitude":"10.242911",
+            'ssn':'CIAO6TRFGBHYFSDR',
+            'is_operator': True,
+            'is_admin': False,
+            'is_health_authority': False
         }
 
         reply = send_registration_form(tested_app, '/create_operator', form)
         
         self.assertEqual(
             reply["status_code"],
-            200,msg=reply)
+            400,msg=reply)
 
-    def test_operator_wrong_email(self):
-        tested_app = self.app.test_client()
-        tested_app.set_app(self.app)
-
-        form = {
-            "email":"testerWorngEmail.test.me",
-            "firstname":"Tester",
-            "lastname":"OWE",
-            "password":"42",
-            "password_repeat":"42",
-            "dateofbirth":"01/01/1970",
-            "telephone":"1234567890",
-            "restaurant_name":"The Restaurant at the End of the Universe",
-            "restaurant_phone":"1234567890",
-            "restaurant_latitude":"43.431489",
-            "restaurant_longitude":"10.242911",
-        }
-
-        reply = send_registration_form(tested_app, '/create_operator', form)
-        
-        self.assertEqual(
-            reply["status_code"],
-            200,msg=reply)
-
-
-    def test_user_wrong_latitude_form(self):
-        tested_app = self.app.test_client()
-        tested_app.set_app(self.app)
-
-        form = {
-            "email":"testerWrongTelephoneNumber@test.me",
-            "firstname":"Tester",
-            "lastname":"OWLat",
-            "password":"42",
-            "password_repeat":"42",
-            "dateofbirth":"01/01/1970",
-            "telephone":"1234567890",
-            "restaurant_name":"The Restaurant at the End of the Universe",
-            "restaurant_phone":"1234567890",
-            "restaurant_latitude":"latitude",
-            "restaurant_longitude":"10.242911",
-        }
-
-        reply = send_registration_form(tested_app, '/create_operator', form)
-        
-        self.assertEqual(
-            reply["status_code"],
-            200,msg=reply)
-
-    def test_user_wrong_longitude_form(self):
-        tested_app = self.app.test_client()
-        tested_app.set_app(self.app)
-
-        form = {
-            "email":"testerWrongTelephoneNumber@test.me",
-            "firstname":"Tester",
-            "lastname":"OWLong",
-            "password":"42",
-            "password_repeat":"42",
-            "dateofbirth":"01/01/1970",
-            "telephone":"1234567890",
-            "restaurant_name":"The Restaurant at the End of the Universe",
-            "restaurant_phone":"1234567890",
-            "restaurant_latitude":"43.431489",
-            "restaurant_longitude":"longitude",
-        }
-
-        reply = send_registration_form(tested_app, '/create_operator', form)
-        
-        self.assertEqual(
-            reply["status_code"],
-            200,msg=reply)
 
  # --- USERS LIST --------------------------------------------------------
     
@@ -678,7 +459,7 @@ class TestRegistration(unittest.TestCase):
             reply.status_code,
             200,msg=html)
 
-        for u in ["Admin Admin", "Tester GF", "Tester OENS", "Tester OGF", "Tester ENS", "Tester SSN"]:
+        for u in ["Admin Admin", "Tester OGF"]:
             self.assertIn(u,html,msg=html)
 
 
