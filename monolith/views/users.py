@@ -152,7 +152,7 @@ def create_user():
                 return redirect("/")
             else:
                 return make_response(render_template("error.html", error=status_code), status_code)
-
+        return make_response(render_template("error.html", error=400), 400)
     return render_template('form.html', form=form, title="Sign in!")
 
 
@@ -196,7 +196,8 @@ def create_operator():
             else:
                 return make_response(render_template("error.html", error=status_code), status_code)
 
-        return render_template('form.html', form=form, title="Sign in!")
+        return make_response(render_template("error.html", error=400), 400)
+    return render_template('form.html', form=form, title="Sign in!")
 
 
 @users.route('/edit', methods=['GET', 'POST'])
