@@ -118,8 +118,25 @@ class TestEdit(unittest.TestCase):
         form = {
             "old_password": "alice",
             "firstname":"Alice Beatrice",
+            "lastname":"alice",
             "new_password":"pass12",
-            "password_repeat":"pass12"
+            "password_repeat":"pass12",
+            "email":"alice@example.com",
+            "dateofbirth":"01/01/1970",
+            "telephone":"12345678900",
+        }
+        reply = client.t_post('/edit', data=form)
+        self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
+
+        form = {
+            "old_password": "pass12",
+            "firstname":"Alice Beatrice",
+            "lastname":"alice",
+            "new_password":"alice",
+            "password_repeat":"alice",
+            "email":"alice@example.com",
+            "dateofbirth":"01/01/1970",
+            "telephone":"12345678900",
         }
         reply = client.t_post('/edit', data=form)
         self.assertEqual(reply.status_code, 302, msg=reply.get_data(as_text=True))
