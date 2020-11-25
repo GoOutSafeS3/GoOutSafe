@@ -236,6 +236,15 @@ def user_contacts(user_id):
     Error status codes:
         404 -- User not found or user not positive
     """
+    user, status = get_getaway().get_user(user_id)
+    if user is None or status != 200:
+        flash("User not found","error")
+        return make_response(render_template('error.html', error='404'), 404)
+
+    if not user.is_positive:
+        flash("User not found","error")
+        return make_response(render_template('error.html', error='404'), 404)
+
     users, status = get_getaway().get_user_contacts(user_id,
         begin=str(datetime.today() - timedelta(days=14)),
         end=str(datetime.today()))
