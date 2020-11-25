@@ -57,7 +57,7 @@ def _contacts():
             if len(users) == 0:
                 flash("User not found","error")
                 return render_template('form.html', form=form, title="Find Contacts")
-            elif len(status) > 1:
+            elif len(users) > 1:
                 flash("More users have been found, please try again","error")
                 return render_template('form.html', form=form, title="Find Contacts")
             else:
@@ -162,7 +162,7 @@ def _unmark_as_positive():
             if len(users) == 0:
                 flash("User not found","error")
                 return render_template('form.html', form=form, title="Unmark a User")
-            elif len(status) > 1:
+            elif len(users) > 1:
                 flash("More users have been found, please try again","error")
                 return render_template('form.html', form=form, title="Unmark a User")
             else:
